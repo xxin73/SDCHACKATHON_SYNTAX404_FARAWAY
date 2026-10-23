@@ -1,3 +1,4 @@
+import { OnetReference } from '@/components/onet-reference';
 import { scenarioRequirements } from '../../../../supabase/functions/faraway-recommendations/core';
 import { EscoReference } from '@/components/esco-reference';
 import { hasDatabaseCatalogue } from '@/lib/catalogue-status';
@@ -93,7 +94,7 @@ export default function JobDetail() {
         <Reveal delay={0.05}><Card className="h-full" testId="card-radar">
           <div className="flex flex-wrap items-center justify-between gap-2"><p className="font-display text-2xl">Skill hexagon</p><RadarLegend withNeed /></div>
           <div className="mt-4 flex flex-wrap items-center gap-3"><label className="text-xs"><input type="checkbox" checked={showFuture} onChange={e=>setShowFuture(e.target.checked)}/> Show future target</label>{showFuture&&<ScenarioToggle id="radar-future" compact/>}</div><p className="mt-3 text-xs text-muted-foreground">Gold: current catalogue target. Purple dashed: selected future target. What-if assumption: digital skills +1 for moderate AI development, +2 for fast (maximum 5); not an ESCO forecast.</p>
-          <EscoReference careerId={career.id} />
+          <EscoReference careerId={career.id} /><OnetReference careerId={career.id} />
           <div className="mx-auto max-w-[460px]"><SkillRadar axes={axes} size={440} showSdg hovered={hoverSkill} onHover={setHoverSkill} /></div>
         </Card></Reveal>
         <Reveal delay={0.1}><Card className="h-full" testId="panel-skill-sdg">

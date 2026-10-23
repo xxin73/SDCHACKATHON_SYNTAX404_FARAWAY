@@ -1,0 +1,9 @@
+{
+  "observedAt": "2026-08-01",
+  "retrievedAt": "2026-10-23T16:27:57.278741+00:00",
+  "unemployment": 2.9,
+  "participation": 71.0,
+  "employedThousands": 16874.4,
+  "source": "https://storage.dosm.gov.my/labour/lfs_month.csv",
+  "sha256": "4eb09ceda2462787cbb37644bd3010f8c7af5fb3954377033e5ce8d3cc87b175"
+}

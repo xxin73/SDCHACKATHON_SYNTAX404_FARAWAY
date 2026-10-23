@@ -1,0 +1,14 @@
+export const SOURCE_REGISTRY=[
+ {name:'OpenDOSM / data.gov.my',url:'https://open.dosm.gov.my/data-catalogue/lfs_month',kind:'Connected dataset',use:'Monthly national labour-force context; one DOSM source, not two independent measurements.'},
+ {name:'O*NET',url:'https://www.onetcenter.org/database.html',kind:'Connected reference subset',use:'Version 31.0 software examples for eight selected US occupational analogues. Displayed on career detail pages; no Malaysian demand inference.'},
+ {name:'JobStreet Malaysia',url:'https://my.jobstreet.com/',kind:'Dated import supported · no live feed',use:'Permitted previous/latest observations. Partner access and historical observations needed for automation.'},
+ {name:'Indeed Malaysia',url:'https://malaysia.indeed.com/',kind:'Dated import supported · no live feed',use:'Permitted previous/latest observations. Partner access and historical observations needed for automation.'},
+ {name:'eMASCO / MASCO 2020 / MoHR',url:'https://emasco.mohr.gov.my/',kind:'Framework reference · not imported',use:'Malaysian occupation classification. Requires a reviewed occupation/skill crosswalk before scoring.'},
+ {name:'MYFutureJobs / MYCEC',url:'https://myfuturejobs.gov.my/',kind:'Service reference · not imported',use:'Jobs, employment services and training information; no verified historical count feed connected.'},
+ {name:'HRD Corp IndSF / Upskill Malaysia',url:'https://hrdcorp.gov.my/indsf',kind:'Framework reference · not imported',use:'Sector competency frameworks. Individual documents need extraction and reviewed mappings; not evidence of current vacancy counts.'},
+ {name:'MQA Malaysian Qualifications Framework',url:'https://www.mqa.gov.my/new/mqf.cfm',kind:'Framework reference · not imported',use:'Qualification levels; not a job demand dataset.'},
+ {name:'UNESCO UIS ISCED',url:'https://www.uis.unesco.org/en/methods-and-tools/isced',kind:'Framework reference · not imported',use:'Education classification; reviewed local qualification mappings required.'},
+ {name:'UNESCO UNEVOC Malaysia',url:'https://unevoc.unesco.org/home/TVET+Country+Profiles/country=MYS',kind:'Country profile · not imported',use:'TVET context; not a live course or vacancy feed.'},
+ {name:'TalentCorp MyCOL 2022/2023',url:'https://www.talentcorp.com.my/images/uploads/publication/3/Critical-Occupations-List-MyCOL-20222023-1695267153.pdf',kind:'Historical report · not imported',use:'Historical critical occupations; cannot be labelled current-year demand.'},
+ {name:'Education and policy research links',url:'https://www.iiep.unesco.org/en/articles/higher-education-malaysia-looking-forward-without-leaving-anyone-behind',kind:'Context only · not imported',use:'Trade.gov, ERIC, IIEP, GovInsider, UM, ISEAS, Penang Institute, ISIS and ASEAN reports require document-specific review. No numeric values or skill requirements extracted from these articles.'},
+];

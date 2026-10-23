@@ -33,7 +33,7 @@ export default function Analysis() {
   return (
     <div className="space-y-8">
       <PageTitle eyebrow="Skill analysis" title={<>How the market moves<br /><span className="text-muted-foreground">when AI arrives.</span></>} >
-        Compare past and latest example job indices, then explore a moderate or rapid AI planning scenario. The two chart datasets are synthetic fixtures; verified current-year market evidence is not connected. Your personal match uses the versioned career catalogue and your confirmed ratings.
+        Review official Malaysian labour statistics and compare dated JobStreet and Indeed observations when supplied. Illustrative AI scenarios are available separately. Imported chart observations do not change your saved career matches.
 
       </PageTitle>
 
