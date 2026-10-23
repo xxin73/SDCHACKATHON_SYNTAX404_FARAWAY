@@ -116,7 +116,7 @@ export function Shell({ children }: { children: ReactNode }) {
           {auth.user && <div className="mb-4 text-sm" role="status" aria-live="polite">{auth.syncStatus.phase === 'saving' ? 'Saving your personal profile…' : auth.syncStatus.phase === 'save-error' ? <><span role="alert">{auth.syncStatus.error} Keep this tab open.</span> <button className="underline" onClick={() => void auth.retry()}>Retry save</button></> : 'Personal profile and skills saved to your account.'}</div>}
           {auth.error && <p className="mb-4 text-sm" role="alert">{auth.error}</p>}
           {children}
-          <footer className="mt-12 border-t pt-5 text-xs text-muted-foreground">Faraway · Working prototype. Signed-in personal profiles, skills and progress sync to your account. Demo and organisation records stay in this browser. Market scenarios, salaries and course listings are illustrative; no live AI or Google sign-in is connected. <Link href="/evidence" className="underline">Review or update evidence</Link></footer>
+          <footer className="mt-12 border-t pt-5 text-xs text-muted-foreground">Faraway · Working prototype. Signed-in personal profiles, skills and progress sync to your account. Demo and organisation records stay in this browser. Market scenarios, salaries and course listings are illustrative; individual AI explanations and plan ordering use Gemini when configured. Google sign-in and live market evidence are not connected. <Link href="/evidence" className="underline">Review or update evidence</Link></footer>
         </motion.main>
       </div>
     </div>

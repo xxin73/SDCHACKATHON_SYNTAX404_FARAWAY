@@ -2,6 +2,10 @@
 
 A working browser-based hackathon prototype for career exploration and reskilling. It keeps the visual style of the supplied Faraway app and implements the personal, HR-manager, and university/TVET workflows from the three supplied slide decks.
 
+## Individual AI recommendations
+
+See [AI_SETUP.md](AI_SETUP.md) for the versioned catalogue, authenticated Gemini Edge Function, saved plan revisions, completion preservation and deployment steps. The AI implementation is prepared on the `ai-individual-flow` branch; cloud deployment must be verified before treating it as live.
+
 ## Individual accounts
 
 Email/password accounts and private personal profile/skill storage now use Supabase. Follow [SUPABASE_SETUP.md](SUPABASE_SETUP.md) before using real accounts. The demo, organisation workflow and rules-based engine remain local.

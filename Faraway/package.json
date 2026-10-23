@@ -10,7 +10,9 @@
     "dev": "node artifacts/faraway/node_modules/vite/bin/vite.js --config artifacts/faraway/vite.config.ts",
     "check:logic": "TSX_TSCONFIG_PATH=artifacts/faraway/tsconfig.json node --import ./scripts/node_modules/tsx/dist/loader.mjs scripts/check-logic.ts",
     "check:auth": "TSX_TSCONFIG_PATH=artifacts/faraway/tsconfig.json node --import ./scripts/node_modules/tsx/dist/loader.mjs --test scripts/tests/*.test.ts",
-    "check:browser": "node scripts/check-auth-browser.mjs"
+    "check:browser": "node scripts/check-auth-browser.mjs",
+    "typecheck:ai": "tsc -p supabase/functions/tsconfig.json",
+    "build:edge": "pnpm --filter @workspace/api-server exec esbuild ../../supabase/functions/faraway-recommendations/index.ts --bundle --format=esm --platform=neutral --outfile=../../supabase/deploy-faraway-recommendations.ts"
   },
   "private": true,
   "dependencies": {

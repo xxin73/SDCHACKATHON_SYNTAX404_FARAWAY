@@ -24,7 +24,7 @@ export default function Analysis() {
   const target = useStore((s) => s.plan.target);
   const [more, setMore] = useState(false);
   const [future, setFuture] = useState(false);
-  const has = !!profile.stream && Object.keys(profile.skills).length > 0;
+  const has = profile.complete && !!profile.stream && Object.keys(profile.skills).length > 0;
   const list = has ? suggested(profile, scenario, more) : [];
   const shown = more ? list : list.slice(0, 3);
   const max = Math.max(...[...JOB_TRENDS, ...JOB_TRENDS_LINKEDIN].map((d) => Math.max(d.fast, d.moderate, d.history[4])));
@@ -32,7 +32,7 @@ export default function Analysis() {
   return (
     <div className="space-y-8">
       <PageTitle eyebrow="Skill analysis" title={<>How the market moves<br /><span className="text-muted-foreground">when AI arrives.</span></>} right={<ScenarioToggle id="an-scn" />}>
-        Illustrative scenario charts, not live market statistics. Imported evidence updates match rankings; the charts below remain labelled scenario fixtures. Two possible adoption futures for Malaysia to 2030. <strong className="font-medium text-foreground">Moderate</strong>: gradual rollout, most firms pilot AI. <strong className="font-medium text-foreground">Fast</strong>: rapid, economy-wide automation of routine tasks.
+        Rankings use baseline catalogue requirements; 10% of the score uses illustrative market fixtures. These charts and scenario switches do not change the authenticated recommendation baseline. Illustrative scenario charts, not live market statistics. Imported evidence updates match rankings; the charts below remain labelled scenario fixtures. Two possible adoption futures for Malaysia to 2030. <strong className="font-medium text-foreground">Moderate</strong>: gradual rollout, most firms pilot AI. <strong className="font-medium text-foreground">Fast</strong>: rapid, economy-wide automation of routine tasks.
       </PageTitle>
 
       <Reveal>

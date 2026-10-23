@@ -2,6 +2,7 @@ import { CAREERS, careerInScenario, type Career, type Scenario } from '@/data/ca
 import { COURSES, type Course } from '@/data/courses';
 import type { Plan, Profile } from './store';
 import { demandFromEvidence } from './evidence';
+import { hasDatabaseCatalogue } from './catalogue-status';
 
 export interface MatchResult {
   career: Career;
@@ -14,13 +15,13 @@ export interface MatchResult {
 }
 
 export function computeMatch(c: Career, p: Profile, scenario: Scenario, skillsOverride?: Record<string, number>): MatchResult {
-  c = careerInScenario(c, scenario)!;
+  c = careerInScenario(c, hasDatabaseCatalogue() ? 'moderate' : scenario)!;
   const skills = skillsOverride ?? p.skills;
   const entries = Object.entries(c.required);
   const skillFit = entries.reduce((a, [k, need]) => a + Math.min((skills[k] ?? 0) / need, 1), 0) / entries.length;
   const interestFit = p.careers.includes(c.id) ? 1 : p.stream === c.stream ? 0.6 : 0.25;
   const experienceFit = Math.min((p.years + 0.5) / (c.minYears + 0.5), 1);
-  const marketFit = demandFromEvidence(c.id, c.demand[scenario]) / 100;
+  const marketFit = (hasDatabaseCatalogue() ? c.demand.moderate : demandFromEvidence(c.id, c.demand[scenario])) / 100;
   const score = 100 * (0.65 * skillFit + 0.15 * interestFit + 0.1 * experienceFit + 0.1 * marketFit);
   const gaps = entries
     .map(([skill, need]) => ({ skill, have: skills[skill] ?? 0, need }))
@@ -30,7 +31,7 @@ export function computeMatch(c: Career, p: Profile, scenario: Scenario, skillsOv
 }
 
 export function rankCareers(p: Profile, scenario: Scenario) {
-  return CAREERS.map((c) => computeMatch(c, p, scenario)).sort((a, b) => b.score - a.score);
+  return CAREERS.map((c) => computeMatch(c, p, scenario)).sort((a, b) => b.score - a.score || a.career.id.localeCompare(b.career.id));
 }
 
 export function suggested(p: Profile, scenario: Scenario, more: boolean) {

@@ -1,3 +1,4 @@
+import { hasDatabaseCatalogue } from '@/lib/catalogue-status';
 import { useMemo, useState } from 'react';
 import { Link } from 'wouter';
 import { motion } from 'framer-motion';
@@ -10,6 +11,8 @@ import { SkillRadar } from '@/components/radar';
 import { HBars, VBars } from '@/components/charts';
 import { LOGO, Magnetic, SpectrumIcon, Tilt } from '@/components/spectrum';
 import { cn } from '@/lib/utils';
+import { useRecommendations } from '@/lib/recommendations';
+import { progressFor } from '../../../../supabase/functions/faraway-recommendations/core';
 
 const STEPS = ['Interest', 'Profile / CV', 'Skills', 'Analysis', 'Study plan'];
 const ICONS = [Code2, Database, BarChart2, Layers, Sparkles, Target];
@@ -35,6 +38,7 @@ export function JourneyStepper({ done, active, labels = STEPS }: { done: boolean
 }
 
 export default function Dashboard() {
+  const recommendations=useRecommendations();
   const profile = useStore((s) => s.profile);
   const scenario = useStore((s) => s.scenario);
   const plan = useStore((s) => s.plan);
@@ -44,14 +48,15 @@ export default function Dashboard() {
 
   const has = !!profile.stream && Object.keys(profile.skills).length > 0;
   const ranked = useMemo(() => (has ? rankCareers(profile, scenario) : []), [has, profile, scenario]);
-  const target = careerInScenario(careerById(plan.target) ?? ranked[0]?.career, scenario);
+  const target = careerInScenario(careerById(plan.target) ?? ranked[0]?.career, hasDatabaseCatalogue() ? 'moderate' : scenario);
   const match = target && has ? computeMatch(target, profile, scenario) : null;
   const done = [!!profile.stream, !!profile.name, Object.keys(profile.skills).length >= 3, !!plan.target, plan.saved];
   const active = done.findIndex((d) => !d);
 
   const axes = target ? Object.entries(target.required).map(([skill, need]) => ({ skill, need, have: profile.skills[skill] ?? 0 })) : [];
-  const planSkills = plan.skills.length ? plan.skills : match?.gaps.map((g) => g.skill) ?? [];
-  const pct = (s: string) => { const course=courseForSkill(s,plan); return course ? (progress[plan.target+':'+course.id]?.length??0)/4 : 0; };
+  const fixedPlan=recommendations.active?.result.plan;
+  const planSkills = fixedPlan ? [...new Set(fixedPlan.modules.flatMap(m=>m.skills))] : plan.skills.length ? plan.skills : match?.gaps.map((g) => g.skill) ?? [];
+  const pct = (s: string) => { const saved=recommendations.active?.result.plan; if(saved){const modules=saved.modules.filter(m=>m.skills.includes(s));return progressFor({...saved,modules,totalHours:modules.reduce((n,m)=>n+m.hours,0)},recommendations.completed).percent/100;} const course=courseForSkill(s,plan); return course ? (progress[plan.target+':'+course.id]?.length??0)/4 : 0; };
   const trend = JOB_TRENDS.find((j) => target && j.role.toLowerCase().startsWith(target.title.split(' ')[0].toLowerCase()));
   const first = session?.name.split(' ')[0] ?? 'there';
 
@@ -144,11 +149,11 @@ export default function Dashboard() {
         <Card className="p-0" testId="card-plan-overview">
           <div className="grid lg:grid-cols-[1fr_320px]">
             <div className="p-6 sm:p-8">
-              <CardTitle eyebrow="Study plan overview" title={<>Study plan <span className="text-muted-foreground">|</span> {target?.title ?? '[Job name]'}</>} right={<Link href={plan.saved ? '/progress' : '/plan'} className="btn-ghost" data-testid="link-plan">{plan.saved ? 'Continue learning' : 'Build plan'}</Link>} />
+              <CardTitle eyebrow="Study plan overview" title={<>Study plan <span className="text-muted-foreground">|</span> {careerById(recommendations.active?.result.careerId??'')?.title ?? target?.title ?? '[Job name]'}</>} right={<Link href={plan.saved ? '/progress' : '/plan'} className="btn-ghost" data-testid="link-plan">{plan.saved ? 'Continue learning' : 'Build plan'}</Link>} />
               {planSkills.length ? (
                 <ul className="space-y-3">
                   {planSkills.map((s, i) => {
-                    const p = pct(s); const course = courseForSkill(s, plan);
+                    const p = pct(s); const course = fixedPlan?.modules.find(m=>m.skills.includes(s)) ?? courseForSkill(s, plan);
                     const hrs = course ? checklistFor(s, course.hours).reduce((a, b) => a + b.hours, 0) : 0;
                     return (
                       <li key={s} onMouseEnter={() => setHoverSkill(s)} onMouseLeave={() => setHoverSkill(null)} data-testid={`row-plan-${s.replace(/\W/g, '')}`}

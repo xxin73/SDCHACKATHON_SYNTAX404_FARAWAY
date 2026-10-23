@@ -7,7 +7,12 @@ import { checklistFor, computeMatch, courseForSkill } from '@/lib/match';
 import { Card, CardTitle, NeedProfile, PageTitle, ScoreRing, SdgPill, skillSdg } from '@/components/bits';
 import { SpectrumIcon } from '@/components/spectrum';
 import { cn } from '@/lib/utils';
+import PersonalProgress from './personal-progress';
 export default function Progress(){
+ const session=useStore(s=>s.session);
+ return session?.id ? <PersonalProgress/> : <DemoProgress/>;
+}
+function DemoProgress(){
  const profile=useStore(s=>s.profile);const scenario=useStore(s=>s.scenario);const plan=useStore(s=>s.plan);const progress=useStore(s=>s.progress);
  const career=careerInScenario(careerById(plan.target),scenario);if(!profile.stream)return <NeedProfile/>;
  if(!career||!plan.saved||!plan.skills.length)return <div className="space-y-5"><NeedProfile text="Save a study plan before tracking your progress."/><Link href="/plan" className="btn-ink">Review study plan</Link></div>;

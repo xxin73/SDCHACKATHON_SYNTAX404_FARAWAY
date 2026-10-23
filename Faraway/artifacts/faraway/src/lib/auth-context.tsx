@@ -17,6 +17,7 @@ type AuthContextValue = {
   signOut(): Promise<void>;
   demo(): void;
   retry(): Promise<void>;
+  flush(): Promise<void>;
 };
 const AuthContext = createContext<AuthContextValue | null>(null);
 const message = (error: unknown) => error instanceof Error ? error.message : String(error);
@@ -90,6 +91,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const value: AuthContextValue = {
     initialized, signingOut, user, syncStatus, error,
+    flush: () => sync.flush(),
     async signIn(email, password) {
       setError('');
       const { error } = await requireSupabase().auth.signInWithPassword({ email, password });

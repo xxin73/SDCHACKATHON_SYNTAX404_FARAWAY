@@ -1,19 +1,20 @@
+import { hasDatabaseCatalogue } from '@/lib/catalogue-status';
 import { useState } from 'react';
 import { useLocation } from 'wouter';
 import { motion } from 'framer-motion';
 import { ArrowRight, Sparkles, Home, Trees, Shuffle, Wifi, AlertTriangle, BookOpen, RefreshCw } from 'lucide-react';
-import { useGenerateStudyPlan } from '@/lib/local-engine';
-import type { StudyPlan } from '@workspace/api-client-react';
+import { useGenerateStudyPlan } from '@/lib/ai-engine';
+import { useRecommendations } from '@/lib/recommendations';
+import { RecommendationMeta } from '@/components/recommendation-meta';
+
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { careerById, careerInScenario, ALL_SKILLS } from '@/data/careers';
-import { getState, setState, useStore, type Plan } from '@/lib/store';
+import { setState, useStore, type Plan } from '@/lib/store';
 import { computeMatch, courseForSkill, myr } from '@/lib/match';
 import { Card, CardTitle, NeedProfile, PageTitle, Reveal, ScenarioToggle, SdgPill, skillSdg } from '@/components/bits';
 import { AiStage, Magnetic, SpectrumIcon } from '@/components/spectrum';
 import { cn } from '@/lib/utils';
 
-const aiKey = () => 'faraway_ai_plan_v2:' + (getState().session?.id || 'demo');
-export function loadAiPlan(): StudyPlan | null { try { const r = localStorage.getItem(aiKey()); return r ? (JSON.parse(r) as StudyPlan) : null; } catch { return null; } }
 
 const updPlan = (p: Partial<Plan>) => setState((s) => ({ ...s, plan: { ...s.plan, ...p, saved: p.saved ?? false } }));
 
@@ -23,11 +24,13 @@ export default function PlanPage() {
   const plan = useStore((s) => s.plan);
   const [, nav] = useLocation();
   const [confirm, setConfirm] = useState<string | null>(null);
-  const [ai, setAi] = useState<StudyPlan | null>(null);
-  const [outlineKey, setOutlineKey] = useState('');
+  const recommendations = useRecommendations();
+  const [saveError, setSaveError] = useState('');
+  const [saving, setSaving] = useState(false);
   const gen = useGenerateStudyPlan();
-  const career = careerInScenario(careerById(plan.target), scenario);
-  if (!profile.stream) return <NeedProfile />;
+  const ai = gen.data;
+  const career = careerInScenario(careerById(plan.target), hasDatabaseCatalogue() ? 'moderate' : scenario);
+  if (!profile.stream || !profile.complete) return <NeedProfile text="Confirm your profile and skills before generating a plan." />;
   if (!career) return <NeedProfile text="Pick a career target first." />;
 
   const match = computeMatch(career, profile, scenario);
@@ -47,15 +50,20 @@ export default function PlanPage() {
       updPlan({ mode: 'custom', skills: selected.filter((x) => x !== s), saved: false });
     } else updPlan({ mode: 'custom', skills: [...selected, s], saved: false });
   };
-  const generate = () => gen.mutate({ data: { targetJob: career.title, scenario, minutesPerDay: plan.minutesPerDay, setting: plan.setting, cost: plan.cost, skills: rows.map(({ skill, have, need }) => ({ skill, have, need })) } }, {
-    onSuccess: (r) => { setAi(r); setOutlineKey(JSON.stringify([plan, scenario])); try { localStorage.setItem(aiKey(), JSON.stringify(r)); } catch { /* ignore */ } },
-  });
-  const save = () => { if (rows.some(r => !r.course)) return; updPlan({ skills: selected, saved: true }); nav('/progress'); };
+  const generate = () => { void gen.mutate({}); };
+  const save = async () => {
+    setSaveError('');setSaving(true);
+    try {
+      if (!gen.run || rows.some(r=>!r.course)) throw new Error('Generate a complete AI plan for your current preferences first.');
+      await recommendations.activate(gen.run);nav('/progress');
+    } catch(e) { setSaveError(e instanceof Error?e.message:String(e)); }
+    finally {setSaving(false);}
+  };
 
   return (
     <div className="space-y-8">
       <PageTitle eyebrow={`Study plan · ${career.title}`} title={<>Your route,<br /><span className="text-muted-foreground">your pace.</span></>} right={<ScenarioToggle id="plan-scn" />}>
-        Demo catalogue. Prices, hours and claimability are illustrative, not verified provider offers. The plan adapts to <strong className="font-medium text-foreground">{scenario}</strong> AI adoption and your preferences.
+        Demo catalogue. Prices, hours and claimability are illustrative, not verified provider offers. AI organises catalogue courses around your confirmed skill gaps and preferences. It does not predict market trends.
       </PageTitle>
 
       <Reveal><Card testId="card-preferences">
@@ -128,15 +136,15 @@ export default function PlanPage() {
             <div className="rounded-2xl border bg-white/80 p-3"><p className="font-mono text-xl">{hours}h</p><p className="text-xs text-muted-foreground">study</p></div>
             <div className="rounded-2xl border bg-white/80 p-3"><p className="font-mono text-xl">{weeks || 0} wk</p><p className="text-xs text-muted-foreground">at {plan.minutesPerDay} min/day</p></div>
           </div>
-          <p className="mt-4 text-xs text-muted-foreground">{rows.some(r=>!r.course) ? "Some selected skills have no matching course. This estimate covers matching modules only; adjust preferences to continue." : "Estimated study time assumes seven study days each week."}</p><button onClick={save} disabled={!selected.length || rows.some(r => !r.course)} className="btn-ink mt-6 w-full" data-testid="button-save-plan">Save plan &amp; start<ArrowRight className="h-4 w-4" /></button>
+          {saveError && <p role="alert" className="mt-4 text-sm">{saveError}</p>}<p className="mt-4 text-xs text-muted-foreground">{rows.some(r=>!r.course) ? "Some selected skills have no matching course. This estimate covers matching modules only; adjust preferences to continue." : "Estimated study time assumes seven study days each week."}</p><button onClick={save} disabled={saving || !gen.run || !selected.length || rows.some(r => !r.course)} className="btn-ink mt-6 w-full" data-testid="button-save-plan">Save plan &amp; start<ArrowRight className="h-4 w-4" /></button>
         </Card></Reveal>
       </div>
 
       <Reveal><Card className="spectrum-border" testId="card-ai-plan">
-        <CardTitle eyebrow="Spectrum engine" title="Your weekly learning outline" right={!gen.isPending && <Magnetic><button onClick={generate} disabled={!selected.length} className="btn-ink" data-testid="button-generate-plan">{ai ? <RefreshCw className="h-4 w-4" /> : <Sparkles className="h-4 w-4" />}{ai ? 'Regenerate' : 'Generate plan'}</button></Magnetic>} />
+        <CardTitle eyebrow="AI organiser" title="Your weekly learning outline" right={!gen.isPending && <Magnetic><button onClick={generate} disabled={!selected.length} className="btn-ink" data-testid="button-generate-plan">{ai ? <RefreshCw className="h-4 w-4" /> : <Sparkles className="h-4 w-4" />}{ai ? 'Regenerate' : 'Generate plan'}</button></Magnetic>} />
         <AiStage pending={gen.isPending} error={gen.error} onRetry={generate} testId="plan" phases={['Sequencing skills by dependency', `Fitting ${plan.minutesPerDay} minutes a day`, 'Matching resources to your budget', 'Breaking modules into steps']}>
-          {ai && outlineKey === JSON.stringify([plan, scenario]) ? (
-            <div data-testid="result-ai-plan">
+          {ai ? (
+            <div data-testid="result-ai-plan"><RecommendationMeta meta={ai.meta}/>
               <div className="mb-6 flex flex-wrap items-baseline gap-4"><p className="max-w-2xl text-sm leading-relaxed text-muted-foreground">{ai.overview}</p><span className="font-mono text-sm">{ai.totalWeeks} weeks total</span></div>
               <div className="grid gap-4 md:grid-cols-2">
                 {ai.modules.map((m, i) => (
@@ -157,7 +165,7 @@ export default function PlanPage() {
         <AlertDialogContent className="rounded-3xl">
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2"><AlertTriangle className="h-5 w-5 text-[hsl(28_90%_55%)]" />{confirm} is a core skill</AlertDialogTitle>
-            <AlertDialogDescription>Employers hiring a {career.title} screen for {career.core.join(', ')}. Removing it will keep your match score lower and may limit interviews.</AlertDialogDescription>
+            <AlertDialogDescription>The practice catalogue lists {career.core.join(', ')} as core skills for {career.title}. Removing this skill leaves its gap unaddressed.</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel className="rounded-full" data-testid="button-keep-core">Keep it</AlertDialogCancel>

@@ -1,8 +1,10 @@
+import { hasDatabaseCatalogue } from '@/lib/catalogue-status';
 import { useEffect, useMemo, useState } from 'react';
 import { Link, Redirect, useLocation, useParams } from 'wouter';
 import { motion } from 'framer-motion';
 import { ArrowLeft, ArrowRight, RefreshCw, Sparkles, Wallet, TrendingUp, Bot, Check } from 'lucide-react';
-import { useGetCareerInsight } from '@/lib/local-engine';
+import { useGetCareerInsight } from '@/lib/ai-engine';
+import { RecommendationMeta } from '@/components/recommendation-meta';
 import { careerById, careerInScenario, SDGS, type Scenario } from '@/data/careers';
 import { setState, useStore } from '@/lib/store';
 import { computeMatch, myr, rankCareers } from '@/lib/match';
@@ -25,7 +27,7 @@ export default function JobDetail() {
   const { id } = useParams<{ id: string }>();
   const profile = useStore((s) => s.profile);
   const scenario = useStore((s) => s.scenario);
-  const career = careerInScenario(careerById(id ?? ''), scenario);
+  const career = careerInScenario(careerById(id ?? ''), hasDatabaseCatalogue() ? 'moderate' : scenario);
   const target = useStore((s) => s.plan.target);
   const [hoverSkill, setHoverSkill] = useState<string | null>(null);
   const [hoverJobSdg, setHoverJobSdg] = useState<number | null>(null);
@@ -33,12 +35,12 @@ export default function JobDetail() {
   const [spin, setSpin] = useState(0);
   const [, nav] = useLocation();
   const { toast } = useToast();
-  const insight = useGetCareerInsight();
-  useEffect(() => { insight.reset(); }, [scenario, profile, id]);
+  const insight = useGetCareerInsight(id??'');
+
 
   const match = useMemo(() => (career ? computeMatch(career, profile, scenario) : null), [career, profile, scenario]);
   if (!career) return <NotFound />;
-  if (!profile.stream || !match) return <NeedProfile />;
+  if (!profile.stream || !profile.complete || !match) return <NeedProfile />;
 
   const merged = { ...profile.skills, ...draft };
   const axes = Object.entries(career.required).map(([skill, need]) => ({ skill, need, have: merged[skill] ?? 0 }));
@@ -103,7 +105,8 @@ export default function JobDetail() {
       {/* scenario chart + toggle */}
       <div className="grid gap-6 lg:grid-cols-[1.4fr_1fr]">
         <Reveal><Card className="h-full" testId="card-scenario-chart">
-          <CardTitle eyebrow="To 2030" title="Under each scenario" />
+          <CardTitle eyebrow="Illustrative demo only" title="Under each scenario" />
+          <p className="mb-4 text-xs text-muted-foreground">These scenario figures and narratives are unverified fixtures, not predictions. They are excluded from AI explanations; rankings use baseline requirements.</p>
           <div className="space-y-6">
             {[{ k: 'demand', label: 'Demo demand index', fmt: (v: number) => `${v}/100`, pct: (v: number) => v },
               { k: 'automationRisk', label: 'Tasks exposed to automation', fmt: (v: number) => `${v}%`, pct: (v: number) => v },
@@ -137,11 +140,11 @@ export default function JobDetail() {
         <Reveal><Card className="h-full" testId="card-description">
           <p className="flex items-center gap-2 font-medium"><SpectrumIcon icon={Bot} size={18} still />The role</p>
           <p className="mt-3 leading-relaxed text-foreground/80">{career.description}</p>
-          <p className="mt-6 flex items-center gap-2 font-medium"><SpectrumIcon icon={TrendingUp} size={18} still />Prospects</p>
+          <p className="mt-6 flex items-center gap-2 font-medium"><SpectrumIcon icon={TrendingUp} size={18} still />Illustrative prospects</p>
           <p className="mt-3 leading-relaxed text-foreground/80">{career.prospects}</p>
           <div className="mt-6 grid gap-4 sm:grid-cols-2">
             <div className="rounded-2xl border bg-white/80 p-4"><p className="flex items-center gap-1.5 text-xs text-muted-foreground"><Wallet className="h-3.5 w-3.5" />Illustrative salary range</p><p className="mt-2 font-mono text-lg" data-testid="text-salary">{myr(career.salary[0])} – {myr(career.salary[1])}</p><p className="text-xs text-muted-foreground">per month, Malaysia</p></div>
-            <div className="rounded-2xl border bg-white/80 p-4"><p className="flex items-center gap-1.5 text-xs text-muted-foreground"><TrendingUp className="h-3.5 w-3.5" />Growth to 2030</p><p className={cn('mt-2 font-mono text-lg', career.growth[scenario] < 0 && 'text-[hsl(350_60%_52%)]')}>{career.growth[scenario] > 0 ? '+' : ''}{career.growth[scenario]}%</p><p className="text-xs text-muted-foreground">{scenario} adoption</p></div>
+            <div className="rounded-2xl border bg-white/80 p-4"><p className="flex items-center gap-1.5 text-xs text-muted-foreground"><TrendingUp className="h-3.5 w-3.5" />Illustrative growth scenario</p><p className={cn('mt-2 font-mono text-lg', career.growth[scenario] < 0 && 'text-[hsl(350_60%_52%)]')}>{career.growth[scenario] > 0 ? '+' : ''}{career.growth[scenario]}%</p><p className="text-xs text-muted-foreground">{scenario} adoption</p></div>
           </div>
           <p className="mt-6 font-medium">Related SDGs</p>
           <div className="mt-3 flex flex-wrap gap-2">{career.sdgs.map((n) => <SdgPill key={n} n={n} />)}</div>
@@ -163,12 +166,12 @@ export default function JobDetail() {
 
       {/* AI insight */}
       <Reveal><Card className="spectrum-border" testId="card-ai-insight">
-        <CardTitle eyebrow="Spectrum engine" title="Career fit explained" right={!insight.data && !insight.isPending && <Magnetic><button onClick={ask} className="btn-ink" data-testid="button-get-insight"><Sparkles className="h-4 w-4" />Generate insight</button></Magnetic>} />
-        <AiStage pending={insight.isPending} error={insight.error} onRetry={ask} testId="insight" phases={['Weighing your skill gaps', `Projecting ${scenario} adoption to 2030`, 'Tracing SDG impact', 'Composing next actions']}>
+        <CardTitle eyebrow="AI explanation" title="Career fit explained" right={!insight.data && !insight.isPending && <Magnetic><button onClick={ask} className="btn-ink" data-testid="button-get-insight"><Sparkles className="h-4 w-4" />Generate insight</button></Magnetic>} />
+        <AiStage pending={insight.isPending} error={insight.error} onRetry={ask} testId="insight" phases={['Weighing your skill gaps', 'Reading catalogue requirements', 'Tracing SDG impact', 'Composing next actions']}>
           {insight.data ? (
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="grid gap-6 lg:grid-cols-2" data-testid="result-insight">
               <div className="space-y-4">
-                <p className="font-display text-3xl leading-tight">{insight.data.headline}</p>
+                <RecommendationMeta meta={insight.data.meta}/><p className="font-display text-3xl leading-tight">{insight.data.headline}</p>
                 <p className="text-sm leading-relaxed text-muted-foreground">{insight.data.scenarioExplanation}</p>
                 <p className="text-sm leading-relaxed">{insight.data.fitSummary}</p>
                 <div className="rounded-2xl border bg-white/80 p-4 text-sm"><p className="eyebrow mb-1">SDG impact</p>{insight.data.sdgImpact}</div>
@@ -181,7 +184,7 @@ export default function JobDetail() {
                 <button onClick={ask} className="btn-ghost mt-4" data-testid="button-regenerate-insight"><RefreshCw className="h-4 w-4" />Regenerate</button>
               </div>
             </motion.div>
-          ) : <p className="text-sm text-muted-foreground">Ask the engine to explain what {career.title} looks like for you under {scenario} AI adoption.</p>}
+          ) : <p className="text-sm text-muted-foreground">Ask the engine to explain what {career.title} looks like for you using your confirmed skills and the versioned practice catalogue.</p>}
         </AiStage>
       </Card></Reveal>
 

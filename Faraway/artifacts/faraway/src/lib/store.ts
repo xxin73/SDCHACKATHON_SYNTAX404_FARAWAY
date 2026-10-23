@@ -95,7 +95,11 @@ function load(): State {
 }
 
 export function setState(fn: (s: State) => State, persist = true) {
+  const previous = state;
   state = fn(state);
+  if (previous.profile.complete && state.profile.complete && JSON.stringify({ ...previous.profile, complete: false }) !== JSON.stringify({ ...state.profile, complete: false })) {
+    state = { ...state, profile: { ...state.profile, complete: false } };
+  }
   // Signed-in personal data stays in memory and Supabase, never the shared demo cache.
   if (persist && !state.session?.id) {
     try { localStorage.setItem(KEY, JSON.stringify({ ...state, session: null })); } catch { /* storage full or blocked */ }

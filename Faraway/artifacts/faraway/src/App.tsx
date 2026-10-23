@@ -18,17 +18,20 @@ import PlanPage from '@/pages/plan';
 import Progress from '@/pages/progress';
 import Organization from '@/pages/organization';
 import EvidencePage from '@/pages/evidence';
+import { RecommendationProvider, useRecommendations } from '@/lib/recommendations';
 
 const queryClient = new QueryClient();
 
 function Router() {
   const [loc] = useLocation();
   const auth = useAuth();
+  const ai = useRecommendations();
   const session = useStore((s) => s.session);
   if (auth.signingOut) return <div className="grid min-h-screen place-items-center" role="status">Saving changes and signing out…</div>;
   if (!auth.initialized || (auth.user && ['idle', 'loading'].includes(auth.syncStatus.phase))) return <div className="grid min-h-screen place-items-center" role="status">Restoring your account…</div>;
   if (auth.user && auth.syncStatus.phase === 'load-error') return <div className="mx-auto max-w-lg space-y-4 p-8"><h1 className="font-display text-3xl">Your profile could not be restored</h1><p role="alert">{auth.syncStatus.error}</p><p>Editing is paused so an empty profile cannot overwrite your saved data.</p><button className="btn-ink" onClick={() => void auth.retry()}>Retry</button><button className="btn-ghost" onClick={() => void auth.signOut()}>Sign out</button>{auth.error && <p role="alert">{auth.error}</p>}</div>;
-  if (loc === '/login'  || loc === '/register') {
+  if (auth.user && !ai.ready) return <div className="mx-auto max-w-lg space-y-4 p-8"><p role={ai.error?'alert':'status'}>{ai.error || 'Loading your versioned catalogue and saved recommendations…'}</p>{ai.error && <><button className="btn-ink" onClick={() => void ai.reload()}>Retry setup</button><button className="btn-ghost" onClick={() => void auth.signOut()}>Sign out</button></>}</div>;
+  if (loc === '/login'   || loc === '/register') {
     if (session) return <Redirect to="/" />;
     return <Switch><Route path="/login" component={Login} /><Route path="/register" component={Register} /></Switch>;
   }
@@ -62,6 +65,7 @@ function RoutedErrorBoundary({ children }: { children: ReactNode }) {
 function App() {
   return (
     <AuthProvider>
+    <RecommendationProvider>
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <SpectrumDefs />
@@ -71,6 +75,7 @@ function App() {
         <Toaster />
       </TooltipProvider>
     </QueryClientProvider>
+    </RecommendationProvider>
     </AuthProvider>
   );
 }
