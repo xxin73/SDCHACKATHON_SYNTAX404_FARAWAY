@@ -106,7 +106,7 @@ export default function JobDetail() {
               <span className="grid h-5 w-5 place-items-center rounded-full font-mono text-[9px] text-white" style={{ background: SDGS[skillSdg(a.skill)].color }}>{skillSdg(a.skill)}</span>
             </li>
           ))}</ul>
-          <SdgExplain n={hoverSkill ? skillSdg(hoverSkill) : null} skill={hoverSkill} placeholder="Hover a radar point or skill to see how it connects to an SDG." />
+          <SdgExplain job={career.title} n={hoverSkill ? skillSdg(hoverSkill) : null} skill={hoverSkill} placeholder="Hover a radar point or skill to see how it connects to an SDG." />
         </Card></Reveal>
       </div>
 

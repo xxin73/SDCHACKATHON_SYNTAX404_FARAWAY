@@ -1,4 +1,5 @@
 import { experienceError, withRoleYears, withTotalYears } from '@/lib/experience';
+import {isHardSkill} from '../../../../supabase/functions/faraway-recommendations/skill-policy';
 import { cleanSkill, skillError } from '@/lib/skill-validation';
 import { useEffect, useRef, useState, type DragEvent } from 'react';
 import { useLocation } from 'wouter';
@@ -40,7 +41,8 @@ export default function Pathway() {
   useEffect(()=>()=>{if(preview)URL.revokeObjectURL(preview.url);},[preview]);
 
   const stream = STREAMS.find((s) => s.id === profile.stream);
-  const skillList = Array.from(new Set([...(stream?.skills ?? []), ...CAREERS.filter(c=>profile.careers.includes(c.id)||c.id===target).flatMap(c=>Object.keys(c.required)), ...Object.keys(profile.skills)]));
+  const chosenRoles=CAREERS.filter(c=>profile.careers.includes(c.id));
+  const skillList = Array.from(new Set([...(chosenRoles.length?chosenRoles.flatMap(c=>Object.keys(c.required)):(stream?.skills??[]).filter(isHardSkill).slice(0,12)), ...Object.keys(profile.skills)])).filter(s=>!profile.excludedSkills?.includes(s));
   const job = careerInScenario(careerById(target) ?? (profile.careers[0] ? careerById(profile.careers[0]) : undefined), scenario);
 
   const apply = (r: ParsedCv) => {
@@ -70,10 +72,11 @@ export default function Pathway() {
   const onDrop = (e: DragEvent) => { e.preventDefault(); setDrag(false); onFile(e.dataTransfer.files?.[0]); };
   const miss = (k: string, v: string) => (missing.some((m) => m.includes(k)) && !v ? 'field-missing' : '');
 
+  const saveOtherCareer=()=>{const q=(profile.otherCareer??'').trim().toLowerCase().replace(/s$/,'');const match=CAREERS.find(c=>c.title.toLowerCase().replace(/s$/,'')===q);if(match)upd(p=>({careers:[...new Set([...p.careers,match.id])]}));toast({title:match?'Career selected':'Interest saved',description:match?match.title:'Your career interest will appear in your profile summary.'});};
   const finish = () => { upd(p => ({ complete: true, skills: {...Object.fromEntries(skillList.map(s=>[s,0])),...p.skills} })); nav('/analysis'); };
   const experienceIssue=experienceError(profile);
   useEffect(()=>{window.scrollTo({top:0,behavior:"instant"});},[step]);
-  const canNext = step === 0 ? !!profile.stream && (profile.stream!=='other'||!!profile.otherInterest?.trim()) : step === 1 ? !experienceIssue && !!profile.name.trim() && /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(profile.email) : step === 2 ? !!profile.highest && (profile.highest!=='Secondary'||!!profile.secondaryQualification)&&(profile.highest!=='Pre-U'||!!profile.preUQualification)&&(profile.highest!=='Diploma'||!!profile.diploma?.field.trim()) : step === 3 ? skillList.length >= 3 : true;
+  const canNext = step === 0 ? !!profile.stream && (profile.stream!=='other'||!!profile.otherInterest?.trim()) : step === 1 ? !experienceIssue && !!profile.name.trim() && /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(profile.email) : step === 2 ? !!profile.highest && (profile.highest!=='Secondary'||!!profile.secondaryQualification)&&(profile.highest!=='Pre-U'||!!profile.preUQualification)&&(profile.highest!=='Diploma'||!!profile.diploma?.field.trim()) : step === 3 ? skillList.length >= 1 : true;
 
   const cvPanel = (
     <div className="space-y-4 lg:sticky lg:top-6">
@@ -126,7 +129,7 @@ export default function Pathway() {
                           <button key={id} onClick={() => upd((p) => ({ careers: on ? p.careers.filter((x) => x !== id) : [...p.careers, id] }))} data-testid={`chip-career-${id}`}
                             className={cn('rounded-full border px-4 py-2 text-sm transition-all', on ? 'border-ink bg-ink text-white' : 'bg-white hover:border-[hsl(250_50%_80%)]')}>{c.title}</button>
                         ); })}
-                      </div><Field label="Other career interest (optional)"><input className="field mt-4" maxLength={100} value={profile.otherCareer??''} onChange={e=>upd(()=>({otherCareer:e.target.value}))} placeholder="Tell us a role you cannot find"/></Field><p className="mt-2 text-xs text-muted-foreground">Custom interests are saved to your profile. We only score roles with defined skill requirements; we do not invent a match for an unsupported role.</p>
+                      </div><Field label="Other career interest (optional)"><input className="field mt-4" maxLength={100} value={profile.otherCareer??''} onChange={e=>upd(()=>({otherCareer:e.target.value}))} onKeyDown={e=>{if(e.key==='Enter'){e.preventDefault();saveOtherCareer();}}} placeholder="For example: Chemical Engineer"/><button type="button" className="btn-ghost mt-2" disabled={!profile.otherCareer?.trim()} onClick={saveOtherCareer}>Save interest</button></Field><p className="mt-2 text-xs text-muted-foreground">Type a career here and press Save interest. It will appear in your profile summary. If it matches a catalogue career, we also select that career and suggest its technical skills. Otherwise it stays as a saved interest until we have a verified skill profile.</p>
                     </motion.div>
                   )}
                 </section>
@@ -194,7 +197,7 @@ export default function Pathway() {
                   <ul className="mt-6 space-y-4">
                     {skillList.map((sk) => { const v = profile.skills[sk] ?? 0; return (
                       <li key={sk} onMouseEnter={() => setHoverSkill(sk)} onMouseLeave={() => setHoverSkill(null)}>
-                        <div className="mb-1.5 flex items-center justify-between text-sm"><span className="flex items-center gap-2">{sk}<SdgPill n={skillSdg(sk)} small /></span><span className="font-mono text-xs text-muted-foreground">{LEVELS[v]} · {v}/5</span></div>
+                        <div className="mb-1.5 flex items-center justify-between text-sm"><span className="flex items-center gap-2">{sk}<SdgPill n={skillSdg(sk)} small /></span><span className="flex items-center gap-3"><span className="font-mono text-xs text-muted-foreground">{LEVELS[v]} · {v}/5</span><button type="button" className="text-xs underline" aria-label={'Remove '+sk} onClick={()=>upd(p=>{const skills={...p.skills};delete skills[sk];return {skills,excludedSkills:[...new Set([...(p.excludedSkills??[]),sk])]};})}>Remove</button></span></div>
                         <input type="range" min={0} max={5} value={v} className="range" aria-label={`${sk} level`} data-testid={`range-skill-${sk.replace(/\W/g, '')}`}
                           onChange={(e) => { const n = Number(e.target.value); upd((p) => { const s = { ...p.skills }; s[sk] = n; return { skills: s }; }); }}
                           style={{ background: `linear-gradient(90deg, #8fb0ff, #c08bff ${v * 20}%, hsl(232 40% 94%) ${v * 20}%)` }} />
@@ -204,7 +207,7 @@ export default function Pathway() {
                   <div className="mt-6 flex gap-2">
                     <input list="all-skills" className="field" placeholder="Others — add a skill" value={other} onChange={(e) => setOther(e.target.value)} data-testid="input-other-skill" />
                     <datalist id="all-skills">{ALL_SKILLS.map((s) => <option key={s} value={s} />)}</datalist>
-                    <button className="btn-ghost shrink-0" disabled={!other.trim()} onClick={() => { const error=skillError(other);if(error){toast({title:'Invalid skill',description:error});return;}const name=cleanSkill(other);upd((p) => ({ skills: { ...p.skills, [name]: p.skills[name] ?? 0 } })); setOther(''); }} data-testid="button-add-skill"><Plus className="h-4 w-4" />Add</button>
+                    <button className="btn-ghost shrink-0" disabled={!other.trim()} onClick={() => { const error=skillError(other);if(error){toast({title:'Invalid skill',description:error});return;}const name=cleanSkill(other);upd((p) => ({ skills: { ...p.skills, [name]: p.skills[name] ?? 0 }, excludedSkills:(p.excludedSkills??[]).filter(s=>s!==name) })); setOther(''); }} data-testid="button-add-skill"><Plus className="h-4 w-4" />Add</button>
                   </div>
                 </section>
 

@@ -1,3 +1,6 @@
+import {selectedQuotes} from './resource-quotes.ts';
+import {impactRequest} from './impact.ts';
+import {focusRole} from './skill-policy.ts';
 import {PATHWAY_VERSION} from './versions.ts';
 import {validateTrendObservations,chartFacts} from './trends.ts';
 import { CALCULATION_VERSION, PROMPT_VERSION, candidates, digest, organise, scenarioRequirements, preferences, profileInput, rank, validateExplanation, type Catalogue, type Generated } from './core.ts';
@@ -56,6 +59,7 @@ export function createHandler(deps: Dependencies) {
       if (reader) for (;;) { const {value,done}=await reader.read(); if(done)break; size+=value.length; if(size>24576){await reader.cancel();throw new Failure(413,'Request too large.');} chunks.push(value); }
       const bytes=new Uint8Array(size); let pos=0; for(const c of chunks){bytes.set(c,pos);pos+=c.length;}
       let body: any; try {body=JSON.parse(new TextDecoder().decode(bytes));} catch {throw new Failure(400,'Invalid JSON request.');}
+      if(body?.kind==='impact')return impactRequest(deps,body,user.id,json);
       if (!body || !['explain','plan'].includes(body.kind) || typeof body.profileHash!=='string' || !/^[a-f0-9]{64}$/.test(body.profileHash) || typeof body.preferencesHash!=='string' || !/^[a-f0-9]{64}$/.test(body.preferencesHash) || Object.keys(body).some(k=>!['kind','careerId','profileHash','preferencesHash','scenario','marketObservations','pathwayVersion','careerIds'].includes(k)) || (body.careerId!==undefined && (typeof body.careerId!=='string'||body.careerId.length>100))) throw new Failure(400,'Invalid recommendation request.');
       if(body.pathwayVersion!==PATHWAY_VERSION)throw new Failure(409,'Reload the website to use the current occupation pathways.');
       if(body.scenario!==undefined&&!['moderate','fast'].includes(body.scenario))throw new Failure(400,'Invalid chart scenario.');
@@ -83,7 +87,7 @@ export function createHandler(deps: Dependencies) {
       const versions=await admin('recommendation_catalogues?is_current=eq.true&select=*');
       if(versions.length!==1) throw new Failure(503,'The versioned catalogue has not been installed.');
       const row=versions[0];
-      const catalogue:Catalogue={...row.payload,version:row.version,published_at:row.published_at,observed_at:row.observed_at,status:row.status};
+      const catalogue:Catalogue={...row.payload,careers:row.payload.careers.map(focusRole),version:row.version,published_at:row.published_at,observed_at:row.observed_at,status:row.status};
       const rankings=rank(input,catalogue);
       const chosen=body.careerId ? rankings.find(r=>r.careerId===body.careerId) : undefined;
       if(body.careerId&&!chosen) throw new Failure(400,'Choose a career in the catalogue.');
@@ -91,6 +95,7 @@ export function createHandler(deps: Dependencies) {
       if(body.kind==='plan') {
         if(body.careerId!==pref.target)throw new Failure(400,'Save your selected career target before generating a plan.');
         try{selection=candidates(catalogue,input,pref);}catch(error){throw new Failure(400,(error as Error).message);}
+        try{selectedQuotes(pref.resources,selection.selected,pref.cost);}catch(e){throw new Failure(400,(e as Error).message);}
         if(!selection.selected.length)throw new Failure(400,'Choose at least one catalogue skill to learn.');
         if(selection.missing.length)throw new Failure(422,`No matching catalogue course for: ${selection.missing.join(', ')}. Adjust preferences; nothing has been invented.`);
       }
@@ -130,7 +135,7 @@ export function createHandler(deps: Dependencies) {
       } else {
         const selected=selection!;
         const raw=await call({task:'Sequence every listed course exactly once. Explain the learning order and each course relevance in terms of its skills. Do not create additional activities or facts.',career:{id:selected.role.id,title:selected.role.title,interestStream:input.stream,qualificationNote:selected.role.qualificationNote},pathwayEvidence:selected.role.pathwayEvidence,skillEvidence:selected.role.skillEvidence,gaps:selected.match.gaps,minutesPerDay:pref.minutesPerDay,modules:selected.modules.map(m=>({courseId:m.course.id,skills:m.skills,activityTitles:m.course.activityTitles}))},{type:'OBJECT',properties:{overview:{type:'STRING'},modules:{type:'ARRAY',items:{type:'OBJECT',properties:{courseId:{type:'STRING'},why:{type:'STRING'}},required:['courseId','why']}}},required:['overview','modules']});
-        result.plan=organise(raw,selected,pref.minutesPerDay); result.careerId=pref.target;
+        result.plan=organise(raw,selected,pref.minutesPerDay); const paid=selectedQuotes(pref.resources,selected.selected,pref.cost);result.plan.resourceQuotes=paid.quotes;result.plan.resourceCost=paid.total;result.plan.totalCost+=paid.total; result.careerId=pref.target;
       }
       const run=await admin('rpc/finish_recommendation',{p_run_id:lease!.id,p_lease:lease!.lease,p_result:result});
       return json(200,{run,cached:false});

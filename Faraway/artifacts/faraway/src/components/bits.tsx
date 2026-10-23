@@ -1,3 +1,5 @@
+import {skillGoal} from '../../../../supabase/functions/faraway-recommendations/impact-context';
+import {ImpactStory} from './impact-story';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { motion, useInView, useReducedMotion } from 'framer-motion';
 import { Link } from 'wouter';
@@ -18,7 +20,7 @@ export function Reveal({ children, delay = 0, className, y = 22 }: { children: R
 }
 
 export function Card({ children, className, testId }: { children: ReactNode; className?: string; testId?: string }) {
-  return <div data-testid={testId} className={cn('glass glass-hover rounded-[1.75rem] p-6', className)}>{children}</div>;
+  return <div data-testid={testId} className={cn('glass glass-hover min-w-0 max-w-full rounded-[1.75rem] p-6', className)}>{children}</div>;
 }
 
 export function CardTitle({ eyebrow, title, right }: { eyebrow?: string; title: ReactNode; right?: ReactNode }) {
@@ -87,9 +89,9 @@ export function SdgExplain({ n, skill, job, placeholder }: { n: number | null; s
             <span className="grid h-11 w-11 place-items-center rounded-2xl font-mono text-lg font-semibold text-white shadow-md" style={{ background: s.color }}>{s.n}</span>
             <div><p className="eyebrow">SDG {s.n}</p><p className="font-medium leading-tight">{s.title}</p></div>
           </div>
-          {skill && <p className="text-sm"><strong className="font-medium">{skill}</strong> connects most strongly to this goal.</p>}
-          {job && !skill && <p className="text-sm"><strong className="font-medium">{job}</strong> contributes to this goal.</p>}
-          <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{SDG_WHY[s.n]}</p>
+          {skill && <p className="text-sm"><strong className="font-medium">{skill}</strong>: turn practice into possibility.</p>}
+          {job && !skill && <p className="text-sm"><strong className="font-medium">{job}</strong>: work with a purpose.</p>}
+          <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{SDG_WHY[s.n]}</p><ImpactStory job={job} skill={skill} n={s.n}/>
           <div className="mt-4 h-1 w-full overflow-hidden rounded-full bg-muted"><motion.div className="h-full rounded-full" style={{ background: s.color }} initial={{ width: 0 }} animate={{ width: '100%' }} transition={{ duration: 0.8 }} /></div>
         </motion.div>
       ) : <p className="pt-2 text-sm leading-relaxed text-muted-foreground">{placeholder}</p>}
@@ -97,7 +99,7 @@ export function SdgExplain({ n, skill, job, placeholder }: { n: number | null; s
   );
 }
 
-export const skillSdg = (skill: string) => SKILL_SDG[skill] ?? 8;
+export const skillSdg = (skill: string) => SKILL_SDG[skill] ?? skillGoal(skill);
 
 export function ScoreRing({ score, size = 84, stroke = 5 }: { score: number | null; size?: number; stroke?: number }) {
   const r = size / 2 - stroke; const c = 2 * Math.PI * r;

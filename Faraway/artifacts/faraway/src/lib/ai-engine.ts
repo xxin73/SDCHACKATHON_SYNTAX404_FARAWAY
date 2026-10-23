@@ -26,7 +26,7 @@ function useRemote(kind:'explain'|'plan',careerId?:string) {
   useEffect(()=>{
     let current=true;setRun(undefined);setError(null);
     if(!session?.id||!profile.complete)return;
-    void Promise.all([digest(profileInput(profile)),digest(preferences(plan)),digest(careerId&&careerById(careerId)?observationsForRole(careerById(careerId)!,loadObservations()).slice(0,40):[])]).then(([p,q,e])=>{
+    void Promise.resolve().then(()=>Promise.all([digest(profileInput(profile)),digest(preferences(plan)),digest(careerId&&careerById(careerId)?observationsForRole(careerById(careerId)!,loadObservations()).slice(0,40):[])])).then(([p,q,e])=>{
       const found=context.runs.find(r=>r.kind===kind&&r.result.meta.pathwayVersion===PATHWAY_VERSION&&r.result.meta.calculationVersion===CALCULATION_VERSION&&(kind!=='explain'||r.result.meta.scenario===scenario&&r.result.meta.chartEvidenceHash===e)&&r.result.meta.profileHash===p&&r.result.meta.catalogueVersion===context.catalogue?.version&&(kind!=='plan'||r.result.meta.preferencesHash===q)&&(kind!=='explain'||r.result.explanations?.some(e=>e.careerId===careerId)));
       if(current)setRun(found);
     }).catch(()=>{});

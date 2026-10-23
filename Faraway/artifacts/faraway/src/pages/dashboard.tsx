@@ -1,3 +1,5 @@
+import {VerticalPairs} from '@/components/trend-panels';
+import {roleIndex} from '@/lib/trend-index';
 import { hasDatabaseCatalogue } from '@/lib/catalogue-status';
 import { useMemo, useState } from 'react';
 import { Link } from 'wouter';
@@ -114,8 +116,8 @@ export default function Dashboard() {
         </Reveal>
         <Reveal delay={0.08}>
           <Card className="h-full" testId="card-skill-trend">
-            <CardTitle eyebrow="Malaysia postings to 2030" title="Skill trend" right={<ScenarioToggle id="dash-scn" compact />} />
-            {has&&target?<HBars data={SKILL_TRENDS.slice(0, 7)} field={scenario}/>:<p className="py-12 text-sm text-muted-foreground">Complete your profile to see related skill analysis.</p>}
+            <CardTitle eyebrow="Career-specific technical skills" title="Skill priorities" right={<ScenarioToggle id="dash-scn" compact />} />
+            {has&&target?<div className="space-y-4">{Object.entries(target.required).map(([skill,need])=><div key={skill}><p className="text-xs mb-1">{skill} · {need}/5 practice target</p><div className="h-2 rounded bg-violet-100"><div className="h-full rounded bg-violet-500" style={{width:need/5*100+'%'}}/></div></div>)}</div>:<p className="py-12 text-sm text-muted-foreground">Complete your profile to see related skill analysis.</p>}
           </Card>
         </Reveal>
       </div>
@@ -138,8 +140,8 @@ export default function Dashboard() {
         </Reveal>
         <Reveal delay={0.08}>
           <Card className="h-full" testId="card-target-chart">
-            <CardTitle eyebrow="Job trend index · 2021 = 100" title={trend ? `${trend.role} demand` : 'Roles on the move'} right={<ScenarioToggle id="dash-scn2" compact />} />
-            {has&&target?<VBars data={JOB_TRENDS} value={(d) => d[scenario]} highlight={trend?.role} height={190}/>:<p className="py-12 text-sm text-muted-foreground">Choose a career to see its analysis.</p>}
+            <CardTitle eyebrow="Occupation requirement index / 100" title={target?.title??'Choose a career'} right={<ScenarioToggle id="dash-scn2" compact />} />
+            {has&&target?<><VerticalPairs data={[{label:target.title,first:roleIndex(target,scenario).current,second:roleIndex(target,scenario).future}]} labels={['Current O*NET reference','AI planning scenario']}/><p className="text-xs mt-3 text-muted-foreground">Technical importance reference and formula-based scenario; not vacancy demand.</p></>:<p className="py-12 text-sm text-muted-foreground">Choose a career to see its analysis.</p>}
           </Card>
         </Reveal>
       </div>

@@ -42,7 +42,7 @@ export function RecommendationProvider({children}:{children:ReactNode}) {
       if(current!==generation.current)return;
       for(const r of results)if(r.error)throw r.error;
       const row=results[0].data!;
-      const cat=enrichCatalogue({...row.payload,version:row.version,published_at:row.published_at,observed_at:row.observed_at,status:row.status} as Catalogue);
+      const cat={...row.payload,version:row.version,published_at:row.published_at,observed_at:row.observed_at,status:row.status} as Catalogue;
       if(!cat.careers?.length||!cat.courses?.length)throw new Error('The practice catalogue is empty.');
       const found=results[1].data as Run[];
       let selected=found.find(r=>r.id===results[2].data?.run_id)??null;

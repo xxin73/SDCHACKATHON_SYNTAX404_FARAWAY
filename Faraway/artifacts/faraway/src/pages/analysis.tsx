@@ -32,7 +32,7 @@ export default function Analysis() {
 
   return (
     <div className="space-y-8">
-      <PageTitle eyebrow="Skill analysis" title={<>How the market moves<br /><span className="text-muted-foreground">when AI arrives.</span></>} >
+      <PageTitle eyebrow="Skill analysis" title={<>Explore technical skills.<br /><span className="text-muted-foreground">Compare possible futures.</span></>} >
         Explore careers linked to your interest, compare their required skills and review dated job observations when available. AI explains the selected career and its evidence. Future skill targets are planning scenarios; imported posting counts do not change match scores.
 
       </PageTitle>
@@ -43,7 +43,7 @@ export default function Analysis() {
         <Reveal><div className="mb-6 flex flex-wrap items-end justify-between gap-3"><div><p className="eyebrow mb-2">Suggested for you</p><h2 className="font-display text-4xl">Careers that fit</h2></div><p className="text-xs text-muted-foreground">Related interests first · fit = 100 × (0.70 skill + 0.20 interest + 0.10 experience)</p></div></Reveal>
         {!has ? <NeedProfile text="Rate your skills to see matches." /> : (
           <>
-            <div className="grid gap-6 md:grid-cols-3">
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
               {shown.map((m, i) => <JobCard key={m.career.id} m={m} i={i} isTarget={target === m.career.id} />)}
             </div>
             <div className="mt-8 flex justify-center">
@@ -70,7 +70,7 @@ function JobCard({ m, i, isTarget }: { m: MatchResult; i: number; isTarget: bool
     <Reveal delay={(i % 3) * 0.08}>
       <Tilt max={7}>
         <div onMouseEnter={() => setHot(true)} onMouseLeave={() => setHot(false)} data-testid={`card-job-${m.career.id}`}
-          className={cn('glass glass-hover flex h-full flex-col rounded-[1.75rem] p-6', isTarget && 'spectrum-border')}>
+          className={cn('glass glass-hover min-w-0 max-w-full flex h-full flex-col rounded-[1.75rem] p-6', isTarget && 'spectrum-border')}>
           <div className="flex items-center justify-between gap-2">
             <span className="truncate rounded-full border bg-white px-3 py-1 text-sm font-medium">{m.career.title}</span>
             {isTarget && <span className="flex items-center gap-1 text-xs text-muted-foreground"><Check className="h-3 w-3" />Target</span>}

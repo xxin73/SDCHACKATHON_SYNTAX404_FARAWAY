@@ -1,3 +1,4 @@
+import {skillRating} from '../../../../supabase/functions/faraway-recommendations/skill-policy';
 import {relevantRole} from '../../../../supabase/functions/faraway-recommendations/pathways';
 import { courseMatches, preferences } from '../../../../supabase/functions/faraway-recommendations/core';
 import { CAREERS, careerById, careerInScenario, type Career, type Scenario } from '@/data/careers';
@@ -20,13 +21,13 @@ export function computeMatch(c: Career, p: Profile, scenario: Scenario, skillsOv
   c = careerInScenario(c, hasDatabaseCatalogue() ? 'moderate' : scenario)!;
   const skills = skillsOverride ?? p.skills;
   const entries = Object.entries(c.required);
-  const skillFit = entries.reduce((a, [k, need]) => a + Math.min((skills[k] ?? 0) / need, 1), 0) / entries.length;
+  const skillFit = entries.reduce((a, [k, need]) => a + Math.min((skillRating(skills,k) ?? 0) / need, 1), 0) / entries.length;
   const interestFit = p.careers.includes(c.id) ? 1 : relevantRole(c,p) ? 0.8 : 0.1;
   const experienceFit = Math.min((p.years + 0.5) / (c.minYears + 0.5), 1);
   const marketFit = (hasDatabaseCatalogue() ? c.demand.moderate : demandFromEvidence(c.id, c.demand[scenario])) / 100;
   const score = 100 * (0.7 * skillFit + 0.2 * interestFit + 0.1 * experienceFit);
   const gaps = entries
-    .map(([skill, need]) => ({ skill, have: skills[skill] ?? 0, need }))
+    .map(([skill, need]) => ({ skill, have: skillRating(skills,skill) ?? 0, need }))
     .filter((g) => g.have < g.need)
     .sort((a, b) => b.need - b.have - (a.need - a.have));
   return { career: c, score: Math.round(score * 10) / 10, skillFit, interestFit, experienceFit, marketFit, gaps };
@@ -44,7 +45,7 @@ export function suggested(p: Profile, scenario: Scenario, more: boolean) {
 }
 
 export function filterCourses(plan: Plan): Course[] {
-  return COURSES.filter(c=>courseMatches(c,preferences(plan)));
+  return COURSES.filter(c=>courseMatches(c,preferences({...plan,resources:undefined})));
 }
 
 /** best course for a skill under the plan's preferences (never bypasses preferences) */

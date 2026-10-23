@@ -23,6 +23,7 @@ export interface Profile {
   avatar?: string;
   otherInterest?: string;
   otherCareer?: string;
+  excludedSkills?: string[];
   ug: EduEntry;
   pg: EduEntry;
   phd: EduEntry;
@@ -31,7 +32,9 @@ export interface Profile {
   complete: boolean;
 }
 
+export interface ResourceChoice {kind:"free"|"paid";url:string;price:number}
 export interface Plan {
+  resources?: Record<string,ResourceChoice>;
   setting: 'indoor' | 'outdoor' | 'either';
   minutesPerDay: number;
   cost: 'free' | 'low' | 'moderate' | 'hrdc' | 'any';

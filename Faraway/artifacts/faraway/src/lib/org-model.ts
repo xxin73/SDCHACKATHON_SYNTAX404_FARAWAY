@@ -1,8 +1,9 @@
+import {roleForPosition} from './org-intelligence';
 export interface DepartmentSetup {name:string;teams:string[];skills:string[]}
 import { cleanSkill, skillError } from './skill-validation';
 import { CAREERS, ALL_SKILLS, type Scenario } from '@/data/careers';
 export interface Member {id:string;name:string;position:string;department:string;team?:string;target:string;skills:Record<string,number>}
-export interface Assignment {id:string;memberId:string;skill:string;courseId:string;title:string;hours:number;cost:number;done:boolean;created:string;scenario:Scenario;activities?:{id:string;title:string;hours:number;done:boolean}[];planId?:string;preferences?:{hoursPerWeek:number;duration:number;budget:number;format:string;schedule:string};mode?:"skill"|"people"}
+export interface Assignment {id:string;memberId:string;skill:string;courseId:string;title:string;hours:number;cost:number;done:boolean;created:string;scenario:Scenario;activities?:{id:string;title:string;hours:number;done:boolean}[];planId?:string;resourceUrl?:string;preferences?:{hoursPerWeek:number;duration:number;budget:number;format:string;schedule:string};mode?:"skill"|"people"}
 export interface OrganizationData {kind:'company'|'university';name:string;industry:string;headcount:number;departments?:string[];departmentCount?:number;departmentSetup?:DepartmentSetup[];members:Member[];assignments:Assignment[]}
 export const ORG_KEY='faraway_workspaces_v3';
 export const newOrg=(kind:OrganizationData['kind']):OrganizationData=>({kind,name:'',industry:'',headcount:0,departments:[],departmentCount:0,members:[],assignments:[]});
@@ -37,7 +38,7 @@ export function importMembers(text:string,context?:{department:string;team:strin
  return rows.map((row,i)=>{const get=(h:string)=>row[keys.indexOf(h)]?.trim()??'';
  if(row.length!==header.length)throw new Error(`Row ${i+2}: expected ${header.length} columns, found ${row.length}. Quote values that contain commas.`);
  if(!get('name')||!(context?.department||get('department')))throw new Error(`Row ${i+2}: name and department are required.`);
- const benchmark=get('target')||get('position');const c=CAREERS.find(c=>c.id.toLowerCase()===benchmark.toLowerCase()||c.title.toLowerCase()===benchmark.toLowerCase());
+ const benchmark=get('target')||get('position');const c=CAREERS.find(c=>c.id.toLowerCase()===benchmark.toLowerCase())||roleForPosition(benchmark);
  const skills:Record<string,number>={};header.forEach((h,j)=>{const prefixed=h.startsWith('skill:');const raw=(prefixed?h.slice(6):h).trim().replace(/\s*\((?:[01]\s*[-–]\s*5|rating)\)$/i,'');const known=[...ALL_SKILLS,...(context?.skills??[]),'C++','C#','HTML','CSS'].find(s=>s.toLowerCase()===raw);if(!prefixed&&!known)return;const value=row[j]?.trim();if(!value)return;const name=known||cleanSkill(raw);const n=Number(value);if(skillError(name)||!Number.isInteger(n)||n<0||n>5)throw new Error(`Row ${i+2}: ${h} must have a skill rating from 0 to 5, or be blank if unassessed.`);if(context&&!context.skills.some(s=>s.toLowerCase()===name.toLowerCase()))throw new Error(`Row ${i+2}: ${name} is not an assessment skill for this department. Download its template.`);skills[name]=n;});
  return{id:(globalThis.crypto?.randomUUID?.()??`id-${Date.now()}-${Math.random().toString(36).slice(2)}`),name:get('name'),department:context?.department||get('department'),team:context?.team||get('team'),position:get('position'),target:c?.id||'',skills};});
 }

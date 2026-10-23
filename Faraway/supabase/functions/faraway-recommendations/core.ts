@@ -1,18 +1,20 @@
+import {readQuotes,type ResourceQuote} from './resource-quotes.ts';
+import {focusRole,skillRating} from './skill-policy.ts';
 const relevantRole=(role:Role,profile:Pick<ProfileInput,'stream'|'careers'>)=>profile.careers.includes(role.id)||role.stream===profile.stream||Boolean(role.interests?.includes(profile.stream));
 // Shared deterministic rules. No network, model calls, browser storage or secrets.
 export type ProfileInput = { stream: string; careers: string[]; years: number; skills: Record<string, number>; complete: boolean };
-export type Preferences = { target: string; setting: string; cost: string; onlineOnly: boolean; minutesPerDay: number; mode: string; skills: string[]; delivery?: 'online'|'in-person'|'hybrid'|'any'; futureScenario?: 'moderate'|'fast' };
+export type Preferences = { resources?:Record<string,ResourceQuote>; target: string; setting: string; cost: string; onlineOnly: boolean; minutesPerDay: number; mode: string; skills: string[]; delivery?: 'online'|'in-person'|'hybrid'|'any'; futureScenario?: 'moderate'|'fast' };
 export type SkillEvidence = { version:string; occupationLabel:string; occupationUri:string; rubric:string; groups:{skill:string;target:number;note:string;sourceSkills:{uri:string;label:string;relation:string}[]}[] };
 export type Role = { id: string; title: string; stream: string; skillEvidence?: SkillEvidence; interests?:string[]; futureSkills?:string[]; qualificationNote?:string; pathwayEvidence?:import('./pathways').PathwayEvidence; marketStatus?:string; required: Record<string, number>; minYears: number; demand: { moderate: number } };
 export type Course = { id: string; title: string; provider: string; version: string; skills: string[]; hours: number; cost: number; rating: number; online: boolean; setting: string; hrdc: boolean; activityTitles?:string[] };
 export type Catalogue = { version: string; published_at: string; observed_at: string | null; status: 'illustrative'; careers: Role[]; courses: Course[] };
 export type Match = { careerId: string; score: number; gaps: { skill: string; have: number; need: number }[] };
 export type Module = { courseId: string; courseVersion: string; title: string; provider: string; skills: string[]; hours: number; cost: number; weeks: number; why: string; activities: { id: string; title: string; hours: number }[] };
-export type PlanResult = { overview: string; modules: Module[]; missing: string[]; totalHours: number; totalCost: number; totalWeeks: number };
+export type PlanResult = { resourceQuotes?:Record<string,ResourceQuote>;resourceCost?:number; overview: string; modules: Module[]; missing: string[]; totalHours: number; totalCost: number; totalWeeks: number };
 export type Explanation = { careerId: string; fitSummary: string; actions: string[]; trendSummary?:string; sourceIds?:string[]; projection?:{moderate:number;fast:number} };
 export type Generated = { kind: 'explain' | 'plan'; rankings: Match[]; explanations?: Explanation[]; plan?: PlanResult; careerId?: string; meta: { catalogueVersion: string; cataloguePublishedAt: string; evidenceObservedAt: string | null; evidenceStatus: string; profileHash: string; preferencesHash: string; generatedAt: string; model: string; promptVersion: string; calculationVersion: string; pathwayVersion?:string; scenario?:'moderate'|'fast'; chartEvidenceHash?:string; trendContext?:unknown } };
-export const PROMPT_VERSION = 'grounded-catalogue-trends-v6';
-export const CALCULATION_VERSION = 'interest-pathway-fit-v2';
+export const PROMPT_VERSION = 'hard-skills-impact-v7';
+export const CALCULATION_VERSION = 'hard-skills-fit-v3';
 
 function object(value: unknown): asserts value is Record<string, unknown> {
   if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error('Expected an object.');
@@ -36,7 +38,8 @@ export function preferences(value: unknown): Preferences {
   if (typeof value.target !== 'string' || value.target.length > 100 || !Array.isArray(value.skills) || value.skills.length > 100 || value.skills.some(x => typeof x !== 'string' || x.length > 100)) throw new Error('Invalid target or skills.');
   if(value.delivery!==undefined&&!['online','in-person','hybrid','any'].includes(String(value.delivery)))throw new Error('Invalid delivery preference.');
   if(value.futureScenario!==undefined&&!['moderate','fast'].includes(String(value.futureScenario)))throw new Error('Invalid future scenario.');
-  return { ...(value.delivery?{delivery:value.delivery as Preferences['delivery']}:{}), ...(value.futureScenario?{futureScenario:value.futureScenario as Preferences['futureScenario']}:{}), target: value.target, setting: String(value.setting), cost: String(value.cost), onlineOnly: value.onlineOnly, minutesPerDay: value.minutesPerDay, mode: String(value.mode), skills: [...value.skills] as string[] };
+  const resources=readQuotes(value.resources);
+  return { ...(resources?{resources}:{}), ...(value.delivery?{delivery:value.delivery as Preferences['delivery']}:{}), ...(value.futureScenario?{futureScenario:value.futureScenario as Preferences['futureScenario']}:{}), target: value.target, setting: String(value.setting), cost: String(value.cost), onlineOnly: value.onlineOnly, minutesPerDay: value.minutesPerDay, mode: String(value.mode), skills: [...value.skills] as string[] };
 }
 export function stable(value: unknown): string {
   if (Array.isArray(value)) return '[' + value.map(stable).join(',') + ']';
@@ -49,14 +52,15 @@ export async function digest(value: unknown) {
 export function rank(profile: ProfileInput, catalogue: Catalogue): Match[] {
   
   const byId=new Map(catalogue.careers.map(c=>[c.id,c]));
-  return catalogue.careers.map(c => {
+  return catalogue.careers.map(original => {
+    const c=focusRole(original);
     const required = Object.entries(c.required);
     if (!required.length || required.some(([,v]) => !Number.isFinite(v) || v <= 0 || v > 5)) throw new Error('Invalid catalogue requirements.');
-    const skillFit = required.reduce((n,[s,v]) => n + Math.min((profile.skills[s] ?? 0)/v,1),0)/required.length;
+    const skillFit = required.reduce((n,[s,v]) => n + Math.min((skillRating(profile.skills,s) ?? 0)/v,1),0)/required.length;
     const interest = profile.careers.includes(c.id) ? 1 : relevantRole(c,profile) ? .8 : .1;
     const experience = Math.min((profile.years+.5)/(c.minYears+.5),1);
     const score = Math.round((100 * (.7*skillFit+.2*interest+.1*experience)) * 10) / 10;
-    return { careerId: c.id, score, gaps: required.map(([skill,need]) => ({skill,need,have:profile.skills[skill]??0})).filter(g => g.have<g.need).sort((a,b) => (b.need-b.have)-(a.need-a.have)) };
+    return { careerId: c.id, score, gaps: required.map(([skill,need]) => ({skill,need,have:skillRating(profile.skills,skill)??0})).filter(g => g.have<g.need).sort((a,b) => (b.need-b.have)-(a.need-a.have)) };
   }).sort((a,b) => Number(relevantRole(byId.get(b.careerId)!,profile))-Number(relevantRole(byId.get(a.careerId)!,profile)) || b.score-a.score || a.careerId.localeCompare(b.careerId));
 }
 export const FUTURE_SKILLS = ['AI Tools','Python','SQL','Machine Learning','Data Visualisation','Cloud Computing'];
@@ -71,10 +75,11 @@ export function courseMatches(c:{setting:string;online:boolean;cost:number;hrdc:
 export function candidates(catalogue: Catalogue, profile: ProfileInput, pref: Preferences) {
   
   const match = rank(profile,catalogue).find(m => m.careerId === pref.target);
-  const role = catalogue.careers.find(r => r.id === pref.target);
+  const originalRole = catalogue.careers.find(r => r.id === pref.target);
+  const role=originalRole?focusRole(originalRole):undefined;
   if (!match || !role) throw new Error('Choose a career from the current catalogue.');
   const required=scenarioRequirements(role.required,pref.futureScenario,role.futureSkills);
-  const gaps=Object.entries(required).map(([skill,need])=>({skill,need,have:profile.skills[skill]??0})).filter(g=>g.have<g.need).sort((a,b)=>(b.need-b.have)-(a.need-a.have));
+  const gaps=Object.entries(required).map(([skill,need])=>({skill,need,have:skillRating(profile.skills,skill)??0})).filter(g=>g.have<g.need).sort((a,b)=>(b.need-b.have)-(a.need-a.have));
   const selected = [...new Set(pref.mode === 'recommended' ? gaps.map(g=>g.skill) : pref.skills)];
   const vocabulary = new Set([...catalogue.careers.flatMap(r=>Object.keys(r.required)),...catalogue.courses.flatMap(c=>c.skills)]);
   if (selected.some(s=>!vocabulary.has(s))) throw new Error('Selected skill is not in the catalogue.');
