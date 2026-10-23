@@ -1,3 +1,4 @@
+import { cleanSkill, skillError } from '@/lib/skill-validation';
 import { useEffect, useRef, useState, type DragEvent } from 'react';
 import { useLocation } from 'wouter';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -14,7 +15,7 @@ import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 
 const STEPS = ['Interest', 'Profile & CV', 'Education', 'Skills', 'Summary'];
-const HIGHEST: Highest[] = ['Secondary', 'Pre-U', 'Degree', 'Masters', 'PhD'];
+const HIGHEST: Highest[] = ['Secondary', 'Pre-U', 'Diploma', 'Degree', 'Masters', 'PhD'];
 
 const upd = (fn: (p: Profile) => Partial<Profile>) => setState((s) => ({ ...s, profile: { ...s.profile, ...fn(s.profile) } }));
 
@@ -68,7 +69,7 @@ export default function Pathway() {
   const miss = (k: string, v: string) => (missing.some((m) => m.includes(k)) && !v ? 'field-missing' : '');
 
   const finish = () => { upd(p => ({ complete: true, skills: {...Object.fromEntries(skillList.map(s=>[s,0])),...p.skills} })); nav('/analysis'); };
-  const canNext = step === 0 ? !!profile.stream && (profile.stream!=='other'||!!profile.otherInterest?.trim()) : step === 1 ? !!profile.name.trim() && /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(profile.email) : step === 2 ? !!profile.highest && (profile.highest!=='Secondary'||!!profile.secondaryQualification) : step === 3 ? skillList.length >= 3 : true;
+  const canNext = step === 0 ? !!profile.stream && (profile.stream!=='other'||!!profile.otherInterest?.trim()) : step === 1 ? !!profile.name.trim() && /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(profile.email) : step === 2 ? !!profile.highest && (profile.highest!=='Secondary'||!!profile.secondaryQualification)&&(profile.highest!=='Pre-U'||!!profile.preUQualification)&&(profile.highest!=='Diploma'||!!profile.ug.field.trim()) : step === 3 ? skillList.length >= 3 : true;
 
   const cvPanel = (
     <div className="space-y-4 lg:sticky lg:top-6">
@@ -78,7 +79,7 @@ export default function Pathway() {
           role="button" tabIndex={0} data-testid="dropzone-cv" onKeyDown={(e) => e.key === 'Enter' && fileRef.current?.click()}
           className={cn('glass group relative flex min-h-[260px] cursor-pointer flex-col items-center justify-center rounded-3xl border-2 border-dashed p-6 text-center transition-all', drag ? 'spectrum-border scale-[1.01] border-transparent' : 'hover:border-[hsl(250_50%_82%)]')}>
           <motion.div animate={drag ? { scale: 1.15, rotate: -6 } : { scale: 1, rotate: 0 }} className="grid h-16 w-16 place-items-center rounded-2xl border bg-white shadow-md"><SpectrumIcon icon={drag ? ScanLine : FileUp} size={30} /></motion.div>
-          <p className="mt-4 font-display text-2xl">Upload CV</p>
+          <p className="mt-4 font-display text-2xl">{preview?'CV uploaded':'Upload CV'}</p>{preview&&<p className="text-xs">{preview.name} · click to replace</p>}
           <p className="mt-1 max-w-[240px] text-sm text-muted-foreground">PDF, TXT, PNG or JPG / JPEG · up to 8 MB. Text extraction runs in your browser. Review the results and rate your skills; a CV does not prove proficiency.</p>
           <input ref={fileRef} type="file" accept=".pdf,.txt,.png,.jpg,.jpeg,application/pdf,text/plain,image/png,image/jpeg" className="hidden" onChange={(e) => { onFile(e.target.files?.[0]); e.target.value = ''; }} data-testid="input-cv-file" />
         </div>
@@ -115,7 +116,7 @@ export default function Pathway() {
                   {profile.stream==='other'&&<Field label="Your interest"><input className="field mt-4" maxLength={100} value={profile.otherInterest??''} onChange={e=>upd(()=>({otherInterest:e.target.value}))} placeholder="For example: marine conservation"/></Field>}
                   {stream && (
                     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mt-8">
-                      <p className="text-sm font-medium">Interested careers <span className="font-normal text-muted-foreground">(select any)</span></p>
+                      <p className="text-sm font-medium">Career interests <span className="font-normal text-muted-foreground">(select any)</span></p>
                       <div className="mt-3 flex flex-wrap gap-2">
                         {Array.from(new Set([...stream.careers,...CAREERS.map(c=>c.id)])).map((id) => { const c = careerById(id); if(!c)return null; const on = profile.careers.includes(id); return (
                           <button key={id} onClick={() => upd((p) => ({ careers: on ? p.careers.filter((x) => x !== id) : [...p.careers, id] }))} data-testid={`chip-career-${id}`}
@@ -147,14 +148,14 @@ export default function Pathway() {
                   </div>
                   <div>
                     <h2 className="font-display text-3xl">Experience</h2>
-                    <p className="mt-3 text-sm text-muted-foreground">Add each role and its duration in years. Total experience updates automatically; If roles overlap, adjust the total below to count that time once.</p>
-                    <Field label="Total relevant experience in years (adjust if roles overlap)"><input type="number" min={0} max={80} step={0.25} className="field mt-3 max-w-xs" value={profile.years} onChange={e=>upd(()=>({years:Math.max(0,Math.min(80,Number(e.target.value)))}))} data-testid="input-years"/></Field>
+                    <p className="mt-3 text-sm text-muted-foreground">Add each role and its duration in years (maximum 99 years per role and in total). Total experience updates automatically and is capped at 99 years; If roles overlap, adjust the total below to count that time once.</p>
+                    <Field label="Total relevant experience in years (adjust if roles overlap)"><input type="number" min={0} max={99} step={0.25} className="field mt-3 max-w-xs" placeholder="0" value={profile.years||''} onChange={e=>upd(()=>({years:Math.max(0,Math.min(99,Number(e.target.value)))}))} data-testid="input-years"/></Field>
                     <div className="mt-4 space-y-3">
                       {profile.roles.map((r,i)=><div key={i} className="rounded-2xl border bg-white/70 p-4"><div className="grid gap-3 sm:grid-cols-3">
                         <Field label="Job title"><input className="field" placeholder="For example: pharmacy assistant" value={r.title} onChange={e=>upd(p=>({roles:p.roles.map((x,j)=>j===i?{...x,title:e.target.value}:x)}))} data-testid={`input-role-title-${i}`}/></Field>
                         <Field label="Company / organisation"><input className="field" value={r.company} onChange={e=>upd(p=>({roles:p.roles.map((x,j)=>j===i?{...x,company:e.target.value}:x)}))} data-testid={`input-role-company-${i}`}/></Field>
-                        <Field label="Duration in years (0.5 = 6 months)"><input className="field" type="number" min={0} max={80} step={0.25} value={r.years} onChange={e=>upd(p=>{const roles=p.roles.map((x,j)=>j===i?{...x,years:Math.max(0,Math.min(80,Number(e.target.value)))}:x);return {roles,years:Math.min(80,roles.reduce((n,x)=>n+x.years,0))};})} data-testid={`input-role-years-${i}`}/></Field>
-                      </div><Field label="Responsibilities and achievements"><textarea className="field mt-3" value={r.responsibilities??''} placeholder="What did you do? Which tools did you use? What did you achieve?" onChange={e=>upd(p=>({roles:p.roles.map((x,j)=>j===i?{...x,responsibilities:e.target.value.slice(0,3000)}:x)}))}/></Field><button className="btn-ghost mt-2 text-xs" onClick={()=>{const found=detectSkills(r.responsibilities??'',ALL_SKILLS);upd(p=>({skills:{...Object.fromEntries(found.map(sk=>[sk,0])),...p.skills}}));toast({title:found.length?'Skills added for your review':'No catalogue keywords found',description:found.length?found.join(', '):'Add skills manually in the Skills step.'});}}>Find skills in responsibilities</button><button className="btn-ghost mt-2 text-xs" onClick={()=>upd(p=>{const roles=p.roles.filter((_,j)=>j!==i);return {roles,years:roles.reduce((n,x)=>n+x.years,0)};})} data-testid={`button-remove-role-${i}`}><Trash2 size={14}/>Remove this role</button></div>)}
+                        <Field label="Duration in years (0.5 = 6 months)"><input className="field" type="number" min={0} max={99} step={0.25} placeholder="0" value={r.years||''} onChange={e=>upd(p=>{const roles=p.roles.map((x,j)=>j===i?{...x,years:Math.max(0,Math.min(99,Number(e.target.value)))}:x);return {roles,years:Math.min(99,roles.reduce((n,x)=>n+x.years,0))};})} data-testid={`input-role-years-${i}`}/></Field>
+                      </div><Field label="Responsibilities and achievements"><textarea className="field mt-3" value={r.responsibilities??''} placeholder="What did you do? Which tools did you use? What did you achieve?" onChange={e=>upd(p=>({roles:p.roles.map((x,j)=>j===i?{...x,responsibilities:e.target.value.slice(0,3000)}:x)}))}/></Field><button className="btn-ghost mt-2 text-xs" onClick={()=>{const found=detectSkills(r.responsibilities??'',ALL_SKILLS);upd(p=>({skills:{...Object.fromEntries(found.map(sk=>[sk,0])),...p.skills}}));toast({title:found.length?'Skills added for your review':'No catalogue keywords found',description:found.length?found.join(', '):'Add skills manually in the Skills step.'});}}>Find skills in responsibilities</button><button className="btn-ghost mt-2 text-xs" onClick={()=>upd(p=>{const roles=p.roles.filter((_,j)=>j!==i);return {roles,years:Math.min(99,roles.reduce((n,x)=>n+x.years,0))};})} data-testid={`button-remove-role-${i}`}><Trash2 size={14}/>Remove this role</button></div>)}
                       <button onClick={() => upd((p) => ({ roles: [...p.roles, { title: '', company: '', years: 0, responsibilities: '' }] }))} className={cn('btn-ghost', !profile.roles.length && missing.some((m) => m.includes('role') || m.includes('experience')) && 'field-missing')} data-testid="button-add-role"><Plus className="h-4 w-4" />Add role</button>
                     </div>
                   </div>
@@ -167,14 +168,15 @@ export default function Pathway() {
               <div className="grid gap-8 lg:grid-cols-[1fr_340px]">
                 <section>
                   <h2 className="font-display text-3xl">Education</h2>
-                  <p className="mt-1 text-sm text-muted-foreground">Highest level completed, then the details that apply.</p>
+                  <p className="mt-1 text-sm text-muted-foreground">Highest level completed, then the qualification and field that apply.</p>
                   <div className="mt-5 flex flex-wrap gap-2">
                     {HIGHEST.map((h) => <button key={h} onClick={() => upd(() => ({ highest: h }))} data-testid={`button-highest-${h}`} className={cn('rounded-full border px-4 py-2 text-sm transition-all', profile.highest === h ? 'border-ink bg-ink text-white' : 'bg-white')}>{h}</button>)}
                   </div>
+                  {profile.highest==='Pre-U'&&<Field label="Pre-university qualification"><select className="field mt-4" value={profile.preUQualification??''} onChange={e=>upd(()=>({preUQualification:e.target.value}))}><option value="">Select qualification</option>{['STPM','A-Level','Foundation','Matriculation','International Baccalaureate (IB)','UEC','Other pre-university qualification'].map(q=><option key={q}>{q}</option>)}</select></Field>}
                   {profile.highest==='Secondary'&&<Field label="Secondary qualification"><select className="field mt-4" value={profile.secondaryQualification??''} onChange={e=>upd(()=>({secondaryQualification:e.target.value}))}><option value="">Select your qualification</option>{['SPM','PT3','IGCSE / O-Level','Other secondary qualification'].map(q=><option key={q}>{q}</option>)}</select></Field>}
                   {(['ug', 'pg', 'phd'] as const).filter((k) => (k === 'ug' && !!profile.highest && !['SPM','Secondary'].includes(profile.highest)) || (k === 'pg' && ['Masters', 'PhD'].includes(profile.highest)) || (k === 'phd' && profile.highest === 'PhD')).map((k) => (
                     <div key={k} className="mt-6">
-                      <p className="eyebrow mb-2">{k === 'ug' ? (profile.highest==='Pre-U'?'Pre-university: STPM, A-Level, foundation or equivalent':'Undergraduate qualification') : k === 'pg' ? 'Postgraduate' : 'Doctorate'}</p>
+                      <p className="eyebrow mb-2">{k === 'ug' ? (profile.highest==='Pre-U'?'Pre-university: STPM, A-Level, foundation or equivalent':profile.highest==='Diploma'?'Diploma field and institution':'Undergraduate qualification') : k === 'pg' ? 'Postgraduate' : 'Doctorate'}</p>
                       <div className="grid gap-3 sm:grid-cols-[1.4fr_1.2fr_100px]">
                         {(['field', 'institution', 'year'] as const).map((f) => (
                           <input key={f} placeholder={f[0].toUpperCase() + f.slice(1)} value={profile[k][f]} onChange={(e) => upd((p) => ({ [k]: { ...p[k], [f]: e.target.value } }))}
@@ -189,10 +191,10 @@ export default function Pathway() {
             )}
 
             {step === 3 && (
-              <div className="grid gap-8 lg:grid-cols-[1fr_1fr]">
+              <div className="space-y-6">
                 <section>
                   <h2 className="font-display text-3xl">Skills</h2>
-                  <p className="mt-1 text-sm text-muted-foreground">Self-rate each from 0 to 5. The radar redraws as you drag.</p>
+                  <p className="mt-1 text-sm text-muted-foreground">Self-rate each skill from 0 to 5. Add other relevant skills below.</p>
                   <ul className="mt-6 space-y-4">
                     {skillList.map((sk) => { const v = profile.skills[sk] ?? 0; return (
                       <li key={sk} onMouseEnter={() => setHoverSkill(sk)} onMouseLeave={() => setHoverSkill(null)}>
@@ -206,16 +208,10 @@ export default function Pathway() {
                   <div className="mt-6 flex gap-2">
                     <input list="all-skills" className="field" placeholder="Others — add a skill" value={other} onChange={(e) => setOther(e.target.value)} data-testid="input-other-skill" />
                     <datalist id="all-skills">{ALL_SKILLS.map((s) => <option key={s} value={s} />)}</datalist>
-                    <button className="btn-ghost shrink-0" disabled={!other.trim()} onClick={() => { upd((p) => ({ skills: { ...p.skills, [other.trim()]: p.skills[other.trim()] ?? 2 } })); setOther(''); }} data-testid="button-add-skill"><Plus className="h-4 w-4" />Add</button>
+                    <button className="btn-ghost shrink-0" disabled={!other.trim()} onClick={() => { const error=skillError(other);if(error){toast({title:'Invalid skill',description:error});return;}const name=cleanSkill(other);upd((p) => ({ skills: { ...p.skills, [name]: p.skills[name] ?? 0 } })); setOther(''); }} data-testid="button-add-skill"><Plus className="h-4 w-4" />Add</button>
                   </div>
                 </section>
-                <section className="glass rounded-3xl p-6 lg:sticky lg:top-6 lg:self-start">
-                  <div className="flex flex-wrap items-center justify-between gap-2"><p className="font-display text-2xl">Radar map</p><span className="flex items-center gap-1.5 font-mono text-[10.5px] text-muted-foreground"><span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#9a6bff]" />REAL-TIME</span></div>
-                  <p className="mb-2 text-xs text-muted-foreground">{job ? `Overlaid with ${job.title} requirements` : 'Select a career target to overlay its requirements'}</p>
-                  <SkillRadar size={380} hovered={hoverSkill} onHover={setHoverSkill}
-                    axes={job ? Array.from(new Set([...Object.keys(job.required), ...Object.keys(profile.skills)])).slice(0, 8).map((s) => ({ skill: s, have: profile.skills[s] ?? 0, need: job.required[s] ?? 0 })) : Object.entries(profile.skills).slice(0, 8).map(([skill, have]) => ({ skill, have }))} />
-                  <RadarLegend withNeed={!!job} />
-                </section>
+
               </div>
             )}
 
@@ -223,9 +219,9 @@ export default function Pathway() {
               <div className="grid gap-6 lg:grid-cols-[1.2fr_1fr]">
                 <section className="space-y-5">
                   <h2 className="font-display text-3xl">Summary</h2>
-                  <textarea className="field min-h-[110px]" placeholder="One or two lines about you" value={profile.summary} onChange={(e) => upd(() => ({ summary: e.target.value }))} data-testid="input-summary" />
+
                   <dl className="grid gap-px overflow-hidden rounded-2xl border bg-border sm:grid-cols-2">
-                    {[['Name', profile.name || '—'], ['Location', profile.location || '—'], ['Stream', stream?.name ?? '—'], ['Interests', [...profile.careers.map((c) => careerById(c)?.title),profile.otherInterest,profile.otherCareer].filter(Boolean).join(', ') || '—'], ['Highest education', `${profile.highest}${profile.ug.field ? ` · ${profile.ug.field}` : ''}`], ['Experience', `${profile.years} yrs · ${profile.roles.length} roles`]].map(([k, v]) => (
+                    {[['Name', profile.name || '—'], ['Location', profile.location || '—'], ['Interest area', profile.otherInterest || stream?.name || '—'], ['Careers to explore', [...profile.careers.map((c) => careerById(c)?.title),profile.otherCareer].filter(Boolean).join(', ') || '—'], ['Highest education', [profile.highest,profile.highest==='Pre-U'?profile.preUQualification:'',profile.highest==='Secondary'?profile.secondaryQualification:'',profile.ug.field].filter(Boolean).join(' · ')], ['Experience', `${profile.years} yrs · ${profile.roles.length} roles`]].map(([k, v]) => (
                       <div key={k} className="bg-white p-4"><dt className="eyebrow">{k}</dt><dd className="mt-1 text-sm">{v}</dd></div>
                     ))}
                   </dl>

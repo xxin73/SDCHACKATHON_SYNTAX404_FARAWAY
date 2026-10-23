@@ -1,3 +1,4 @@
+import { cleanSkill, skillError } from '@/lib/skill-validation';
 import { scenarioRequirements } from '../../../../supabase/functions/faraway-recommendations/core';
 import { duration, resourcesFor } from '@/lib/learning-resources';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
@@ -31,6 +32,9 @@ export default function PlanPage() {
   const [saveError, setSaveError] = useState('');
   const [saving, setSaving] = useState(false);
   const [review,setReview]=useState(false);
+  const [availability,setAvailability]=useState(false);
+  const [customSkill,setCustomSkill]=useState('');
+  const [customError,setCustomError]=useState('');
   const gen = useGenerateStudyPlan();
   const ai = gen.data;
   const career = careerInScenario(careerById(plan.target), hasDatabaseCatalogue() ? 'moderate' : scenario);
@@ -42,10 +46,11 @@ export default function PlanPage() {
   const gaps=Object.entries(required).map(([skill,need])=>({skill,need,have:profile.skills[skill]??0})).filter(g=>g.have<g.need).sort((a,b)=>(b.need-b.have)-(a.need-a.have));
   const recommended = gaps.map(g=>g.skill);
   const selected = plan.mode === 'recommended' ? recommended : plan.skills;
-  const pool = Array.from(new Set([...Object.keys(career.required), ...ALL_SKILLS]));
+  const pool = Array.from(new Set([...Object.keys(career.required), ...ALL_SKILLS, ...plan.skills]));
   const options = plan.mode === 'recommended' ? recommended : pool;
   const rows = selected.map((s) => ({ skill: s, course: courseForSkill(s, plan), have: profile.skills[s] ?? 0, need: required[s] ?? 4 }));
   const missingSkills = rows.filter(r=>!r.course).map(r=>r.skill);
+  const availableSkills=rows.filter(r=>r.course).map(r=>r.skill);
   const canGenerate = selected.length > 0 && missingSkills.length === 0;
   const hasPreviousPlan = recommendations.runs.some(r=>r.kind==='plan');
   const uniqueRows = Array.from(new Map(rows.filter(r=>r.course).map(r=>[r.course!.id,r])).values());
@@ -59,7 +64,7 @@ export default function PlanPage() {
       updPlan({ mode: 'custom', skills: selected.filter((x) => x !== s), saved: false });
     } else updPlan({ mode: 'custom', skills: [...selected, s], saved: false });
   };
-  const generate = () => { setSaveError(''); if(canGenerate) void gen.mutate({}, {onSuccess:()=>setReview(true)}); };
+  const generate = () => { setSaveError(''); if(!canGenerate){setAvailability(true);return;} void gen.mutate({}, {onSuccess:()=>setReview(true)}); };
   const save = async () => {
     setSaveError('');setSaving(true);
     try {
@@ -107,6 +112,7 @@ export default function PlanPage() {
       <div className="grid gap-6 lg:grid-cols-[1fr_340px]">
         <Reveal><Card className="h-full" testId="card-skill-select">
           <CardTitle eyebrow={plan.mode === 'recommended' ? 'Recommended from your gaps' : 'Custom — choose any'} title="Skills to learn" />
+          {plan.mode==='custom'&&<div className="mb-5"><label className="text-sm" htmlFor="custom-learning-skill">What else would you like to learn?</label><div className="mt-2 flex gap-2"><input id="custom-learning-skill" className="field" list="custom-plan-skills" value={customSkill} onChange={e=>{setCustomSkill(e.target.value);setCustomError('');}} placeholder="Type a skill, e.g. SQL"/><datalist id="custom-plan-skills">{pool.map(s=><option key={s}>{s}</option>)}</datalist><button className="btn-ghost" onClick={()=>{const error=skillError(customSkill);if(error){setCustomError(error);return;}const raw=cleanSkill(customSkill);const skill=pool.find(s=>s.toLowerCase()===raw.toLowerCase())??raw;updPlan({skills:Array.from(new Set([...selected,skill]))});setCustomSkill('');}}>Add</button></div>{customError&&<p role="alert" className="mt-2 text-sm text-red-700">{customError}</p>}<p className="mt-2 text-xs text-muted-foreground">Custom skills are saved. Generating a course plan requires a matching course; unavailable skills are shown below.</p></div>}
           <div className="flex flex-wrap gap-2">
             {options.map((s) => { const on = selected.includes(s); return (
               <button key={s} onClick={() => toggle(s)} data-testid={`chip-skill-${s.replace(/\W/g, '')}`} className={cn('inline-flex items-center gap-2 rounded-full border px-3.5 py-1.5 text-sm transition-all', on ? 'border-ink bg-ink text-white' : 'bg-white hover:border-[hsl(250_50%_80%)]')}>
@@ -144,13 +150,14 @@ export default function PlanPage() {
                 <p className="font-medium">No matching course for: {missingSkills.join(', ')}.</p>
                 <p className="mt-2 text-muted-foreground">Your current cost, setting or online-only filters exclude the available courses, or the catalogue has no coverage. AI cannot fill this with invented courses.</p>
                 {plan.cost==='hrdc' && <p className="mt-2">There are no verified HRD Corp courses in this catalogue yet.</p>}
-                <button className="btn-ghost mt-3" data-testid="button-broaden-course-filters" onClick={()=>updPlan({cost:'any',setting:'either',onlineOnly:false,delivery:'any'})}>Show any cost and setting</button>
-                <p className="mt-2 text-xs text-muted-foreground">This button changes filters only. It does not buy or enrol in a course. You can also remove an unavailable skill from a custom plan.</p>
+                <button className="btn-ghost mt-3" data-testid="button-broaden-course-filters" onClick={()=>updPlan({setting:'either',onlineOnly:false,delivery:'any'})}>Show any learning format (keep budget)</button>
+                {availableSkills.length>0&&<button className="btn-ghost mt-3" onClick={()=>updPlan({mode:'custom',skills:availableSkills})}>Keep {availableSkills.length} available skills only</button>}
+                <p className="mt-2 text-xs text-muted-foreground">Your budget stays unchanged. You can explicitly change Cost above, or remove skills with no matching course from your custom plan.</p>
               </> : gen.isPending ? <p>Generating a plan for your current preferences…</p>
               : !gen.run ? <p>{hasPreviousPlan ? 'Your preferences or skills differ from the saved plan. Generate a new plan below, then save it. Your existing progress is kept.' : 'Step 1: Generate your plan below. Step 2: Review it and save.'}</p>
               : <p>Your plan matches these preferences. Review the outline below, then save.</p>}
           </div>
-          <button onClick={generate} disabled={!canGenerate||gen.isPending||saving} className="btn-ink mt-5 w-full" data-testid="button-generate-plan">
+          <button onClick={generate} disabled={!selected.length||gen.isPending||saving} className="btn-ink mt-5 w-full" data-testid="button-generate-plan">
             <Sparkles className="h-4 w-4" />{gen.isPending ? 'Generating…' : ai ? 'Regenerate plan' : 'Generate plan'}
           </button>
           <button onClick={()=>setReview(true)} disabled={saving || gen.isPending || !gen.run || !canGenerate} className="btn-ghost mt-3 w-full" data-testid="button-save-plan">{saving?'Saving…':'Review & start plan'}<ArrowRight className="h-4 w-4" /></button>
@@ -179,6 +186,8 @@ export default function PlanPage() {
         </AiStage>
       </Card></Reveal>
 
+      <Dialog open={availability} onOpenChange={setAvailability}><DialogContent className="max-w-lg rounded-3xl"><DialogTitle>Review course availability</DialogTitle><DialogDescription>Your budget and learning-format choices will stay as selected.</DialogDescription><p className="text-sm">No matching course for: {missingSkills.join(', ')}.</p>{availableSkills.length>0?<><p className="text-sm">You can generate a plan for {availableSkills.join(', ')}. The unavailable skills listed above will be excluded only if you choose this option.</p><button className="btn-ink" disabled={gen.isPending} onClick={()=>{updPlan({mode:'custom',skills:availableSkills});setAvailability(false);void gen.mutate({}, {onSuccess:()=>setReview(true)});}}>Generate for available skills only</button></>:<p className="text-sm">No selected skill has a course matching these preferences. Add or choose another skill, or explicitly change your filters. We will not replace Free with paid courses.</p>}<button className="btn-ghost" onClick={()=>setAvailability(false)}>Back to preferences</button></DialogContent></Dialog>
+
       <Dialog open={review&&!!ai} onOpenChange={setReview}><DialogContent className="max-h-[85vh] max-w-2xl overflow-y-auto rounded-3xl"><DialogTitle className="font-display text-3xl">Your plan is ready</DialogTitle><DialogDescription>Review your generated plan, then start learning. Your completed activities will be kept.</DialogDescription>{ai&&<><p className="text-sm">{ai.overview}</p><p className="font-medium">{duration(hours)} · {weeks} weeks · {total?myr(total):'Free'}</p><ul className="space-y-3">{ai.modules.map((m,i)=><li key={i} className="rounded-xl border p-3"><p className="font-medium">{i+1}. {m.skill}</p><p className="text-sm text-muted-foreground">{m.why}</p></li>)}</ul></>}{saveError&&<p role="alert">{saveError}</p>}<div className="flex flex-wrap gap-3"><button className="btn-ghost" onClick={()=>setReview(false)}>Edit preferences</button><button className="btn-ink" disabled={saving||!gen.run||!canGenerate} onClick={save} data-testid="button-start-plan">{saving?'Starting…':'Start plan'}<ArrowRight size={16}/></button></div></DialogContent></Dialog>
 
       <AlertDialog open={!!confirm} onOpenChange={(o) => !o && setConfirm(null)}>
@@ -196,4 +205,3 @@ export default function PlanPage() {
     </div>
   );
 }
-
