@@ -1,3 +1,5 @@
+import {jobRadarAxes} from '@/lib/radar-model';
+import {skillRating,skillKey} from '../../../../supabase/functions/faraway-recommendations/skill-policy';
 import {PathwayEvidence} from '@/components/pathway-evidence';
 import { OnetReference } from '@/components/onet-reference';
 import { scenarioRequirements } from '../../../../supabase/functions/faraway-recommendations/core';
@@ -34,7 +36,7 @@ export default function JobDetail() {
   const career = careerInScenario(careerById(id ?? ''), hasDatabaseCatalogue() ? 'moderate' : scenario);
   const target = useStore((s) => s.plan.target);
   const [hoverSkill, setHoverSkill] = useState<string | null>(null);
-  const [hoverJobSdg, setHoverJobSdg] = useState<number | null>(null);
+  const [hoverJobSdg, setHoverJobSdg] = useState<number | null>(career?.sdgs[0]??null);
   const [draft, setDraft] = useState<Record<string, number>>({});
   const [spin, setSpin] = useState(0);
   const [showFuture,setShowFuture]=useState(true);
@@ -49,7 +51,7 @@ export default function JobDetail() {
 
   const merged = { ...profile.skills, ...draft };
   const futureRequired=scenarioRequirements(career.required,scenario,career.futureSkills);
-  const axes = Object.entries(career.required).map(([skill, need]) => ({ skill, need, future:showFuture?futureRequired[skill]:undefined, have: merged[skill] ?? 0 }));
+  const axes = jobRadarAxes(career.required,merged,showFuture?futureRequired:undefined);
   const preview = computeMatch(career, profile, scenario, merged);
   const dirty = Object.keys(draft).length > 0;
   const isTarget = target === career.id;
@@ -72,11 +74,11 @@ export default function JobDetail() {
       <Link href="/analysis" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground" data-testid="link-back-analysis"><ArrowLeft className="h-4 w-4" />Skill analysis</Link>
       <Reveal>
         <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
-          <div className="flex items-center gap-5">
+          <div className="flex min-w-0 flex-col items-start gap-5 sm:flex-row sm:items-center">
             <motion.div key={spin} initial={{ rotate: -120, scale: 0.8 }} animate={{ rotate: 0, scale: 1 }} transition={{ type: 'spring', stiffness: 110, damping: 14 }}><ScoreRing score={preview.score} size={104} /></motion.div>
             <div>
               <p className="eyebrow">Career target{isTarget && ' · current'}</p>
-              <h1 className="mt-1 font-display text-5xl leading-none sm:text-6xl" data-testid="text-job-title">{career.title}</h1>
+              <h1 className="mt-1 break-words font-display text-4xl leading-none sm:text-6xl" data-testid="text-job-title">{career.title}</h1>
               <p className="mt-2 text-muted-foreground">{career.blurb}</p>
             </div>
           </div>
@@ -86,7 +88,7 @@ export default function JobDetail() {
       </Reveal>
 
       {/* three column: job SDG | radar | skill SDG */}
-      <div className="grid gap-6 lg:grid-cols-[260px_1fr_260px]">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[260px_1fr_260px]">
         <Reveal><Card className="h-full" testId="panel-job-sdg">
           <p className="eyebrow mb-1">SDG explanation</p><p className="mb-4 font-medium">This job's SDGs</p>
           <div className="mb-5 flex flex-col items-start gap-2">{career.sdgs.map((n) => <SdgPill key={n} n={n} onHover={setHoverJobSdg} active={hoverJobSdg === n} />)}</div>
@@ -96,13 +98,13 @@ export default function JobDetail() {
           <div className="flex flex-wrap items-center justify-between gap-2"><p className="font-display text-2xl">Skill hexagon</p><RadarLegend withNeed /></div>
           <div className="mt-4 flex flex-wrap items-center gap-3"><label className="text-xs"><input type="checkbox" checked={showFuture} onChange={e=>setShowFuture(e.target.checked)}/> Show future target</label>{showFuture&&<ScenarioToggle id="radar-future" compact/>}</div><p className="mt-3 text-xs text-muted-foreground">Gold: current catalogue target. Purple dashed: selected future target. What-if assumption: selected role skills +1 for moderate AI development, +2 for fast (maximum 5); not an ESCO forecast.</p>
           <EscoReference careerId={career.id} /><OnetReference careerId={career.id} /><PathwayEvidence careerId={career.id}/>
-          <div className="mx-auto max-w-[460px]"><SkillRadar axes={axes} size={440} showSdg hovered={hoverSkill} onHover={setHoverSkill} /></div>
+          <p className="mt-3 text-xs text-muted-foreground">{new Set(Object.keys(profile.skills).map(skillKey)).size} assessed skills in your profile; all are included here. Extra profile skills have no role target and do not change this role’s score.</p><Link href="/pathway?step=skills" className="mt-3 inline-block text-xs underline">Add or edit profile skills →</Link><div className="mx-auto max-w-[460px]"><SkillRadar axes={axes} size={440} showSdg hovered={hoverSkill} onHover={setHoverSkill} /></div>
         </Card></Reveal>
         <Reveal delay={0.1}><Card className="h-full" testId="panel-skill-sdg">
           <p className="eyebrow mb-1">SDG explanation</p><p className="mb-4 font-medium">Each skill's SDG</p>
           <ul className="mb-5 space-y-1">{axes.map((a) => (
-            <li key={a.skill} onMouseEnter={() => setHoverSkill(a.skill)} onMouseLeave={() => setHoverSkill(null)} className={cn('flex cursor-default items-center justify-between rounded-lg px-2 py-1 text-sm transition-colors', hoverSkill === a.skill && 'bg-white shadow-sm')}>
-              <span className={cn(a.have < a.need && 'text-[hsl(330_60%_50%)]')}>{a.skill}</span>
+            <li key={a.skill} tabIndex={0} onFocus={()=>setHoverSkill(a.skill)} onClick={()=>setHoverSkill(a.skill)} onMouseEnter={() => setHoverSkill(a.skill)} className={cn('flex cursor-default items-center justify-between rounded-lg px-2 py-1 text-sm transition-colors', hoverSkill === a.skill && 'bg-white shadow-sm')}>
+              <span className={cn(a.have !== null && a.need !== undefined && a.have < a.need && 'text-[hsl(330_60%_50%)]')}>{a.skill}</span>
               <span className="grid h-5 w-5 place-items-center rounded-full font-mono text-[9px] text-white" style={{ background: SDGS[skillSdg(a.skill)].color }}>{skillSdg(a.skill)}</span>
             </li>
           ))}</ul>
@@ -111,7 +113,7 @@ export default function JobDetail() {
       </div>
 
       {/* scenario chart + toggle */}
-      <div className="grid gap-6 lg:grid-cols-1">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-1">
         <Reveal><Card className="h-full" testId="card-scenario-chart">
           <CardTitle eyebrow="Skill priorities for this role" title={`Core skills and ${scenario==='fast'?'rapid':'moderate'} AI development`} right={<ScenarioToggle id="job-skill-priorities" compact/>}/>
           <div className="overflow-x-auto"><table className="w-full text-left text-sm"><thead><tr><th className="p-3">Skill</th><th className="p-3">Core for this role?</th><th className="p-3">Future priority</th><th className="p-3">Current → future target</th></tr></thead><tbody>{Object.entries(career.required).map(([skill,level])=><tr key={skill} className="border-t"><td className="p-3">{skill}</td><td className="p-3">{career.core.includes(skill)?'Core':'Supporting'}</td><td className="p-3">{futureRequired[skill]>level?'Growing in selected scenario':'Maintained'}</td><td className="p-3">{level}/5 → {futureRequired[skill]}/5</td></tr>)}</tbody></table></div>
@@ -121,7 +123,7 @@ export default function JobDetail() {
       </div>
 
       {/* description + reassess */}
-      <div className="grid gap-6 lg:grid-cols-[1.4fr_1fr]">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1.4fr_1fr]">
         <Reveal><Card className="h-full" testId="card-description">
           <p className="flex items-center gap-2 font-medium"><SpectrumIcon icon={Bot} size={18} still />The role</p>
           <p className="mt-3 leading-relaxed text-foreground/80">{career.description}</p>{career.qualificationNote&&<p className="mt-4 rounded-xl border p-3 text-sm">{career.qualificationNote}</p>}
@@ -139,9 +141,9 @@ export default function JobDetail() {
           <div className="space-y-4">
             {axes.map((d) => (
               <div key={d.skill}>
-                <div className="flex justify-between text-sm"><span className={cn(d.have < d.need && 'text-[hsl(330_60%_50%)]')}>{d.skill}</span><span className="font-mono text-xs text-muted-foreground">{LEVELS[d.have]} · need {d.need}</span></div>
-                <input type="range" min={0} max={5} value={d.have} className="range mt-2" aria-label={`${d.skill} level`} data-testid={`range-reassess-${d.skill.replace(/\W/g, '')}`}
-                  onChange={(e) => setDraft((x) => ({ ...x, [d.skill]: Number(e.target.value) }))} style={{ background: `linear-gradient(90deg, #8fb0ff, #c08bff ${d.have * 20}%, hsl(232 40% 94%) ${d.have * 20}%)` }} />
+                <div className="flex justify-between text-sm"><span className={cn(d.have !== null && d.need !== undefined && d.have < d.need && 'text-[hsl(330_60%_50%)]')}>{d.skill}</span><span className="font-mono text-xs text-muted-foreground">{d.have===null?'Unassessed':LEVELS[d.have]} · need {d.need??'N/A'}</span></div>
+                <input type="range" min={0} max={5} value={d.have??0} className="range mt-2" aria-label={`${d.skill} level`} data-testid={`range-reassess-${d.skill.replace(/\W/g, '')}`}
+                  onChange={(e) => setDraft((x) => ({ ...x, [d.skill]: Number(e.target.value) }))} style={{ background: `linear-gradient(90deg, #8fb0ff, #c08bff ${(d.have??0) * 20}%, hsl(232 40% 94%) ${(d.have??0) * 20}%)` }} />
               </div>
             ))}
           </div>
@@ -154,7 +156,7 @@ export default function JobDetail() {
         <CardTitle eyebrow="AI explanation" title="Career fit explained" right={!insight.data && !insight.isPending && <Magnetic><button onClick={ask} className="btn-ink" data-testid="button-get-insight"><Sparkles className="h-4 w-4" />Generate insight</button></Magnetic>} />
         <AiStage pending={insight.isPending} error={insight.error} onRetry={ask} testId="insight" phases={['Weighing your skill gaps', 'Reading catalogue requirements', 'Tracing SDG impact', 'Composing next actions']}>
           {insight.data ? (
-            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="grid gap-6 lg:grid-cols-2" data-testid="result-insight">
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="grid grid-cols-1 gap-6 lg:grid-cols-2" data-testid="result-insight">
               <div className="space-y-4">
                 <RecommendationMeta meta={insight.data.meta}/><p className="font-display text-3xl leading-tight">{insight.data.headline}</p>
                 <p className="text-sm leading-relaxed text-muted-foreground">{insight.data.scenarioExplanation}</p>

@@ -1,70 +1,11 @@
-import { motion } from 'framer-motion';
-import { SDGS } from '@/data/careers';
-import { skillSdg } from './bits';
-
-export interface RadarAxis { skill: string; have: number; need?: number; future?: number }
-
-/** Hand-built SVG radar: user hexagon + optional job requirement overlay + SDG tags per point. */
-export function SkillRadar({ axes, size = 360, showSdg, onHover, hovered, compact }: {
-  axes: RadarAxis[]; size?: number; showSdg?: boolean; onHover?: (skill: string | null) => void; hovered?: string | null; compact?: boolean;
-}) {
-  const n = axes.length;
-  if (n < 3) {
-    return <div className="grid place-items-center text-center text-sm text-muted-foreground" style={{ height: size * 0.75 }}>Rate at least three skills to draw your hexagon.</div>;
-  }
-  const pad = compact ? 34 : 70;
-  const vb = size; const c = vb / 2; const R = c - pad;
-  const pt = (i: number, v: number) => { const a = -Math.PI / 2 + (i / n) * Math.PI * 2; return [c + Math.cos(a) * R * (v / 5), c + Math.sin(a) * R * (v / 5)]; };
-  const poly = (vals: number[]) => vals.map((v, i) => pt(i, Math.max(v, 0.08)).join(',')).join(' ');
-  const hasNeed = axes.some((a) => a.need !== undefined);
-  return (
-    <svg viewBox={`0 0 ${vb} ${vb}`} className="h-auto w-full overflow-visible" role="img" aria-label="Skill radar map" data-testid="chart-radar">
-      <defs>
-        <linearGradient id="rad-you" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#7aa7ff" stopOpacity=".55" /><stop offset=".5" stopColor="#b48cff" stopOpacity=".45" /><stop offset="1" stopColor="#ff8fc7" stopOpacity=".45" /></linearGradient>
-        <linearGradient id="rad-you-s" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#5b8bf5" /><stop offset=".5" stopColor="#9a6bff" /><stop offset="1" stopColor="#f070b0" /></linearGradient>
-      </defs>
-      {[1, 2, 3, 4, 5].map((l) => <polygon key={l} points={poly(Array(n).fill(l))} fill={l === 5 ? 'hsl(232 60% 98.5%)' : 'none'} stroke="hsl(232 35% 90%)" strokeWidth={1} />)}
-      {axes.map((_, i) => { const [x, y] = pt(i, 5); return <line key={i} x1={c} y1={c} x2={x} y2={y} stroke="hsl(232 35% 91%)" />; })}
-      {hasNeed && (
-        <motion.polygon initial={false} animate={{ points: poly(axes.map((a) => a.need ?? 0)) }} transition={{ duration: 0.8, ease: [0.2, 0.8, 0.2, 1] }}
-          fill="hsl(40 92% 55% / .08)" stroke="hsl(40 85% 50%)" strokeWidth={1.5} strokeDasharray="5 4" />
-      )}
-      {axes.some(a=>a.future!==undefined)&&<motion.polygon initial={false} animate={{points:poly(axes.map(a=>a.future??a.need??0))}} fill="rgba(130,75,220,.05)" stroke="#824bdc" strokeWidth={2} strokeDasharray="3 3"/>}
-      <motion.polygon initial={false} animate={{ points: poly(axes.map((a) => a.have)) }} transition={{ type: 'spring', stiffness: 120, damping: 16 }}
-        fill="url(#rad-you)" stroke="url(#rad-you-s)" strokeWidth={2} strokeLinejoin="round" />
-      {axes.map((a, i) => {
-        const [x, y] = pt(i, Math.max(a.have, 0.08));
-        return <motion.circle key={a.skill} initial={false} animate={{ cx: x, cy: y, r: hovered === a.skill ? 6 : 3.5 }} fill="#fff" stroke="#9a6bff" strokeWidth={2} />;
-      })}
-      {axes.map((a, i) => {
-        const [x, y] = pt(i, compact ? 5.9 : 6.3);
-        const anchor = Math.abs(x - c) < 8 ? 'middle' : x > c ? 'start' : 'end';
-        const sdg = SDGS[skillSdg(a.skill)];
-        const gap = a.need !== undefined && a.have < a.need;
-        const hot = hovered === a.skill;
-        return (
-          <g key={a.skill} transform={`translate(${x},${y})`} onMouseEnter={() => onHover?.(a.skill)} onMouseLeave={() => onHover?.(null)} style={{ cursor: onHover ? 'help' : 'default' }} data-testid={`radar-point-${a.skill.replace(/\W/g, '')}`}>
-            <rect x={anchor === 'start' ? -6 : anchor === 'end' ? -110 : -58} y={-16} width={116} height={showSdg ? 38 : 24} fill="transparent" />
-            <text textAnchor={anchor} y={showSdg ? -2 : 4} fontSize={compact ? 10 : 12} fontWeight={hot ? 600 : 500} fill={gap ? 'hsl(330 60% 50%)' : 'hsl(232 30% 22%)'}>{a.skill}</text>
-            {showSdg && (
-              <g transform={`translate(${anchor === 'start' ? 0 : anchor === 'end' ? -46 : -23},6)`}>
-                <rect width={46} height={15} rx={7.5} fill={hot ? sdg.color : '#fff'} stroke={sdg.color} strokeWidth={1} />
-                <text x={23} y={10.8} textAnchor="middle" fontSize={9} fontFamily="Geist Mono" fill={hot ? '#fff' : sdg.color}>SDG {sdg.n}</text>
-              </g>
-            )}
-          </g>
-        );
-      })}
-    </svg>
-  );
+import {useState,useId} from 'react';
+import {SDGS} from '@/data/careers';
+import {skillSdg} from './bits';
+import {hexagonPages,chartSegments,type RadarValue} from '@/lib/radar-model';
+export type RadarAxis=RadarValue;
+export function SkillRadar({axes,size=360,showSdg,onHover,hovered,compact}:{axes:RadarAxis[];size?:number;showSdg?:boolean;onHover?:(skill:string|null)=>void;hovered?:string|null;compact?:boolean}){
+ const [page,setPage]=useState(0),id=useId().replace(/:/g,'');const pages=hexagonPages(axes),active=Math.min(page,pages.length-1),slots=pages[active],n=6,c=size/2,R=c-(compact?55:84);const pt=(i:number,v:number)=>{const a=-Math.PI/2+i/n*Math.PI*2;return [c+Math.cos(a)*R*v/5,c+Math.sin(a)*R*v/5];};const points=(values:number[])=>values.map((v,i)=>pt(i,v).join(',')).join(' ');
+ const shape=(values:(number|null|undefined)[],color:string,fill:string,dashed=false)=>values.every(v=>v!=null)?<polygon points={points(values as number[])} fill={fill} stroke={color} strokeWidth={2} strokeDasharray={dashed?'5 4':undefined}/>:<g>{chartSegments(values).filter(a=>a.length>1).map((indices,i)=><polyline key={i} points={indices.map(j=>pt(j,values[j]!).join(',')).join(' ')} fill="none" stroke={color} strokeWidth={2} strokeDasharray={dashed?'5 4':undefined}/>)}</g>;
+ return <div className="min-w-0"><svg viewBox={`0 0 ${size} ${size}`} className="h-auto w-full" role="img" aria-label="Six-axis skill hexagon; unassessed skills are N/A" data-testid="chart-radar"><defs><linearGradient id={'rad-'+id}><stop stopColor="#7aa7ff" stopOpacity=".4"/><stop offset="1" stopColor="#ff8fc7" stopOpacity=".35"/></linearGradient></defs>{[5,4,3,2,1].map(l=><polygon key={l} points={points(Array(6).fill(l))} fill={l===5?'hsl(232 60% 98.5%)':'none'} stroke="hsl(232 35% 88%)"/>)}{slots.map((a,i)=>{const [x,y]=pt(i,5);return <line key={i} x1={c} y1={c} x2={x} y2={y} stroke="hsl(232 35% 90%)"/>;})}{shape(slots.map(a=>a.need),'#dda341','rgba(221,163,65,.07)',true)}{shape(slots.map(a=>a.future),'#824bdc','rgba(130,75,220,.05)',true)}{shape(slots.map(a=>a.have),'#9a6bff',`url(#rad-${id})`)}{slots.map((a,i)=>{const [x,y]=pt(i,6.35);const anchor='middle' as const;const hot=hovered===a.skill,sdg=SDGS[skillSdg(a.skill)];const have=a.have;const [px,py]=pt(i,have??0);return <g key={i}><g transform={`translate(${x},${y})`} role={onHover&&!a.placeholder?'button':undefined} tabIndex={onHover&&!a.placeholder?0:undefined} onFocus={()=>!a.placeholder&&onHover?.(a.skill)} onClick={()=>!a.placeholder&&onHover?.(a.skill)} onMouseEnter={()=>!a.placeholder&&onHover?.(a.skill)} data-testid={a.placeholder?undefined:`radar-point-${a.skill.replace(/\W/g,'')}`}><text textAnchor={anchor} fontSize={compact?9:10} fill={a.placeholder?'#9ca3af':hot?'#824bdc':'#333'} fontWeight={hot?600:500}>{a.skill.length>20?a.skill.slice(0,18)+'…':a.skill}<title>{a.skill}</title></text><text textAnchor={anchor} y={14} fontSize={9} fill="#777">{have===null?'N/A':`${Number(have.toFixed(1))}/5`}</text>{showSdg&&!a.placeholder&&sdg&&<text textAnchor={anchor} y={27} fontSize={9} fill={sdg.color}>SDG {sdg.n}</text>}</g>{have!==null&&<circle cx={px} cy={py} r={hot?6:3.5} fill="#fff" stroke="#9a6bff" strokeWidth={2}/>}</g>;})}</svg><p className="text-center text-[10px] text-muted-foreground">N/A means unassessed or an unused axis, not zero. Only assessed points are drawn.</p>{pages.length>1&&<div className="mt-3 flex items-center justify-center gap-3 text-xs"><button className="underline" disabled={active===0} onClick={()=>setPage(active-1)}>Previous skills</button><span>{active+1}/{pages.length} · {axes.length} skills</span><button className="underline" disabled={active===pages.length-1} onClick={()=>setPage(active+1)}>More skills</button></div>}</div>;
 }
-
-export function RadarLegend({ withNeed }: { withNeed?: boolean }) {
-  return (
-    <div className="flex flex-wrap gap-4 text-xs text-muted-foreground">
-      <span className="flex items-center gap-1.5"><i className="h-2.5 w-2.5 rounded-sm bg-gradient-to-br from-[#7aa7ff] to-[#ff8fc7]" />You</span>
-      {withNeed && <span className="flex items-center gap-1.5"><i className="h-2.5 w-2.5 rounded-sm border border-dashed border-[hsl(40_85%_50%)]" />Job requirement</span>}
-      {withNeed && <span className="flex items-center gap-1.5"><i className="h-2.5 w-2.5 rounded-sm bg-[hsl(330_60%_50%)]" />Gap skill</span>}
-    </div>
-  );
-}
+export function RadarLegend({withNeed}:{withNeed?:boolean}){return <div className="flex flex-wrap gap-3 text-xs text-muted-foreground"><span>● Assessed level</span>{withNeed&&<><span className="text-amber-600">┄ Role requirement</span><span className="text-violet-600">┄ Future scenario</span></>}</div>;}

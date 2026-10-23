@@ -1,3 +1,4 @@
+import {targetForContext} from '../../../../supabase/functions/faraway-recommendations/sdg-targets';
 import {skillGoal} from '../../../../supabase/functions/faraway-recommendations/impact-context';
 import {ImpactStory} from './impact-story';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
@@ -69,7 +70,7 @@ export function SdgPill({ n, small, onHover, active }: { n: number; small?: bool
   const s = SDGS[n];
   if (!s) return null;
   return (
-    <span title={`SDG ${n}: ${s.title}`} role={onHover ? "button" : undefined} tabIndex={onHover ? 0 : undefined} onFocus={() => onHover?.(n)} onBlur={() => onHover?.(null)} onClick={() => onHover?.(active ? null : n)} onKeyDown={(e) => {if(e.key === "Enter" || e.key === " "){e.preventDefault();onHover?.(active ? null : n);}}} onMouseEnter={() => onHover?.(n)} onMouseLeave={() => onHover?.(null)} data-testid={`pill-sdg-${n}`}
+    <span title={`SDG ${n}: ${s.title}`} role={onHover ? "button" : undefined} tabIndex={onHover ? 0 : undefined} onFocus={() => onHover?.(n)} onClick={() => onHover?.(n)} onKeyDown={(e) => {if(e.key === "Enter" || e.key === " "){e.preventDefault();onHover?.(n);}}} onMouseEnter={() => onHover?.(n)} data-testid={`pill-sdg-${n}`}
       className={cn('inline-flex cursor-default items-center gap-2 rounded-full border bg-white/80 transition-all', small ? 'py-0.5 pl-0.5 pr-2 text-[10.5px]' : 'py-1 pl-1 pr-3 text-xs', active && 'shadow-md')}
       style={active ? { borderColor: s.color } : undefined}>
       <span className="grid place-items-center rounded-full font-mono font-semibold text-white" style={{ background: s.color, width: small ? 16 : 22, height: small ? 16 : 22, fontSize: small ? 9 : 10 }}>{n}</span>
@@ -81,6 +82,7 @@ export function SdgPill({ n, small, onHover, active }: { n: number; small?: bool
 /** Hover explanation panel for an SDG: what it is, and how the job / skill links to it. */
 export function SdgExplain({ n, skill, job, placeholder }: { n: number | null; skill?: string | null; job?: string; placeholder: string }) {
   const s = n ? SDGS[n] : null;
+  const target=n?targetForContext(n,skill??'',job??''):null;
   return (
     <div className="relative min-h-[150px]" aria-live="polite">
       {s ? (
@@ -91,7 +93,7 @@ export function SdgExplain({ n, skill, job, placeholder }: { n: number | null; s
           </div>
           {skill && <p className="text-sm"><strong className="font-medium">{skill}</strong>: turn practice into possibility.</p>}
           {job && !skill && <p className="text-sm"><strong className="font-medium">{job}</strong>: work with a purpose.</p>}
-          <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{SDG_WHY[s.n]}</p><ImpactStory job={job} skill={skill} n={s.n}/>
+          <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{SDG_WHY[s.n]}</p>{target&&<div className="mt-3 rounded-xl border p-3 text-xs"><p className="font-medium">Target {target.id} · {target.title}</p><p className="mt-2">{target.summary}</p><a className="mt-2 inline-block underline" href={target.url} target="_blank" rel="noreferrer">UN target reference ↗</a><p className="mt-2 text-[10px] text-muted-foreground">Faraway’s suggested link · potential contribution, not measured achievement</p></div>}<ImpactStory job={job} skill={skill} n={s.n}/>
           <div className="mt-4 h-1 w-full overflow-hidden rounded-full bg-muted"><motion.div className="h-full rounded-full" style={{ background: s.color }} initial={{ width: 0 }} animate={{ width: '100%' }} transition={{ duration: 0.8 }} /></div>
         </motion.div>
       ) : <p className="pt-2 text-sm leading-relaxed text-muted-foreground">{placeholder}</p>}
