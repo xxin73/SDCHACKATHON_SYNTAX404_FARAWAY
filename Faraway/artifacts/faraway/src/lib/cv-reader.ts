@@ -1,5 +1,5 @@
 import type { Profile } from './store';
-export type CvResult = Pick<Profile,'name'|'email'|'location'|'summary'|'highest'|'years'|'roles'|'ug'|'pg'|'phd'> & {skills:{name:string;level:number}[];suggestedStream:string;missing:string[]};
+export type CvResult = Pick<Profile,'name'|'email'|'location'|'summary'|'highest'|'years'|'roles'|'ug'|'pg'|'phd'> & {skills:{name:string;level:number}[];suggestedStream:string;missing:string[];educationText?:string;experienceText?:string};
 export async function readCvText(input:{fileName:string;contentBase64:string}):Promise<string>{
   const ext=input.fileName.split('.').pop()?.toLowerCase();
   if(!['txt','pdf','png','jpg','jpeg'].includes(ext??''))throw new Error('Choose a PDF, TXT, PNG, JPG or JPEG CV.');
@@ -28,9 +28,23 @@ export async function readCvText(input:{fileName:string;contentBase64:string}):P
     return text.join('\n');
   } finally {await loading.destroy();}
 }
-export function parseCvText(text:string,knownSkills:string[],current:Profile):CvResult {
+
+export function detectSkills(text:string, knownSkills:string[]):string[] {
+  const aliases:Record<string,string[]>={SQL:['sql','mysql','postgresql','sqlite'], 'C++':['c++','cpp'], 'Web Development':['website','web development','web application','web app'], JavaScript:['javascript','js'], 'Data Visualisation':['data visualization','data visualisation'], 'Git & DevOps':['git','devops']};
+  const candidates=Array.from(new Set([...knownSkills,'C++','Web Development','HTML','CSS']));
+  return candidates.filter(skill=>(aliases[skill]??[skill]).some(alias=>new RegExp('(^|[^a-z0-9])'+alias.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'(?=$|[^a-z0-9])','i').test(text)));
+}
+export function parseCvText(text:string,knownSkills:string[],_current?:Profile):CvResult {
   if(text.trim().length<5)throw new Error('No readable text found. Try a clearer image, an unlocked PDF, or enter your details manually.');
   const lines=text.split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
-  const name=lines.find(s=>s.length>=3&&s.length<80&&!/@|https?:|curriculum|resume|\bcv\b|\d{5}/i.test(s))??'';
-  return {name,email:text.match(/[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}/)?.[0]??'',location:'',summary:'',highest:current.highest,years:current.years,roles:current.roles,ug:current.ug,pg:current.pg,phd:current.phd,skills:knownSkills.filter(s=>new RegExp(`(^|[^a-z])${s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')}([^a-z]|$)`,'i').test(text)).map(name=>({name,level:0})),suggestedStream:'',missing:['location','experience responsibilities','education','summary','skill ratings: detected keywords need your assessment']};
+  const named=lines.find(s=>/^(?:full\s+)?name\s*:/i.test(s))?.replace(/^(?:full\s+)?name\s*:\s*/i,'');
+  const name=named??lines.slice(0,8).find(s=>/^[\p{L}][\p{L} .'’-]{2,69}$/u.test(s)&&s.split(/\s+/).length>=2&&!/student|engineer|developer|analyst|manager|assistant|education|experience|skills|profile|summary|curriculum|resume|university|college|bachelor|master|contact|address|malaysia/i.test(s))??'';
+  const location=lines.find(s=>/^(?:location|address|based in)\s*:/i.test(s))?.replace(/^[^:]+:\s*/,'')??lines.find(s=>/\b(?:Johor|Selangor|Kuala Lumpur|Penang|Perak|Sabah|Sarawak|Melaka|Negeri Sembilan|Pahang|Kedah|Perlis|Kelantan|Terengganu|Putrajaya|Sepang|Batu Pahat)\b/i.test(s)&&!/@|university|college|school|sdn|bhd/i.test(s))??'';
+  const section=(heading:RegExp)=>{const start=lines.findIndex(l=>heading.test(l));if(start<0)return '';const end=lines.findIndex((l,i)=>i>start&&/^(education|(?:work |professional )?experience|skills|projects|references|certifications|summary|profile|interests)\s*:?$/i.test(l));return lines.slice(start+1,end<0?undefined:end).join('\n');};
+  const education=section(/^education\s*:?$/i)||lines.filter(l=>/bachelor|master|ph\.?d|a.level|stpm|foundation|igcse|\bspm\b|diploma/i.test(l)).join('\n');
+  const highest:Profile['highest']=/ph\.?d|doctorate/i.test(education)?'PhD':/master/i.test(education)?'Masters':/bachelor|degree/i.test(education)?'Degree':/diploma/i.test(education)?'Diploma':/a.level|stpm|foundation|pre.u/i.test(education)?'Pre-U':/igcse|\bspm\b|secondary/i.test(education)?'Secondary':'';
+  const experience=section(/^(?:work |professional |employment )?experience\s*:?$/i);
+  const summary=section(/^(?:professional )?(?:summary|profile|objective)\s*:?$/i);
+  const empty=()=>({field:'',institution:'',year:''});
+  return {name,email:text.match(/[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}/)?.[0]??'',location,summary,highest,years:0,roles:[],ug:empty(),pg:empty(),phd:empty(),skills:detectSkills(text,knownSkills).map(name=>({name,level:0})),suggestedStream:'',missing:[...(!name?['name']:[]),...(!location?['location']:[]),...(!education?['education']:[]),...(!experience?['experience']:[])],educationText:education,experienceText:experience};
 }
