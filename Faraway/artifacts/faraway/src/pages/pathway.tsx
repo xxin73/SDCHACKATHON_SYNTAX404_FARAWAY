@@ -1,9 +1,9 @@
-import { useRef, useState, type DragEvent } from 'react';
+import { useEffect, useRef, useState, type DragEvent } from 'react';
 import { useLocation } from 'wouter';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowLeft, ArrowRight, Check, FileUp, Plus, ScanLine, Trash2, UserRound, X } from 'lucide-react';
 import { useParseCv } from '@/lib/local-engine';
-import type { CvResult as ParsedCv } from '@/lib/cv-reader';
+import { detectSkills, type CvResult as ParsedCv } from '@/lib/cv-reader';
 import { ALL_SKILLS, CAREERS, STREAMS, careerById, careerInScenario } from '@/data/careers';
 import { setState, useStore, type Highest, type Profile } from '@/lib/store';
 import { AiStage, SpectrumIcon } from '@/components/spectrum';
@@ -32,6 +32,9 @@ export default function Pathway() {
   const fileRef = useRef<HTMLInputElement>(null);
   const lastInput = useRef<{ fileName: string; mimeType: string; contentBase64: string } | null>(null);
   const [drag, setDrag] = useState(false);
+  const [preview, setPreview] = useState<{url:string;type:string;name:string}|null>(null);
+  const [cvReview,setCvReview]=useState<ParsedCv|null>(null);
+  useEffect(()=>()=>{if(preview)URL.revokeObjectURL(preview.url);},[preview]);
 
   const stream = STREAMS.find((s) => s.id === profile.stream);
   const skillList = Array.from(new Set([...(stream?.skills ?? []), ...CAREERS.filter(c=>profile.careers.includes(c.id)||c.id===target).flatMap(c=>Object.keys(c.required)), ...Object.keys(profile.skills)]));
@@ -42,7 +45,7 @@ export default function Pathway() {
     r.skills.forEach((s) => { skills[s.name] = profile.skills[s.name] ?? 0; });
     upd((p) => ({
       name: r.name || p.name, email: r.email || p.email, location: r.location || p.location, summary: r.summary || p.summary,
-      highest: r.highest || p.highest, years: r.years ?? p.years, roles: r.roles?.length ? r.roles : p.roles, ug: r.ug.field ? r.ug : p.ug, pg: r.pg.field ? r.pg : p.pg, phd: r.phd.field ? r.phd : p.phd,
+      highest: r.highest || p.highest, years: p.years, roles: r.roles?.length ? r.roles : p.roles, ug: r.ug.field ? r.ug : p.ug, pg: r.pg.field ? r.pg : p.pg, phd: r.phd.field ? r.phd : p.phd,
       skills: { ...p.skills, ...skills }, stream: p.stream || r.suggestedStream,
     }));
     const empty = ['name', 'email', 'location'].filter((k) => !(r as unknown as Record<string, string>)[k]);
@@ -51,11 +54,12 @@ export default function Pathway() {
   };
   const run = (input: { fileName: string; mimeType: string; contentBase64: string }) => {
     lastInput.current = input;
-    parse.mutate({ data: { ...input, knownSkills: ALL_SKILLS } }, { onSuccess: apply });
+    parse.mutate({ data: { ...input, knownSkills: ALL_SKILLS } }, { onSuccess: setCvReview });
   };
   const onFile = (f?: File | null) => {
     if (!f || parse.isPending) return;
     if (f.size > 8 * 1024 * 1024) { toast({ title: 'File too large', description: 'Please upload a CV under 8 MB.' }); return; }
+    setPreview({url:URL.createObjectURL(f),type:f.type|| (f.name.toLowerCase().endsWith('.pdf')?'application/pdf':'text/plain'),name:f.name}); setCvReview(null);
     const reader = new FileReader();
     reader.onload = () => { const res = String(reader.result); run({ fileName: f.name, mimeType: f.type || 'application/octet-stream', contentBase64: res.slice(res.indexOf(',') + 1) }); };
     reader.readAsDataURL(f);
@@ -79,8 +83,10 @@ export default function Pathway() {
           <input ref={fileRef} type="file" accept=".pdf,.txt,.png,.jpg,.jpeg,application/pdf,text/plain,image/png,image/jpeg" className="hidden" onChange={(e) => { onFile(e.target.files?.[0]); e.target.value = ''; }} data-testid="input-cv-file" />
         </div>
       </AiStage>
+      {preview&&<div className="rounded-2xl border p-3"><p className="mb-2 text-sm font-medium">{preview.name}</p>{preview.type.startsWith('image/')?<img src={preview.url} alt="Your uploaded CV" className="w-full"/>:<iframe src={preview.url} title="Your uploaded CV" className="h-[480px] w-full"/>}</div>}
+      {cvReview&&<div className="space-y-3 rounded-2xl border bg-white p-4"><h3 className="font-medium">Review extracted details</h3><p className="text-xs">Only the uploaded file is used. Empty fields keep your saved details. Check every suggestion before applying.</p>{(['name','email','location'] as const).map(k=><label key={k} className="block text-sm">{k}<input className="field" value={cvReview[k]} onChange={e=>setCvReview({...cvReview,[k]:e.target.value})}/></label>)}<p className="text-sm">Education detected: {cvReview.highest||'Needs manual review'}</p>{cvReview.educationText&&<pre className="whitespace-pre-wrap text-xs">{cvReview.educationText}</pre>}{cvReview.experienceText&&<><p className="text-sm">Experience text — use this to enter your roles; dates and durations are not guessed.</p><pre className="whitespace-pre-wrap text-xs">{cvReview.experienceText}</pre></>}<p className="text-xs">Suggested skills (rate these yourself): {cvReview.skills.map(s=>s.name).join(', ')||'None detected'}</p><button className="btn-ink" onClick={()=>{apply(cvReview);setCvReview(null);}}>Apply reviewed details</button><button className="btn-ghost" onClick={()=>setCvReview(null)}>Discard</button></div>}
       <p className="text-xs text-muted-foreground">No CV? Enter your information manually. Image/scanned PDF reading currently uses English OCR and downloads recognition files on first use.</p>
-      {missing.length > 0 && <p className="rounded-2xl bg-[hsl(30_100%_97%)] p-3 text-xs text-[hsl(25_60%_38%)]" data-testid="text-missing">Not found in CV: {missing.join(', ')}. Fill the dashed boxes.</p>}
+      {missing.length > 0 && <p className="rounded-2xl bg-[hsl(30_100%_97%)] p-3 text-xs text-[hsl(25_60%_38%)]" data-testid="text-missing">Could not confidently extract: {missing.join(', ')}. Review or enter these details manually; they may still be present in your CV.</p>}
     </div>
   );
 
@@ -141,14 +147,14 @@ export default function Pathway() {
                   </div>
                   <div>
                     <h2 className="font-display text-3xl">Experience</h2>
-                    <p className="mt-3 text-sm text-muted-foreground">Add each role and its duration in years. Total experience updates automatically; count overlapping work only once using the total override.</p>
-                    <Field label="Total relevant experience (years; override if roles overlap)"><input type="number" min={0} max={80} step={0.25} className="field mt-3 max-w-xs" value={profile.years} onChange={e=>upd(()=>({years:Math.max(0,Math.min(80,Number(e.target.value)))}))} data-testid="input-years"/></Field>
+                    <p className="mt-3 text-sm text-muted-foreground">Add each role and its duration in years. Total experience updates automatically; If roles overlap, adjust the total below to count that time once.</p>
+                    <Field label="Total relevant experience in years (adjust if roles overlap)"><input type="number" min={0} max={80} step={0.25} className="field mt-3 max-w-xs" value={profile.years} onChange={e=>upd(()=>({years:Math.max(0,Math.min(80,Number(e.target.value)))}))} data-testid="input-years"/></Field>
                     <div className="mt-4 space-y-3">
                       {profile.roles.map((r,i)=><div key={i} className="rounded-2xl border bg-white/70 p-4"><div className="grid gap-3 sm:grid-cols-3">
                         <Field label="Job title"><input className="field" placeholder="For example: pharmacy assistant" value={r.title} onChange={e=>upd(p=>({roles:p.roles.map((x,j)=>j===i?{...x,title:e.target.value}:x)}))} data-testid={`input-role-title-${i}`}/></Field>
                         <Field label="Company / organisation"><input className="field" value={r.company} onChange={e=>upd(p=>({roles:p.roles.map((x,j)=>j===i?{...x,company:e.target.value}:x)}))} data-testid={`input-role-company-${i}`}/></Field>
                         <Field label="Duration in years (0.5 = 6 months)"><input className="field" type="number" min={0} max={80} step={0.25} value={r.years} onChange={e=>upd(p=>{const roles=p.roles.map((x,j)=>j===i?{...x,years:Math.max(0,Math.min(80,Number(e.target.value)))}:x);return {roles,years:Math.min(80,roles.reduce((n,x)=>n+x.years,0))};})} data-testid={`input-role-years-${i}`}/></Field>
-                      </div><Field label="Responsibilities and achievements"><textarea className="field mt-3" value={r.responsibilities??''} placeholder="What did you do? Which tools did you use? What did you achieve?" onChange={e=>upd(p=>({roles:p.roles.map((x,j)=>j===i?{...x,responsibilities:e.target.value.slice(0,3000)}:x)}))}/></Field><button className="btn-ghost mt-2 text-xs" onClick={()=>{const found=ALL_SKILLS.filter(sk=>(r.responsibilities??'').toLowerCase().includes(sk.toLowerCase()));upd(p=>({skills:{...Object.fromEntries(found.map(sk=>[sk,0])),...p.skills}}));toast({title:found.length?'Skills added for your review':'No catalogue keywords found',description:found.length?found.join(', '):'Add skills manually in the Skills step.'});}}>Find skills in responsibilities</button><button className="btn-ghost mt-2 text-xs" onClick={()=>upd(p=>{const roles=p.roles.filter((_,j)=>j!==i);return {roles,years:roles.reduce((n,x)=>n+x.years,0)};})} data-testid={`button-remove-role-${i}`}><Trash2 size={14}/>Remove this role</button></div>)}
+                      </div><Field label="Responsibilities and achievements"><textarea className="field mt-3" value={r.responsibilities??''} placeholder="What did you do? Which tools did you use? What did you achieve?" onChange={e=>upd(p=>({roles:p.roles.map((x,j)=>j===i?{...x,responsibilities:e.target.value.slice(0,3000)}:x)}))}/></Field><button className="btn-ghost mt-2 text-xs" onClick={()=>{const found=detectSkills(r.responsibilities??'',ALL_SKILLS);upd(p=>({skills:{...Object.fromEntries(found.map(sk=>[sk,0])),...p.skills}}));toast({title:found.length?'Skills added for your review':'No catalogue keywords found',description:found.length?found.join(', '):'Add skills manually in the Skills step.'});}}>Find skills in responsibilities</button><button className="btn-ghost mt-2 text-xs" onClick={()=>upd(p=>{const roles=p.roles.filter((_,j)=>j!==i);return {roles,years:roles.reduce((n,x)=>n+x.years,0)};})} data-testid={`button-remove-role-${i}`}><Trash2 size={14}/>Remove this role</button></div>)}
                       <button onClick={() => upd((p) => ({ roles: [...p.roles, { title: '', company: '', years: 0, responsibilities: '' }] }))} className={cn('btn-ghost', !profile.roles.length && missing.some((m) => m.includes('role') || m.includes('experience')) && 'field-missing')} data-testid="button-add-role"><Plus className="h-4 w-4" />Add role</button>
                     </div>
                   </div>
