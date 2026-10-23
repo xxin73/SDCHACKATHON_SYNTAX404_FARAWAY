@@ -10,7 +10,7 @@ export type Module = { courseId: string; courseVersion: string; title: string; p
 export type PlanResult = { overview: string; modules: Module[]; missing: string[]; totalHours: number; totalCost: number; totalWeeks: number };
 export type Explanation = { careerId: string; fitSummary: string; actions: string[] };
 export type Generated = { kind: 'explain' | 'plan'; rankings: Match[]; explanations?: Explanation[]; plan?: PlanResult; careerId?: string; meta: { catalogueVersion: string; cataloguePublishedAt: string; evidenceObservedAt: string | null; evidenceStatus: string; profileHash: string; preferencesHash: string; generatedAt: string; model: string; promptVersion: string; calculationVersion: string } };
-export const PROMPT_VERSION = 'grounded-personal-esco-v2';
+export const PROMPT_VERSION = 'grounded-personal-esco-v3';
 export const CALCULATION_VERSION = 'weighted-baseline-v1';
 
 function object(value: unknown): asserts value is Record<string, unknown> {
