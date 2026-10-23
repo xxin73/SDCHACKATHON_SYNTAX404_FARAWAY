@@ -41,7 +41,7 @@ export function Login() {
           </motion.div>
 
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25, duration: 0.9 }} className="mt-10 w-full max-w-sm space-y-3">
-            <button onClick={() => { auth.demo(); go(); }} className="btn-ghost w-full justify-center py-3 shadow-sm" data-testid="button-login-google"><Compass className="h-4 w-4" />Explore the demo</button>
+
             {!showEmail ? (
               <button onClick={() => setShowEmail(true)} className="btn-ink w-full py-3" data-testid="button-login-email"><Mail className="h-4 w-4" />Continue with email</button>
             ) : (
@@ -52,7 +52,7 @@ export function Login() {
                 <button disabled={busy} className="btn-ink w-full py-3" data-testid="button-login-submit">{busy ? 'Signing in…' : 'Sign in'} <ArrowRight className="h-4 w-4" /></button>
               </motion.form>
             )}
-            <p className="text-xs text-muted-foreground">Personal accounts sync securely · demo stays in this browser</p><p className="text-right text-sm text-muted-foreground">New to Faraway? <Link href="/register" className="font-medium text-foreground underline-offset-4 hover:underline" data-testid="link-signup">Create account</Link></p>
+            <p className="text-xs text-muted-foreground">Your profile and progress save securely to your account</p><p className="text-right text-sm text-muted-foreground">New to Faraway? <Link href="/register" className="font-medium text-foreground underline-offset-4 hover:underline" data-testid="link-signup">Create account</Link></p>
           </motion.div>
         </div>
 
@@ -122,7 +122,8 @@ export function Mode() {
   const [, nav] = useLocation();
   const name = useStore((s) => s.session?.name ?? '');
   const [hover, setHover] = useState<'p' | 'o' | null>(null);
-  const choose = (m: 'personal' | 'organization') => { try { localStorage.setItem('faraway_mode', m); } catch { /* ignore */ } nav(m === 'personal' ? '/' : '/organization'); };
+  const [organization, setOrganization] = useState(false);
+  const choose = (m: 'personal' | 'organization') => { if(m==='organization'){setOrganization(true);return;} try { localStorage.setItem('faraway_mode', m); } catch { /* ignore */ } nav(m === 'personal' ? '/' : '/organization'); };
   const opts = [
     { k: 'p' as const, m: 'personal' as const, icon: User, title: 'Personal', sub: 'Fresh graduate, job seeker, or a worker whose role is shifting under AI.' },
     { k: 'o' as const, m: 'organization' as const, icon: Building2, title: 'Organization', sub: 'HR manager, TVET centre or university career office planning for a team.' },
@@ -134,11 +135,11 @@ export function Mode() {
         <div className="flex items-center gap-3"><img src={LOGO} alt="Faraway" className="h-10 w-10 object-contain" /><span className="font-mono text-xs tracking-[0.3em]">FARAWAY</span></div>
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.9 }} className="glass mt-[8vh] rounded-[2.25rem] p-8 sm:p-14">
           <div className="flex items-center gap-3"><SpectrumIcon icon={Compass} size={26} /><p className="eyebrow">{name ? `Welcome, ${name.split(' ')[0]}` : 'Welcome'}</p></div>
-          <h1 className="mt-5 font-display text-5xl leading-[1] sm:text-7xl">Who are you exploring for?</h1>
+          <h1 className="mt-5 font-display text-5xl leading-[1] sm:text-7xl">{organization ? 'Which organisation are you supporting?' : 'Who are you exploring for?'}</h1>
           <p className="mt-4 max-w-xl text-muted-foreground">Faraway tunes its compass differently for one person charting a career and for an organisation charting many.</p>
         </motion.div>
         <div className="mt-6 grid flex-1 gap-6 pb-6 md:grid-cols-2">
-          {opts.map((o, i) => (
+          {organization ? <><button className="glass glass-hover rounded-[2rem] p-8 text-left" data-testid="button-org-company" onClick={()=>{localStorage.setItem('faraway_org_kind','company');localStorage.setItem('faraway_mode','organization');nav('/organization?kind=company');}}><Building2 className="mb-4"/><h2 className="font-display text-3xl">HR manager / employer</h2><p className="mt-3">Reskill employees and track workforce learning.</p></button><button className="glass glass-hover rounded-[2rem] p-8 text-left" data-testid="button-org-university" onClick={()=>{localStorage.setItem('faraway_org_kind','university');localStorage.setItem('faraway_mode','organization');nav('/organization?kind=university');}}><Building2 className="mb-4"/><h2 className="font-display text-3xl">University / TVET career centre</h2><p className="mt-3">Assess student readiness and plan learning pathways.</p></button><button className="btn-ghost" onClick={()=>setOrganization(false)}>Back to workspace choice</button></> : opts.map((o, i) => (
             <motion.button key={o.k} onClick={() => choose(o.m)} onMouseEnter={() => setHover(o.k)} onMouseLeave={() => setHover(null)} data-testid={`button-mode-${o.m}`}
               initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 + i * 0.1, duration: 0.8 }} whileTap={{ scale: 0.985 }}
               className={cn('glass glass-hover group relative flex min-h-[220px] flex-col justify-between rounded-[2.25rem] p-8 text-left', hover === o.k && 'spectrum-border')}>
@@ -158,3 +159,4 @@ export function Mode() {
     </div>
   );
 }
+

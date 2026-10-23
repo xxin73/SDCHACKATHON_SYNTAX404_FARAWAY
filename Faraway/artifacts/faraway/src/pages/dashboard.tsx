@@ -89,7 +89,7 @@ export default function Dashboard() {
       <Reveal>
         <div id="summary" className="glass grid grid-cols-2 gap-px overflow-hidden rounded-[1.75rem] bg-[hsl(232_30%_93%)] md:grid-cols-4" data-testid="band-summary">
           {[
-            { icon: GraduationCap, label: 'Highest education', v: profile.name ? profile.highest : null },
+            { icon: GraduationCap, label: 'Highest education', v: profile.highest || null },
             { icon: Briefcase, label: 'Experience', v: profile.name ? `${profile.years} yrs` : null },
             { icon: Layers, label: 'Skills rated', v: has ? String(Object.keys(profile.skills).length) : null },
             { icon: Target, label: 'Best match', v: ranked[0] ? `${ranked[0].score.toFixed(1)}` : null },
@@ -180,3 +180,4 @@ export default function Dashboard() {
     </div>
   );
 }
+

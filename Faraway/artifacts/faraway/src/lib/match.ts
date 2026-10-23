@@ -1,3 +1,4 @@
+import { courseMatches, preferences } from '../../../../supabase/functions/faraway-recommendations/core';
 import { CAREERS, careerInScenario, type Career, type Scenario } from '@/data/careers';
 import { COURSES, type Course } from '@/data/courses';
 import type { Plan, Profile } from './store';
@@ -37,19 +38,12 @@ export function rankCareers(p: Profile, scenario: Scenario) {
 export function suggested(p: Profile, scenario: Scenario, more: boolean) {
   const ranked = rankCareers(p, scenario);
   const primary = ranked.filter((r) => r.career.stream === p.stream || p.careers.includes(r.career.id));
-  if (!more) return primary.slice(0, 4);
+  if (!more) return [...primary,...ranked.filter(r=>!primary.includes(r))].slice(0, 6);
   return ranked;
 }
 
 export function filterCourses(plan: Plan): Course[] {
-  return COURSES.filter((c) => {
-    if (plan.setting !== 'either' && c.setting !== plan.setting) return false;
-    if (plan.onlineOnly && !c.online) return false;
-    if (plan.cost === 'free' && c.cost > 0) return false;
-    if (plan.cost === 'low' && c.cost > 200) return false;
-    if (plan.cost === 'hrdc' && !c.hrdc) return false;
-    return true;
-  });
+  return COURSES.filter(c=>courseMatches(c,preferences(plan)));
 }
 
 /** best course for a skill under the plan's preferences (never bypasses preferences) */
@@ -70,3 +64,4 @@ export function checklistFor(skill: string, hours: number) {
   ];
   return parts.map((p) => ({ ...p, hours: Math.round(hours * p.w * 100) / 100 }));
 }
+

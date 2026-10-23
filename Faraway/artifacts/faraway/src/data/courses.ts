@@ -14,6 +14,8 @@ export interface Course {
   cost: number; // MYR, 0 = free
   hrdc: boolean;
   online: boolean;
+  delivery?: 'online'|'in-person'|'hybrid';
+  hrdcVerifiedUrl?: string;
   setting: 'indoor' | 'outdoor';
   instructor: string;
   provider: string;

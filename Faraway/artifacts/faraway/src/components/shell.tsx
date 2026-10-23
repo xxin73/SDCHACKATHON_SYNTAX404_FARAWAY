@@ -32,15 +32,16 @@ export function Shell({ children }: { children: ReactNode }) {
 
   const isOrg = loc.startsWith('/organization');
   const items = isOrg ? [
-    {href:'/organization?view=people',label:'People directory',icon:Building2,match:()=>false},
-    {href:'/organization?view=analysis',label:'Workforce intelligence',icon:BarChart3,match:()=>false},
-    {href:'/organization?view=plan',label:'Learning plans',icon:Brain,match:()=>false},
-    {href:'/organization?view=progress',label:'Team progress',icon:Briefcase,match:()=>false},
+    {href:'/organization?view=people',label:'People directory',icon:Building2,match:()=>orgView==='people'},
+    {href:'/organization?view=analysis',label:'Workforce intelligence',icon:BarChart3,match:()=>orgView==='analysis'},
+    {href:'/organization?view=plan',label:'Learning plans',icon:Brain,match:()=>orgView==='plan'},
+    {href:'/organization?view=progress',label:'Team progress',icon:Briefcase,match:()=>orgView==='progress'},
   ] : [
     { href: '/pathway', label: 'Explore pathway', icon: Atom, match: (l: string) => l.startsWith('/pathway') },
     { href: '/analysis', label: 'Skill analysis', icon: BarChart3, match: (l: string) => l.startsWith('/analysis') },
     { href: jobHref, label: 'Career target', icon: Briefcase, match: (l: string) => l.startsWith('/jobs') },
-    { href: '/plan', label: 'Study plan & progress', icon: Brain, match: (l: string) => l.startsWith('/plan') || l.startsWith('/progress') },
+    { href: '/plan', label: 'Study plan', icon: Brain, match: (l: string) => l.startsWith('/plan') },
+    { href: '/progress', label: 'Learning progress', icon: Briefcase, match: (l: string) => l.startsWith('/progress') },
   ];
   const mobileItems = isOrg ? [
     {href:'/organization?view=overview',label:'Home',icon:LayoutGrid,active:orgView==='overview'},
@@ -53,7 +54,8 @@ export function Shell({ children }: { children: ReactNode }) {
     {href:'/pathway',label:'Explore',icon:Atom,active:loc==='/pathway'},
     {href:'/analysis',label:'Insights',icon:BarChart3,active:loc==='/analysis'},
     {href:jobHref,label:'Career',icon:Briefcase,active:loc.startsWith('/jobs')},
-    {href:plan.saved?'/progress':'/plan',label:'Learning',icon:Brain,active:loc==='/plan'||loc==='/progress'},
+    {href:'/plan',label:'Plan',icon:Brain,active:loc==='/plan'},
+    {href:'/progress',label:'Progress',icon:Briefcase,active:loc==='/progress'},
   ];
   const crumb = loc.startsWith('/jobs') ? 'Career target' : CRUMB[loc] ?? 'Personal';
   const name = session?.name ?? 'Guest';
@@ -83,7 +85,7 @@ export function Shell({ children }: { children: ReactNode }) {
         })}
       </nav>
 
-      <nav aria-label="Mobile navigation" className="mobile-bottom-nav md:hidden">{mobileItems.map(({href,label,icon:I,active})=><Link key={label} href={href} aria-current={active?'page':undefined} className={cn('mobile-nav-item',active&&'is-active')}><span className="mobile-nav-icon"><I size={21} strokeWidth={active?2.2:1.7}/></span><span>{label}</span></Link>)}</nav>
+      <nav aria-label="Mobile navigation" className="mobile-bottom-nav md:hidden" style={{gridTemplateColumns:`repeat(${mobileItems.length},minmax(0,1fr))`}}>{mobileItems.map(({href,label,icon:I,active})=><Link key={label} href={href} aria-current={active?'page':undefined} className={cn('mobile-nav-item',active&&'is-active')}><span className="mobile-nav-icon"><I size={21} strokeWidth={active?2.2:1.7}/></span><span>{label}</span></Link>)}</nav>
       <div className="md:pl-[76px]">
         <header className="app-header mx-auto max-w-[1280px] px-4 pt-4 sm:px-8 md:px-12">
           <div className="flex items-center justify-between">
@@ -116,9 +118,10 @@ export function Shell({ children }: { children: ReactNode }) {
           {auth.user && <div className="mb-4 text-sm" role="status" aria-live="polite">{auth.syncStatus.phase === 'saving' ? 'Saving your personal profile…' : auth.syncStatus.phase === 'save-error' ? <><span role="alert">{auth.syncStatus.error} Keep this tab open.</span> <button className="underline" onClick={() => void auth.retry()}>Retry save</button></> : 'Personal profile and skills saved to your account.'}</div>}
           {auth.error && <p className="mb-4 text-sm" role="alert">{auth.error}</p>}
           {children}
-          <footer className="mt-12 border-t pt-5 text-xs text-muted-foreground">Faraway · Working prototype. Signed-in personal profiles, skills and progress sync to your account. Demo and organisation records stay in this browser. Market scenarios, salaries and course listings are illustrative; individual AI explanations and plan ordering use Gemini when configured. Google sign-in and live market evidence are not connected. <Link href="/evidence" className="underline">Review or update evidence</Link></footer>
+          <footer className="mt-12 border-t pt-5 text-xs text-muted-foreground">Faraway · Personal profiles and learning progress sync to your account. Organisation records are stored in this browser. Scenario figures and catalogue course estimates are illustrative; source links and learning resources are identified separately. <Link href="/evidence" className="underline">Review or update evidence</Link></footer>
         </motion.main>
       </div>
     </div>
   );
 }
+

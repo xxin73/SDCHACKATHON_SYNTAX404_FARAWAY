@@ -1,5 +1,5 @@
 // ../../supabase/functions/faraway-recommendations/core.ts
-var PROMPT_VERSION = "grounded-personal-esco-v3";
+var PROMPT_VERSION = "grounded-personal-esco-v4";
 var CALCULATION_VERSION = "weighted-baseline-v1";
 function object(value) {
   if (!value || typeof value !== "object" || Array.isArray(value)) throw new Error("Expected an object.");
@@ -17,10 +17,12 @@ function profileInput(value) {
 }
 function preferences(value) {
   object(value);
-  if (!["indoor", "outdoor", "either"].includes(String(value.setting)) || !["free", "low", "hrdc", "any"].includes(String(value.cost)) || !["recommended", "custom"].includes(String(value.mode)) || typeof value.onlineOnly !== "boolean") throw new Error("Invalid learning preferences.");
+  if (!["indoor", "outdoor", "either"].includes(String(value.setting)) || !["free", "low", "moderate", "hrdc", "any"].includes(String(value.cost)) || !["recommended", "custom"].includes(String(value.mode)) || typeof value.onlineOnly !== "boolean") throw new Error("Invalid learning preferences.");
   if (typeof value.minutesPerDay !== "number" || !Number.isInteger(value.minutesPerDay) || value.minutesPerDay < 15 || value.minutesPerDay > 240) throw new Error("Choose 15\u2013240 study minutes per day.");
   if (typeof value.target !== "string" || value.target.length > 100 || !Array.isArray(value.skills) || value.skills.length > 100 || value.skills.some((x) => typeof x !== "string" || x.length > 100)) throw new Error("Invalid target or skills.");
-  return { target: value.target, setting: String(value.setting), cost: String(value.cost), onlineOnly: value.onlineOnly, minutesPerDay: value.minutesPerDay, mode: String(value.mode), skills: [...value.skills] };
+  if (value.delivery !== void 0 && !["online", "in-person", "hybrid", "any"].includes(String(value.delivery))) throw new Error("Invalid delivery preference.");
+  if (value.futureScenario !== void 0 && !["moderate", "fast"].includes(String(value.futureScenario))) throw new Error("Invalid future scenario.");
+  return { ...value.delivery ? { delivery: value.delivery } : {}, ...value.futureScenario ? { futureScenario: value.futureScenario } : {}, target: value.target, setting: String(value.setting), cost: String(value.cost), onlineOnly: value.onlineOnly, minutesPerDay: value.minutesPerDay, mode: String(value.mode), skills: [...value.skills] };
 }
 function stable(value) {
   if (Array.isArray(value)) return "[" + value.map(stable).join(",") + "]";
@@ -42,14 +44,24 @@ function rank(profile, catalogue) {
     return { careerId: c.id, score, gaps: required.map(([skill, need]) => ({ skill, need, have: profile.skills[skill] ?? 0 })).filter((g) => g.have < g.need).sort((a, b) => b.need - b.have - (a.need - a.have)) };
   }).sort((a, b) => b.score - a.score || a.careerId.localeCompare(b.careerId));
 }
+var FUTURE_SKILLS = ["AI Tools", "Python", "SQL", "Machine Learning", "Data Visualisation", "Cloud Computing"];
+function scenarioRequirements(required, scenario) {
+  return Object.fromEntries(Object.entries(required).map(([skill, level]) => [skill, Math.min(5, level + (scenario && FUTURE_SKILLS.includes(skill) ? scenario === "fast" ? 2 : 1 : 0))]));
+}
+function courseMatches(c, pref) {
+  const delivery = c.delivery ?? (c.online ? "online" : "in-person");
+  return (pref.setting === "either" || pref.setting === c.setting) && (!pref.onlineOnly || delivery === "online") && (!pref.delivery || pref.delivery === "any" || pref.delivery === delivery) && (pref.cost !== "free" || c.cost === 0) && (pref.cost !== "low" || c.cost <= 200) && (pref.cost !== "moderate" || c.cost <= 500) && (pref.cost !== "hrdc" || c.hrdc && Boolean(c.hrdcVerifiedUrl));
+}
 function candidates(catalogue, profile, pref) {
   const match = rank(profile, catalogue).find((m) => m.careerId === pref.target);
   const role = catalogue.careers.find((r) => r.id === pref.target);
   if (!match || !role) throw new Error("Choose a career from the current catalogue.");
-  const selected = [...new Set(pref.mode === "recommended" ? match.gaps.map((g) => g.skill) : pref.skills)];
+  const required = scenarioRequirements(role.required, pref.futureScenario);
+  const gaps = Object.entries(required).map(([skill, need]) => ({ skill, need, have: profile.skills[skill] ?? 0 })).filter((g) => g.have < g.need).sort((a, b) => b.need - b.have - (a.need - a.have));
+  const selected = [...new Set(pref.mode === "recommended" ? gaps.map((g) => g.skill) : pref.skills)];
   const vocabulary = new Set(catalogue.careers.flatMap((r) => Object.keys(r.required)));
   if (selected.some((s) => !vocabulary.has(s))) throw new Error("Selected skill is not in the catalogue.");
-  const pool = catalogue.courses.filter((c) => (pref.setting === "either" || pref.setting === c.setting) && (!pref.onlineOnly || c.online) && (pref.cost !== "free" || c.cost === 0) && (pref.cost !== "low" || c.cost <= 200) && (pref.cost !== "hrdc" || c.hrdc));
+  const pool = catalogue.courses.filter((c) => courseMatches(c, pref));
   const modules = /* @__PURE__ */ new Map();
   const missing = [];
   for (const skill of selected) {
@@ -62,7 +74,7 @@ function candidates(catalogue, profile, pref) {
     entry.skills.push(skill);
     modules.set(course.id, entry);
   }
-  return { match, role, selected, modules: [...modules.values()], missing };
+  return { match: { ...match, gaps }, role: { ...role, required }, selected, modules: [...modules.values()], missing };
 }
 function activities(course) {
   return [{ id: "foundations", title: "Core concepts", w: 0.25 }, { id: "practice", title: "Guided practice exercises", w: 0.3 }, { id: "project", title: "Mini project applying the skill", w: 0.3 }, { id: "assess", title: "Self-assessment and reflection", w: 0.15 }].map((a) => ({ id: a.id, title: a.title, hours: Math.round(course.hours * a.w * 100) / 100 }));

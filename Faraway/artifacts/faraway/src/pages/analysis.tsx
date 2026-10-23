@@ -26,19 +26,17 @@ export default function Analysis() {
   const [future, setFuture] = useState(false);
   const has = profile.complete && !!profile.stream && Object.keys(profile.skills).length > 0;
   const list = has ? suggested(profile, scenario, more) : [];
-  const shown = more ? list : list.slice(0, 3);
+  const shown = more ? list : list.slice(0, 6);
   const max = Math.max(...[...JOB_TRENDS, ...JOB_TRENDS_LINKEDIN].map((d) => Math.max(d.fast, d.moderate, d.history[4])));
 
   return (
     <div className="space-y-8">
-      <PageTitle eyebrow="Skill analysis" title={<>How the market moves<br /><span className="text-muted-foreground">when AI arrives.</span></>} right={<ScenarioToggle id="an-scn" />}>
+      <PageTitle eyebrow="Skill analysis" title={<>How the market moves<br /><span className="text-muted-foreground">when AI arrives.</span></>} >
         Rankings use baseline catalogue requirements; 10% of the score uses illustrative market fixtures. These charts and scenario switches do not change the authenticated recommendation baseline. Illustrative scenario charts, not live market statistics. Imported evidence updates match rankings; the charts below remain labelled scenario fixtures. Two possible adoption futures for Malaysia to 2030. <strong className="font-medium text-foreground">Moderate</strong>: gradual rollout, most firms pilot AI. <strong className="font-medium text-foreground">Fast</strong>: rapid, economy-wide automation of routine tasks.
       </PageTitle>
 
       <Reveal>
-        <FlipCard testId="card-flip-skill-trend" hint={['Click to flip to 2030 scenarios', 'Click to flip back to 2021–2025']}
-          front={<><CardTitle eyebrow="Postings change 2021 → 2025" title="Skill trend · today" /><HBars data={SKILL_TRENDS} field="now" /></>}
-          back={<><CardTitle eyebrow={`Projected to 2030 · ${scenario} adoption`} title={<span>Skill trend · <span className="spectrum-text">future</span></span>} /><HBars data={SKILL_TRENDS} field={scenario} /></>} />
+        <Card testId="card-skill-trend"><CardTitle eyebrow="Skill demand" title={future?'Future skill estimate':'Historical skill trend'} right={<div className="flex flex-wrap gap-3"><div className="inline-flex rounded-xl border bg-white p-1" role="tablist" aria-label="Skill chart view"><button role="tab" aria-selected={!future} className={future?'btn-ghost':'btn-ink'} onClick={()=>setFuture(false)} data-testid="button-chart-history">Historical trend</button><button role="tab" aria-selected={future} className={future?'btn-ink':'btn-ghost'} onClick={()=>setFuture(true)} data-testid="button-chart-future">Future estimate</button></div>{future&&<ScenarioToggle id="an-scn" compact/>}</div>}/><p className="mb-4 text-xs text-muted-foreground">Illustrative figures. {future?'2030 what-if estimate; choose an AI development scenario above.':'2021–2025 example baseline; live sources are not connected yet.'}</p><HBars data={SKILL_TRENDS} field={future?scenario:'now'}/></Card>
       </Reveal>
 
       <div className="grid gap-6 lg:grid-cols-2">
@@ -53,17 +51,7 @@ export default function Analysis() {
       </div>
 
       <Reveal>
-        <div className="flip-3d">
-          <motion.div className="preserve-3d relative grid" animate={{ rotateX: future ? 180 : 0 }} transition={{ duration: 1, ease: [0.2, 0.8, 0.2, 1] }}>
-            {[false, true].map((f) => (
-              <div key={String(f)} className={cn('glass backface-hidden col-start-1 row-start-1 rounded-[1.75rem] p-6', f && 'spectrum-border')} style={f ? { transform: 'rotateX(180deg)' } : undefined}>
-                <CardTitle eyebrow="Job trend · bar reflection" title={f ? <>2030 · <span className="spectrum-text">{scenario} AI</span></> : '2025 · demo baseline'}
-                  right={<div className="flex flex-wrap items-center gap-2"><ScenarioToggle id={`refl-${f}`} compact /><button onClick={() => setFuture(!f)} className="btn-ghost py-1.5 text-xs" data-testid={`button-flip-reflection-${f ? 'back' : 'future'}`}>{f ? 'Back to today' : 'Flip to future'}</button></div>} />
-                <VBars data={JOB_TRENDS} value={(x) => (f ? x[scenario] : x.history[4])} reflect max={max} height={200} />
-              </div>
-            ))}
-          </motion.div>
-        </div>
+        <Card testId="card-future-job-trend"><CardTitle eyebrow="Future job demand · illustrative index" title={`2030 · ${scenario} AI development`} right={<ScenarioToggle id="future-jobs" compact/>}/><VBars data={JOB_TRENDS} value={x=>x[scenario]} reflect max={max} height={200}/><p className="mt-3 text-xs text-muted-foreground">Index values are scenario assumptions, not percentages or measured hiring forecasts.</p></Card>
       </Reveal>
 
       <section>
@@ -74,7 +62,7 @@ export default function Analysis() {
               {shown.map((m, i) => <JobCard key={m.career.id} m={m} i={i} isTarget={target === m.career.id} />)}
             </div>
             <div className="mt-8 flex justify-center">
-              <button onClick={() => setMore((x) => !x)} className="btn-ghost" data-testid="button-explore-more">{more ? 'Show top three' : 'Explore more'}<ChevronDown className={cn('h-4 w-4 transition-transform', more && 'rotate-180')} /></button>
+              <button onClick={() => setMore((x) => !x)} className="btn-ghost" data-testid="button-explore-more">{more ? 'Show top six' : 'Explore more'}<ChevronDown className={cn('h-4 w-4 transition-transform', more && 'rotate-180')} /></button>
             </div>
           </>
         )}
@@ -106,7 +94,7 @@ function JobCard({ m, i, isTarget }: { m: MatchResult; i: number; isTarget: bool
             <motion.div animate={hot ? { scale: 1.12, rotate: -4 } : { scale: 1, rotate: 0 }} transition={{ type: 'spring', stiffness: 200, damping: 14 }}>
               <SpectrumIcon icon={Icon} size={56} still={!hot} />
             </motion.div>
-            <span className="absolute bottom-2 right-3 font-mono text-[10px] text-muted-foreground">demand {m.career.demand.moderate}/{m.career.demand.fast}</span>
+            <span className="absolute bottom-2 right-3 font-mono max-w-full px-2 text-[10px] text-muted-foreground">Scenario demand index: {m.career.demand.moderate}/100 (moderate), {m.career.demand.fast}/100 (fast)</span>
           </Link>
           <p className="text-sm text-muted-foreground">{m.career.blurb}</p>
           <div className="mt-4 flex items-center justify-between text-sm"><span>Match score</span><span className="font-mono font-medium" data-testid={`text-score-${m.career.id}`}>{m.score.toFixed(1)}</span></div>
@@ -119,3 +107,4 @@ function JobCard({ m, i, isTarget }: { m: MatchResult; i: number; isTarget: bool
     </Reveal>
   );
 }
+

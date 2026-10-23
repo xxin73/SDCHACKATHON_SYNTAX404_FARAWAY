@@ -1,3 +1,4 @@
+import { scenarioRequirements } from '../../../../supabase/functions/faraway-recommendations/core';
 import { EscoReference } from '@/components/esco-reference';
 import { hasDatabaseCatalogue } from '@/lib/catalogue-status';
 import { useEffect, useMemo, useState } from 'react';
@@ -34,6 +35,7 @@ export default function JobDetail() {
   const [hoverJobSdg, setHoverJobSdg] = useState<number | null>(null);
   const [draft, setDraft] = useState<Record<string, number>>({});
   const [spin, setSpin] = useState(0);
+  const [showFuture,setShowFuture]=useState(true);
   const [, nav] = useLocation();
   const { toast } = useToast();
   const insight = useGetCareerInsight(id??'');
@@ -44,14 +46,15 @@ export default function JobDetail() {
   if (!profile.stream || !profile.complete || !match) return <NeedProfile />;
 
   const merged = { ...profile.skills, ...draft };
-  const axes = Object.entries(career.required).map(([skill, need]) => ({ skill, need, have: merged[skill] ?? 0 }));
+  const futureRequired=scenarioRequirements(career.required,scenario);
+  const axes = Object.entries(career.required).map(([skill, need]) => ({ skill, need, future:showFuture?futureRequired[skill]:undefined, have: merged[skill] ?? 0 }));
   const preview = computeMatch(career, profile, scenario, merged);
   const dirty = Object.keys(draft).length > 0;
   const isTarget = target === career.id;
 
   const refresh = () => {
     const before = match.score;
-    setState((s) => ({ ...s, profile: { ...s.profile, skills: { ...s.profile.skills, ...draft } } }));
+    setState((s) => ({ ...s, profile: { ...s.profile, skills: { ...s.profile.skills, ...draft }, complete:true } }), true, true);
     setDraft({}); setSpin((x) => x + 1);
     toast({ title: 'Hexagon refreshed', description: `Match moved from ${before.toFixed(1)} to ${preview.score.toFixed(1)}.` });
   };
@@ -89,6 +92,7 @@ export default function JobDetail() {
         </Card></Reveal>
         <Reveal delay={0.05}><Card className="h-full" testId="card-radar">
           <div className="flex flex-wrap items-center justify-between gap-2"><p className="font-display text-2xl">Skill hexagon</p><RadarLegend withNeed /></div>
+          <div className="mt-4 flex flex-wrap items-center gap-3"><label className="text-xs"><input type="checkbox" checked={showFuture} onChange={e=>setShowFuture(e.target.checked)}/> Show future target</label>{showFuture&&<ScenarioToggle id="radar-future" compact/>}</div><p className="mt-3 text-xs text-muted-foreground">Gold: current catalogue target. Purple dashed: selected future target. What-if assumption: digital skills +1 for moderate AI development, +2 for fast (maximum 5); not an ESCO forecast.</p>
           <EscoReference careerId={career.id} />
           <div className="mx-auto max-w-[460px]"><SkillRadar axes={axes} size={440} showSdg hovered={hoverSkill} onHover={setHoverSkill} /></div>
         </Card></Reveal>
@@ -105,35 +109,11 @@ export default function JobDetail() {
       </div>
 
       {/* scenario chart + toggle */}
-      <div className="grid gap-6 lg:grid-cols-[1.4fr_1fr]">
+      <div className="grid gap-6 lg:grid-cols-1">
         <Reveal><Card className="h-full" testId="card-scenario-chart">
-          <CardTitle eyebrow="Illustrative demo only" title="Under each scenario" />
-          <p className="mb-4 text-xs text-muted-foreground">These scenario figures and narratives are unverified fixtures, not predictions. They are excluded from AI explanations; rankings use baseline requirements.</p>
-          <div className="space-y-6">
-            {[{ k: 'demand', label: 'Demo demand index', fmt: (v: number) => `${v}/100`, pct: (v: number) => v },
-              { k: 'automationRisk', label: 'Tasks exposed to automation', fmt: (v: number) => `${v}%`, pct: (v: number) => v },
-              { k: 'growth', label: 'Job growth', fmt: (v: number) => `${v > 0 ? '+' : ''}${v}%`, pct: (v: number) => 50 + v }].map((row) => (
-              <div key={row.k}>
-                <p className="mb-2 text-sm">{row.label}</p>
-                {(['moderate', 'fast'] as Scenario[]).map((s) => { const v = (career[row.k as 'demand'] as Record<Scenario, number>)[s]; return (
-                  <div key={s} className="mb-1.5 grid grid-cols-[72px_1fr_56px] items-center gap-3 text-xs">
-                    <span className={cn('capitalize', s === scenario ? 'font-medium' : 'text-muted-foreground')}>{s}</span>
-                    <div className="h-2.5 overflow-hidden rounded-full bg-[hsl(232_40%_96%)]"><motion.div className={cn('h-full rounded-full', s === scenario ? 'spectrum-bar' : 'bg-[hsl(232_25%_82%)]')} initial={{ width: 0 }} whileInView={{ width: `${Math.max(2, Math.min(100, row.pct(v)))}%` }} viewport={{ once: true }} transition={{ duration: 1 }} /></div>
-                    <span className="text-right font-mono">{row.fmt(v)}</span>
-                  </div>
-                ); })}
-              </div>
-            ))}
-          </div>
-        </Card></Reveal>
-        <Reveal delay={0.08}><Card className="h-full" testId="card-scenario-toggle">
-          <CardTitle eyebrow="Toggle" title="Moderate or fast?" />
-          <ScenarioToggle id="job-scn" />
-          <motion.div key={scenario} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="mt-5 space-y-3 text-sm leading-relaxed text-muted-foreground">
-            {scenario === 'moderate' ? <p><strong className="font-medium text-foreground">Moderate adoption</strong> — Malaysian firms adopt AI gradually through 2030. Most roles are augmented rather than replaced; routine tasks shrink slowly and reskilling has time to catch up.</p>
-              : <p><strong className="font-medium text-foreground">Fast adoption</strong> — AI spreads economy-wide within a few years. Routine and entry-level tasks automate quickly, while infrastructure, security and AI-building roles surge.</p>}
-            <p>For {career.title}: demand <span className="font-mono text-foreground">{career.demand[scenario]}/100</span>, automation exposure <span className="font-mono text-foreground">{career.automationRisk[scenario]}%</span>.</p>
-          </motion.div>
+          <CardTitle eyebrow="Illustrative scenario comparison" title={`Current vs ${scenario} AI development`} right={<ScenarioToggle id="job-compare" compact/>}/>
+          <p className="mb-4 text-xs text-muted-foreground">Current labour-market measurements are not connected. Future numbers below are scenario assumptions, not measured demand or predictions.</p>
+          <table className="w-full text-left text-sm"><thead><tr><th className="p-2">Measure</th><th className="p-2">Current</th><th className="p-2">{scenario==='fast'?'Fast':'Moderate'} AI future</th></tr></thead><tbody>{[{label:'Demand index (0–100)',value:career.demand[scenario]+'/100'},{label:'Tasks exposed to automation',value:career.automationRisk[scenario]+'%'},{label:'Job growth',value:career.growth[scenario]+'%'}].map(r=><tr key={r.label} className="border-t"><td className="p-2">{r.label}</td><td className="p-2 text-muted-foreground">No verified baseline</td><td className="p-2 font-mono">{r.value}</td></tr>)}</tbody></table>
         </Card></Reveal>
       </div>
 
@@ -146,7 +126,7 @@ export default function JobDetail() {
           <p className="mt-3 leading-relaxed text-foreground/80">{career.prospects}</p>
           <div className="mt-6 grid gap-4 sm:grid-cols-2">
             <div className="rounded-2xl border bg-white/80 p-4"><p className="flex items-center gap-1.5 text-xs text-muted-foreground"><Wallet className="h-3.5 w-3.5" />Illustrative salary range</p><p className="mt-2 font-mono text-lg" data-testid="text-salary">{myr(career.salary[0])} – {myr(career.salary[1])}</p><p className="text-xs text-muted-foreground">per month, Malaysia</p></div>
-            <div className="rounded-2xl border bg-white/80 p-4"><p className="flex items-center gap-1.5 text-xs text-muted-foreground"><TrendingUp className="h-3.5 w-3.5" />Illustrative growth scenario</p><p className={cn('mt-2 font-mono text-lg', career.growth[scenario] < 0 && 'text-[hsl(350_60%_52%)]')}>{career.growth[scenario] > 0 ? '+' : ''}{career.growth[scenario]}%</p><p className="text-xs text-muted-foreground">{scenario} adoption</p></div>
+            <div className="rounded-2xl border bg-white/80 p-4"><div className="flex flex-wrap justify-between gap-2"><p className="flex items-center gap-1.5 text-xs text-muted-foreground"><TrendingUp className="h-3.5 w-3.5" />Illustrative growth scenario</p><ScenarioToggle id="growth-scenario" compact/></div><p className={cn('mt-2 font-mono text-lg', career.growth[scenario] < 0 && 'text-[hsl(350_60%_52%)]')}>{career.growth[scenario] > 0 ? '+' : ''}{career.growth[scenario]}%</p><p className="text-xs text-muted-foreground">{scenario} adoption</p></div>
           </div>
           <p className="mt-6 font-medium">Related SDGs</p>
           <div className="mt-3 flex flex-wrap gap-2">{career.sdgs.map((n) => <SdgPill key={n} n={n} />)}</div>

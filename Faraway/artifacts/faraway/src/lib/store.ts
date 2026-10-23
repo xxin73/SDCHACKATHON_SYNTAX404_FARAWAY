@@ -1,10 +1,10 @@
 import { useSyncExternalStore } from 'react';
 import type { Scenario } from '@/data/careers';
 
-export type Highest = 'SPM' | 'Diploma' | 'Degree' | 'Masters' | 'PhD';
+export type Highest = '' | 'Secondary' | 'Pre-U' | 'SPM' | 'Diploma' | 'Degree' | 'Masters' | 'PhD';
 
 export interface EduEntry { field: string; institution: string; year: string }
-export interface Role { title: string; company: string; years: number }
+export interface Role { title: string; company: string; years: number; responsibilities?: string }
 
 export interface Profile {
   stream: string;
@@ -16,6 +16,9 @@ export interface Profile {
   years: number;
   roles: Role[];
   highest: Highest;
+  secondaryQualification?: string;
+  otherInterest?: string;
+  otherCareer?: string;
   ug: EduEntry;
   pg: EduEntry;
   phd: EduEntry;
@@ -27,7 +30,9 @@ export interface Profile {
 export interface Plan {
   setting: 'indoor' | 'outdoor' | 'either';
   minutesPerDay: number;
-  cost: 'free' | 'low' | 'hrdc' | 'any';
+  cost: 'free' | 'low' | 'moderate' | 'hrdc' | 'any';
+  delivery?: 'online' | 'in-person' | 'hybrid' | 'any';
+  futureScenario?: Scenario;
   onlineOnly: boolean;
   mode: 'recommended' | 'custom';
   target: string;
@@ -49,7 +54,7 @@ const emptyEdu: EduEntry = { field: '', institution: '', year: '' };
 
 export const emptyProfile: Profile = {
   stream: '', careers: [], name: '', email: '', location: '', status: 'graduate', years: 0, roles: [],
-  highest: 'Degree', ug: { ...emptyEdu }, pg: { ...emptyEdu }, phd: { ...emptyEdu }, skills: {}, summary: '', complete: false,
+  highest: '', ug: { ...emptyEdu }, pg: { ...emptyEdu }, phd: { ...emptyEdu }, skills: {}, summary: '', complete: false,
 };
 
 export const sampleProfile: Profile = {
@@ -94,10 +99,10 @@ function load(): State {
   }
 }
 
-export function setState(fn: (s: State) => State, persist = true) {
+export function setState(fn: (s: State) => State, persist = true, confirmAssessment = false) {
   const previous = state;
   state = fn(state);
-  if (previous.profile.complete && state.profile.complete && JSON.stringify({ ...previous.profile, complete: false }) !== JSON.stringify({ ...state.profile, complete: false })) {
+  if (!confirmAssessment && previous.profile.complete && state.profile.complete && JSON.stringify({ ...previous.profile, complete: false }) !== JSON.stringify({ ...state.profile, complete: false })) {
     state = { ...state, profile: { ...state.profile, complete: false } };
   }
   // Signed-in personal data stays in memory and Supabase, never the shared demo cache.
@@ -131,3 +136,4 @@ export function useStore<T>(sel: (s: State) => T): T {
 }
 
 export const getState = () => state;
+

@@ -1,3 +1,6 @@
+import { scenarioRequirements } from '../../../../supabase/functions/faraway-recommendations/core';
+import { duration, resourcesFor } from '@/lib/learning-resources';
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { hasDatabaseCatalogue } from '@/lib/catalogue-status';
 import { useState } from 'react';
 import { useLocation } from 'wouter';
@@ -27,6 +30,7 @@ export default function PlanPage() {
   const recommendations = useRecommendations();
   const [saveError, setSaveError] = useState('');
   const [saving, setSaving] = useState(false);
+  const [review,setReview]=useState(false);
   const gen = useGenerateStudyPlan();
   const ai = gen.data;
   const career = careerInScenario(careerById(plan.target), hasDatabaseCatalogue() ? 'moderate' : scenario);
@@ -34,11 +38,13 @@ export default function PlanPage() {
   if (!career) return <NeedProfile text="Pick a career target first." />;
 
   const match = computeMatch(career, profile, scenario);
-  const recommended = match.gaps.map((g) => g.skill);
+  const required=scenarioRequirements(career.required,plan.futureScenario);
+  const gaps=Object.entries(required).map(([skill,need])=>({skill,need,have:profile.skills[skill]??0})).filter(g=>g.have<g.need).sort((a,b)=>(b.need-b.have)-(a.need-a.have));
+  const recommended = gaps.map(g=>g.skill);
   const selected = plan.mode === 'recommended' ? recommended : plan.skills;
   const pool = Array.from(new Set([...Object.keys(career.required), ...ALL_SKILLS]));
   const options = plan.mode === 'recommended' ? recommended : pool;
-  const rows = selected.map((s) => ({ skill: s, course: courseForSkill(s, plan), have: profile.skills[s] ?? 0, need: career.required[s] ?? 4 }));
+  const rows = selected.map((s) => ({ skill: s, course: courseForSkill(s, plan), have: profile.skills[s] ?? 0, need: required[s] ?? 4 }));
   const missingSkills = rows.filter(r=>!r.course).map(r=>r.skill);
   const canGenerate = selected.length > 0 && missingSkills.length === 0;
   const hasPreviousPlan = recommendations.runs.some(r=>r.kind==='plan');
@@ -53,7 +59,7 @@ export default function PlanPage() {
       updPlan({ mode: 'custom', skills: selected.filter((x) => x !== s), saved: false });
     } else updPlan({ mode: 'custom', skills: [...selected, s], saved: false });
   };
-  const generate = () => { setSaveError(''); if(canGenerate) void gen.mutate({}); };
+  const generate = () => { setSaveError(''); if(canGenerate) void gen.mutate({}, {onSuccess:()=>setReview(true)}); };
   const save = async () => {
     setSaveError('');setSaving(true);
     try {
@@ -65,23 +71,18 @@ export default function PlanPage() {
 
   return (
     <div className="space-y-8">
-      <PageTitle eyebrow={`Study plan · ${career.title}`} title={<>Your route,<br /><span className="text-muted-foreground">your pace.</span></>} right={<ScenarioToggle id="plan-scn" />}>
-        Demo catalogue. Prices, hours and claimability are illustrative, not verified provider offers. AI organises catalogue courses around your confirmed skill gaps and preferences. It does not predict market trends.
+      <PageTitle eyebrow={`Study plan · ${career.title}`} title={<>Your route,<br /><span className="text-muted-foreground">your pace.</span></>} >
+        Course catalogue. Prices, hours and claimability are illustrative, not verified provider offers. AI organises catalogue courses around your confirmed skill gaps and preferences. It does not predict market trends.
       </PageTitle>
 
       <Reveal><Card testId="card-preferences">
         <CardTitle eyebrow="Preferences" title="How you like to learn" />
         <div className="grid gap-8 md:grid-cols-2">
           <div>
-            <p className="mb-2 text-sm font-medium">Setting</p>
-            <div className="grid grid-cols-3 gap-2">
-              {([['indoor', Home, 'Indoor'], ['outdoor', Trees, 'Outdoor'], ['either', Shuffle, 'Either']] as const).map(([v, I, l]) => (
-                <button key={v} onClick={() => updPlan({ setting: v })} data-testid={`button-setting-${v}`} className={cn('flex flex-col items-center gap-2 rounded-2xl border bg-white/70 p-4 text-sm transition-all', plan.setting === v && 'spectrum-border border-transparent bg-white shadow-md')}><SpectrumIcon icon={I} size={22} still={plan.setting !== v} />{l}</button>
-              ))}
-            </div>
+            <p className="mb-2 text-sm font-medium">Learning format</p><div className="flex flex-wrap gap-2">{([['online','Online only'],['in-person','In person'],['hybrid','Hybrid'],['any','No preference']] as const).map(([v,label])=><button key={v} className={cn('rounded-full border px-4 py-2 text-sm',(plan.delivery??(plan.onlineOnly?'online':'any'))===v?'bg-ink text-white':'bg-white')} data-testid={`button-delivery-${v}`} onClick={()=>updPlan({delivery:v,onlineOnly:v==='online',setting:'either'})}>{label}</button>)}</div>
             <p className="mb-2 mt-6 text-sm font-medium">Cost</p>
             <div className="flex flex-wrap gap-2">
-              {([['free', 'Free'], ['low', 'Low cost (up to RM 200)'], ['hrdc', 'HRD Corp verified only'], ['any', 'Any']] as const).map(([v, l]) => (
+              {([['free', 'Free'], ['low', 'Low cost (up to RM 200)'], ['moderate', 'Moderate (up to RM 500)'], ['any', 'No budget limit']] as const).map(([v, l]) => (
                 <button key={v} onClick={() => updPlan({ cost: v })} data-testid={`button-cost-${v}`} className={cn('rounded-full border px-4 py-2 text-sm transition-all', plan.cost === v ? 'border-ink bg-ink text-white' : 'bg-white')}>{l}</button>
               ))}
             </div>
@@ -90,10 +91,7 @@ export default function PlanPage() {
             <div className="flex justify-between text-sm"><span className="font-medium">Study time per day</span><span className="font-mono">{plan.minutesPerDay} min</span></div>
             <input type="range" min={15} max={240} step={15} value={plan.minutesPerDay} onChange={(e) => updPlan({ minutesPerDay: Number(e.target.value) })} className="range mt-3" data-testid="range-minutes"
               style={{ background: `linear-gradient(90deg, #8fb0ff, #c08bff ${((plan.minutesPerDay - 15) / 225) * 100}%, hsl(232 40% 94%) ${((plan.minutesPerDay - 15) / 225) * 100}%)` }} />
-            <label className="mt-6 flex cursor-pointer items-center justify-between rounded-2xl border bg-white/70 p-4 text-sm">
-              <span className="flex items-center gap-2"><Wifi className="h-4 w-4" />Online only</span>
-              <input type="checkbox" checked={plan.onlineOnly} onChange={(e) => updPlan({ onlineOnly: e.target.checked })} className="h-4 w-4 accent-[hsl(250_60%_60%)]" data-testid="checkbox-online" />
-            </label>
+            <div className="mt-5 rounded-2xl border bg-white/70 p-4"><p className="text-sm font-medium">Which future are you preparing for?</p><p className="mt-1 text-xs text-muted-foreground">Choose current requirements, or a what-if AI development scenario. This changes the target skill gaps used for this plan.</p><select className="field mt-3" aria-label="Plan future scenario" value={plan.futureScenario??'current'} onChange={e=>updPlan({futureScenario:e.target.value==='current'?undefined:e.target.value as 'moderate'|'fast'})}><option value="current">Current catalogue requirements</option><option value="moderate">Moderate AI development</option><option value="fast">Fast AI development</option></select><p className="mt-2 text-xs text-muted-foreground">Future digital skill targets increase by 1 (moderate) or 2 (fast), capped at 5. This is a transparent planning assumption, not a forecast.</p></div>
             <p className="mb-2 mt-6 text-sm font-medium">Plan type</p>
             <div className="inline-flex rounded-full border bg-white p-1">
               {(['recommended', 'custom'] as const).map((m) => (
@@ -112,7 +110,7 @@ export default function PlanPage() {
           <div className="flex flex-wrap gap-2">
             {options.map((s) => { const on = selected.includes(s); return (
               <button key={s} onClick={() => toggle(s)} data-testid={`chip-skill-${s.replace(/\W/g, '')}`} className={cn('inline-flex items-center gap-2 rounded-full border px-3.5 py-1.5 text-sm transition-all', on ? 'border-ink bg-ink text-white' : 'bg-white hover:border-[hsl(250_50%_80%)]')}>
-                {s}{career.core.includes(s) && <span className={cn('rounded-full px-1.5 font-mono text-[9px]', on ? 'bg-white/20' : 'bg-muted')}>CORE</span>}
+                {s}{selected.includes(s)&&<span className="text-[10px]">{(profile.skills[s]??0)===0?'Start here':`Improve ${profile.skills[s]}/5 → ${required[s]??4}/5`}</span>}{career.core.includes(s) && <span className={cn('rounded-full px-1.5 font-mono text-[9px]', on ? 'bg-white/20' : 'bg-muted')}>CORE</span>}
               </button>
             ); })}
           </div>
@@ -122,9 +120,9 @@ export default function PlanPage() {
               <thead className="bg-[hsl(232_50%_98%)] text-left text-xs text-muted-foreground"><tr><th className="p-3 font-medium">Skill</th><th className="p-3 font-medium">Course</th><th className="hidden p-3 font-medium sm:table-cell">Hours</th><th className="p-3 text-right font-medium">Cost</th></tr></thead>
               <tbody>{rows.map((r) => (
                 <tr key={r.skill} className="border-t bg-white/70" data-testid={`row-course-${r.skill.replace(/\W/g, '')}`}>
-                  <td className="p-3"><span className="flex items-center gap-2">{r.skill}<SdgPill n={skillSdg(r.skill)} small /></span></td>
-                  <td className="p-3 text-muted-foreground">{r.course ? <>{r.course.title}<span className="block text-xs">{r.course.provider}{r.course.hrdc && ' · HRD Corp'}</span></> : 'No matching course — adjust preferences'}</td>
-                  <td className="hidden p-3 font-mono sm:table-cell">{r.course?.hours ?? '—'}</td>
+                  <td className="p-3"><span className="flex items-center gap-2">{r.skill}<span className="text-[10px]">{r.have===0?'High priority · foundation':r.need-r.have>=2?'High priority · develop':'Build next'}</span><SdgPill n={skillSdg(r.skill)} small /></span></td>
+                  <td className="p-3 text-muted-foreground">{r.course ? <>{r.course.title}<span className="block text-xs">{r.course.provider}</span></> : 'No matching course — adjust preferences'}</td>
+                  <td className="hidden p-3 font-mono sm:table-cell">{r.course?duration(r.course.hours):'—'}</td>
                   <td className="p-3 text-right font-mono">{r.course ? (r.course.cost ? myr(r.course.cost) : 'Free') : '—'}</td>
                 </tr>
               ))}</tbody>
@@ -134,9 +132,9 @@ export default function PlanPage() {
         <Reveal delay={0.08}><Card className="spectrum-border h-full" testId="card-cost-summary">
           <p className="eyebrow">Estimate</p>
           <p className="mt-4 font-display text-5xl" data-testid="text-total-cost">{rows.some(r=>!r.course) ? 'Incomplete' : total ? myr(total) : 'Free'}</p>
-          <p className="text-sm text-muted-foreground">unique course cost · illustrative</p><p className="mt-3 text-xs text-muted-foreground">A course covering multiple skills is counted once. No verified HRD Corp courses are currently in this demo catalogue.</p>
+          <p className="text-sm text-muted-foreground">unique course cost · illustrative</p><p className="mt-3 text-xs text-muted-foreground">A course covering multiple skills is counted once. Fees and hours are catalogue estimates. Provider enrolment is separate.</p>
           <div className="mt-6 grid grid-cols-2 gap-3">
-            <div className="rounded-2xl border bg-white/80 p-3"><p className="font-mono text-xl">{hours}h</p><p className="text-xs text-muted-foreground">study</p></div>
+            <div className="rounded-2xl border bg-white/80 p-3"><p className="font-mono text-xl">{duration(hours)}</p><p className="text-xs text-muted-foreground">study</p></div>
             <div className="rounded-2xl border bg-white/80 p-3"><p className="font-mono text-xl">{weeks || 0} wk</p><p className="text-xs text-muted-foreground">at {plan.minutesPerDay} min/day</p></div>
           </div>
           {saveError && <p role="alert" className="mt-4 text-sm">{saveError}</p>}
@@ -146,7 +144,7 @@ export default function PlanPage() {
                 <p className="font-medium">No matching course for: {missingSkills.join(', ')}.</p>
                 <p className="mt-2 text-muted-foreground">Your current cost, setting or online-only filters exclude the available courses, or the catalogue has no coverage. AI cannot fill this with invented courses.</p>
                 {plan.cost==='hrdc' && <p className="mt-2">There are no verified HRD Corp courses in this catalogue yet.</p>}
-                <button className="btn-ghost mt-3" data-testid="button-broaden-course-filters" onClick={()=>updPlan({cost:'any',setting:'either',onlineOnly:false})}>Show any cost and setting</button>
+                <button className="btn-ghost mt-3" data-testid="button-broaden-course-filters" onClick={()=>updPlan({cost:'any',setting:'either',onlineOnly:false,delivery:'any'})}>Show any cost and setting</button>
                 <p className="mt-2 text-xs text-muted-foreground">This button changes filters only. It does not buy or enrol in a course. You can also remove an unavailable skill from a custom plan.</p>
               </> : gen.isPending ? <p>Generating a plan for your current preferences…</p>
               : !gen.run ? <p>{hasPreviousPlan ? 'Your preferences or skills differ from the saved plan. Generate a new plan below, then save it. Your existing progress is kept.' : 'Step 1: Generate your plan below. Step 2: Review it and save.'}</p>
@@ -155,7 +153,7 @@ export default function PlanPage() {
           <button onClick={generate} disabled={!canGenerate||gen.isPending||saving} className="btn-ink mt-5 w-full" data-testid="button-generate-plan">
             <Sparkles className="h-4 w-4" />{gen.isPending ? 'Generating…' : ai ? 'Regenerate plan' : 'Generate plan'}
           </button>
-          <button onClick={save} disabled={saving || gen.isPending || !gen.run || !canGenerate} className="btn-ghost mt-3 w-full" data-testid="button-save-plan">{saving?'Saving…':'Save plan & start'}<ArrowRight className="h-4 w-4" /></button>
+          <button onClick={()=>setReview(true)} disabled={saving || gen.isPending || !gen.run || !canGenerate} className="btn-ghost mt-3 w-full" data-testid="button-save-plan">{saving?'Saving…':'Review & start plan'}<ArrowRight className="h-4 w-4" /></button>
           <p className="mt-3 text-xs text-muted-foreground">Estimated study time assumes seven study days each week. Changing preferences requires generating a matching plan before saving.</p>
         </Card></Reveal>
       </div>
@@ -171,8 +169,8 @@ export default function PlanPage() {
                   <motion.div key={m.skill + i} initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08 }} className="rounded-2xl border bg-white/80 p-5">
                     <div className="flex items-center justify-between"><p className="font-medium">{m.skill}</p><span className="font-mono text-xs text-muted-foreground">{m.weeks} wk</span></div>
                     <p className="mt-1 text-sm text-muted-foreground">{m.why}</p>
-                    <ul className="mt-3 space-y-1.5">{m.steps.map((s, j) => <li key={j} className="flex justify-between gap-3 text-sm"><span>{s.title}</span><span className="font-mono text-xs text-muted-foreground">{s.hours}h</span></li>)}</ul>
-                    <p className="mt-3 flex items-center gap-1.5 text-xs text-muted-foreground"><BookOpen className="h-3 w-3" />{m.resource}</p>
+                    <ul className="mt-3 space-y-1.5">{m.steps.map((s, j) => <li key={j} className="flex justify-between gap-3 text-sm"><span>{s.title}</span><span className="font-mono text-xs text-muted-foreground">{duration(s.hours)}</span></li>)}</ul>
+                    <p className="mt-3 flex items-center gap-1.5 text-xs text-muted-foreground"><BookOpen className="h-3 w-3" />{m.resource}</p><div className="mt-3 space-y-1">{resourcesFor(m.skill.split(', ')).map(r=><a key={r.url} href={r.url} target="_blank" rel="noopener noreferrer" className="block text-xs underline">{r.title} ↗</a>)}</div>
                   </motion.div>
                 ))}
               </div>
@@ -180,6 +178,8 @@ export default function PlanPage() {
           ) : <p className="text-sm text-muted-foreground">Let the engine sequence your selected skills into weekly modules with step-by-step hours.</p>}
         </AiStage>
       </Card></Reveal>
+
+      <Dialog open={review&&!!ai} onOpenChange={setReview}><DialogContent className="max-h-[85vh] max-w-2xl overflow-y-auto rounded-3xl"><DialogTitle className="font-display text-3xl">Your plan is ready</DialogTitle><DialogDescription>Review your generated plan, then start learning. Your completed activities will be kept.</DialogDescription>{ai&&<><p className="text-sm">{ai.overview}</p><p className="font-medium">{duration(hours)} · {weeks} weeks · {total?myr(total):'Free'}</p><ul className="space-y-3">{ai.modules.map((m,i)=><li key={i} className="rounded-xl border p-3"><p className="font-medium">{i+1}. {m.skill}</p><p className="text-sm text-muted-foreground">{m.why}</p></li>)}</ul></>}{saveError&&<p role="alert">{saveError}</p>}<div className="flex flex-wrap gap-3"><button className="btn-ghost" onClick={()=>setReview(false)}>Edit preferences</button><button className="btn-ink" disabled={saving||!gen.run||!canGenerate} onClick={save} data-testid="button-start-plan">{saving?'Starting…':'Start plan'}<ArrowRight size={16}/></button></div></DialogContent></Dialog>
 
       <AlertDialog open={!!confirm} onOpenChange={(o) => !o && setConfirm(null)}>
         <AlertDialogContent className="rounded-3xl">

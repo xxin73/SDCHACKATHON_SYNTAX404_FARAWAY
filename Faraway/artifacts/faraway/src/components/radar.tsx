@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 import { SDGS } from '@/data/careers';
 import { skillSdg } from './bits';
 
-export interface RadarAxis { skill: string; have: number; need?: number }
+export interface RadarAxis { skill: string; have: number; need?: number; future?: number }
 
 /** Hand-built SVG radar: user hexagon + optional job requirement overlay + SDG tags per point. */
 export function SkillRadar({ axes, size = 360, showSdg, onHover, hovered, compact }: {
@@ -29,6 +29,7 @@ export function SkillRadar({ axes, size = 360, showSdg, onHover, hovered, compac
         <motion.polygon initial={false} animate={{ points: poly(axes.map((a) => a.need ?? 0)) }} transition={{ duration: 0.8, ease: [0.2, 0.8, 0.2, 1] }}
           fill="hsl(40 92% 55% / .08)" stroke="hsl(40 85% 50%)" strokeWidth={1.5} strokeDasharray="5 4" />
       )}
+      {axes.some(a=>a.future!==undefined)&&<motion.polygon initial={false} animate={{points:poly(axes.map(a=>a.future??a.need??0))}} fill="rgba(130,75,220,.05)" stroke="#824bdc" strokeWidth={2} strokeDasharray="3 3"/>}
       <motion.polygon initial={false} animate={{ points: poly(axes.map((a) => a.have)) }} transition={{ type: 'spring', stiffness: 120, damping: 16 }}
         fill="url(#rad-you)" stroke="url(#rad-you-s)" strokeWidth={2} strokeLinejoin="round" />
       {axes.map((a, i) => {

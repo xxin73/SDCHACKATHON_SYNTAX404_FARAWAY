@@ -1,6 +1,6 @@
 // Shared deterministic rules. No network, model calls, browser storage or secrets.
 export type ProfileInput = { stream: string; careers: string[]; years: number; skills: Record<string, number>; complete: boolean };
-export type Preferences = { target: string; setting: string; cost: string; onlineOnly: boolean; minutesPerDay: number; mode: string; skills: string[] };
+export type Preferences = { target: string; setting: string; cost: string; onlineOnly: boolean; minutesPerDay: number; mode: string; skills: string[]; delivery?: 'online'|'in-person'|'hybrid'|'any'; futureScenario?: 'moderate'|'fast' };
 export type SkillEvidence = { version:string; occupationLabel:string; occupationUri:string; rubric:string; groups:{skill:string;target:number;note:string;sourceSkills:{uri:string;label:string;relation:string}[]}[] };
 export type Role = { id: string; title: string; stream: string; skillEvidence?: SkillEvidence; required: Record<string, number>; minYears: number; demand: { moderate: number } };
 export type Course = { id: string; title: string; provider: string; version: string; skills: string[]; hours: number; cost: number; rating: number; online: boolean; setting: string; hrdc: boolean };
@@ -10,7 +10,7 @@ export type Module = { courseId: string; courseVersion: string; title: string; p
 export type PlanResult = { overview: string; modules: Module[]; missing: string[]; totalHours: number; totalCost: number; totalWeeks: number };
 export type Explanation = { careerId: string; fitSummary: string; actions: string[] };
 export type Generated = { kind: 'explain' | 'plan'; rankings: Match[]; explanations?: Explanation[]; plan?: PlanResult; careerId?: string; meta: { catalogueVersion: string; cataloguePublishedAt: string; evidenceObservedAt: string | null; evidenceStatus: string; profileHash: string; preferencesHash: string; generatedAt: string; model: string; promptVersion: string; calculationVersion: string } };
-export const PROMPT_VERSION = 'grounded-personal-esco-v3';
+export const PROMPT_VERSION = 'grounded-personal-esco-v4';
 export const CALCULATION_VERSION = 'weighted-baseline-v1';
 
 function object(value: unknown): asserts value is Record<string, unknown> {
@@ -29,10 +29,12 @@ export function profileInput(value: unknown): ProfileInput {
 }
 export function preferences(value: unknown): Preferences {
   object(value);
-  if (!['indoor','outdoor','either'].includes(String(value.setting)) || !['free','low','hrdc','any'].includes(String(value.cost)) || !['recommended','custom'].includes(String(value.mode)) || typeof value.onlineOnly !== 'boolean') throw new Error('Invalid learning preferences.');
+  if (!['indoor','outdoor','either'].includes(String(value.setting)) || !['free','low','moderate','hrdc','any'].includes(String(value.cost)) || !['recommended','custom'].includes(String(value.mode)) || typeof value.onlineOnly !== 'boolean') throw new Error('Invalid learning preferences.');
   if (typeof value.minutesPerDay !== 'number' || !Number.isInteger(value.minutesPerDay) || value.minutesPerDay < 15 || value.minutesPerDay > 240) throw new Error('Choose 15–240 study minutes per day.');
   if (typeof value.target !== 'string' || value.target.length > 100 || !Array.isArray(value.skills) || value.skills.length > 100 || value.skills.some(x => typeof x !== 'string' || x.length > 100)) throw new Error('Invalid target or skills.');
-  return { target: value.target, setting: String(value.setting), cost: String(value.cost), onlineOnly: value.onlineOnly, minutesPerDay: value.minutesPerDay, mode: String(value.mode), skills: [...value.skills] as string[] };
+  if(value.delivery!==undefined&&!['online','in-person','hybrid','any'].includes(String(value.delivery)))throw new Error('Invalid delivery preference.');
+  if(value.futureScenario!==undefined&&!['moderate','fast'].includes(String(value.futureScenario)))throw new Error('Invalid future scenario.');
+  return { ...(value.delivery?{delivery:value.delivery as Preferences['delivery']}:{}), ...(value.futureScenario?{futureScenario:value.futureScenario as Preferences['futureScenario']}:{}), target: value.target, setting: String(value.setting), cost: String(value.cost), onlineOnly: value.onlineOnly, minutesPerDay: value.minutesPerDay, mode: String(value.mode), skills: [...value.skills] as string[] };
 }
 export function stable(value: unknown): string {
   if (Array.isArray(value)) return '[' + value.map(stable).join(',') + ']';
@@ -56,14 +58,25 @@ export function rank(profile: ProfileInput, catalogue: Catalogue): Match[] {
     return { careerId: c.id, score, gaps: required.map(([skill,need]) => ({skill,need,have:profile.skills[skill]??0})).filter(g => g.have<g.need).sort((a,b) => (b.need-b.have)-(a.need-a.have)) };
   }).sort((a,b) => b.score-a.score || a.careerId.localeCompare(b.careerId));
 }
+export const FUTURE_SKILLS = ['AI Tools','Python','SQL','Machine Learning','Data Visualisation','Cloud Computing'];
+// Explicit what-if rule; ESCO does not supply future proficiency targets.
+export function scenarioRequirements(required:Record<string,number>,scenario?:'moderate'|'fast') {
+ return Object.fromEntries(Object.entries(required).map(([skill,level])=>[skill,Math.min(5,level+(scenario&&FUTURE_SKILLS.includes(skill)?scenario==='fast'?2:1:0))]));
+}
+export function courseMatches(c:{setting:string;online:boolean;cost:number;hrdc:boolean;delivery?:string;hrdcVerifiedUrl?:string},pref:Preferences){
+ const delivery=c.delivery??(c.online?'online':'in-person');
+ return (pref.setting==='either'||pref.setting===c.setting)&&(!pref.onlineOnly||delivery==='online')&&(!pref.delivery||pref.delivery==='any'||pref.delivery===delivery)&&(pref.cost!=='free'||c.cost===0)&&(pref.cost!=='low'||c.cost<=200)&&(pref.cost!=='moderate'||c.cost<=500)&&(pref.cost!=='hrdc'||(c.hrdc&&Boolean(c.hrdcVerifiedUrl)));
+}
 export function candidates(catalogue: Catalogue, profile: ProfileInput, pref: Preferences) {
   const match = rank(profile,catalogue).find(m => m.careerId === pref.target);
   const role = catalogue.careers.find(r => r.id === pref.target);
   if (!match || !role) throw new Error('Choose a career from the current catalogue.');
-  const selected = [...new Set(pref.mode === 'recommended' ? match.gaps.map(g=>g.skill) : pref.skills)];
+  const required=scenarioRequirements(role.required,pref.futureScenario);
+  const gaps=Object.entries(required).map(([skill,need])=>({skill,need,have:profile.skills[skill]??0})).filter(g=>g.have<g.need).sort((a,b)=>(b.need-b.have)-(a.need-a.have));
+  const selected = [...new Set(pref.mode === 'recommended' ? gaps.map(g=>g.skill) : pref.skills)];
   const vocabulary = new Set(catalogue.careers.flatMap(r=>Object.keys(r.required)));
   if (selected.some(s=>!vocabulary.has(s))) throw new Error('Selected skill is not in the catalogue.');
-  const pool = catalogue.courses.filter(c => (pref.setting==='either'||pref.setting===c.setting) && (!pref.onlineOnly||c.online) && (pref.cost!=='free'||c.cost===0) && (pref.cost!=='low'||c.cost<=200) && (pref.cost!=='hrdc'||c.hrdc));
+  const pool = catalogue.courses.filter(c=>courseMatches(c,pref));
   const modules = new Map<string, {course: Course; skills: string[]}>();
   const missing: string[] = [];
   for (const skill of selected) {
@@ -71,7 +84,7 @@ export function candidates(catalogue: Catalogue, profile: ProfileInput, pref: Pr
     if (!course) { missing.push(skill); continue; }
     const entry = modules.get(course.id) ?? {course,skills:[]}; entry.skills.push(skill); modules.set(course.id,entry);
   }
-  return {match,role,selected,modules:[...modules.values()],missing};
+  return {match:{...match,gaps},role:{...role,required},selected,modules:[...modules.values()],missing};
 }
 export function activities(course: Course) {
   return [{id:'foundations',title:'Core concepts',w:.25},{id:'practice',title:'Guided practice exercises',w:.3},{id:'project',title:'Mini project applying the skill',w:.3},{id:'assess',title:'Self-assessment and reflection',w:.15}].map(a=>({id:a.id,title:a.title,hours:Math.round(course.hours*a.w*100)/100}));

@@ -48,7 +48,7 @@ export function Counter({ to, decimals = 0, suffix = '' }: { to: number; decimal
 
 export function ScenarioToggle({ id = 'scn', compact }: { id?: string; compact?: boolean }) {
   const scenario = useStore((s) => s.scenario);
-  const set = (v: Scenario) => setState((s) => ({ ...s, scenario: v, plan: {...s.plan, saved: s.scenario === v ? s.plan.saved : false} }));
+  const set = (v: Scenario) => setState((s) => ({ ...s, scenario: v, plan: s.plan }));
   return (
     <div role="radiogroup" aria-label="AI adoption scenario" className="inline-flex rounded-full border bg-white/80 p-1 shadow-sm backdrop-blur">
       {(['moderate', 'fast'] as Scenario[]).map((v) => (
@@ -56,7 +56,7 @@ export function ScenarioToggle({ id = 'scn', compact }: { id?: string; compact?:
           className={cn('relative rounded-full font-medium transition-colors', compact ? 'px-3 py-1 text-xs' : 'px-4 py-1.5 text-sm', scenario === v ? 'text-white' : 'text-muted-foreground hover:text-foreground')}>
           {scenario === v && <motion.span layoutId={id} className="absolute inset-0 rounded-full bg-ink" transition={{ type: 'spring', stiffness: 400, damping: 32 }} />}
           {scenario === v && <motion.span layoutId={id + '-line'} className="spectrum-bar absolute inset-x-3 -bottom-px h-[2px] rounded-full" />}
-          <span className="relative">{v === 'fast' ? 'Fast AI' : 'Moderate'}</span>
+          <span className="relative">{v === 'fast' ? 'Fast AI development' : 'Moderate AI development'}</span>
         </button>
       ))}
     </div>
