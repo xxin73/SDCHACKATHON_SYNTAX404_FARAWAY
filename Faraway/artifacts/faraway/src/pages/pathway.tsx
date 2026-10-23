@@ -1,4 +1,4 @@
-import { withRoleYears, withTotalYears } from '@/lib/experience';
+import { experienceError, withRoleYears, withTotalYears } from '@/lib/experience';
 import { cleanSkill, skillError } from '@/lib/skill-validation';
 import { useEffect, useRef, useState, type DragEvent } from 'react';
 import { useLocation } from 'wouter';
@@ -24,6 +24,7 @@ export default function Pathway() {
   const profile = useStore((s) => s.profile);
   const target = useStore((s) => s.plan.target);
   const scenario = useStore((s) => s.scenario);
+  const [careerSearch,setCareerSearch]=useState('');
   const [step, setStep] = useState(new URLSearchParams(window.location.search).get('step')==='skills'?3:0);
   const [missing, setMissing] = useState<string[]>([]);
   const [other, setOther] = useState('');
@@ -70,7 +71,9 @@ export default function Pathway() {
   const miss = (k: string, v: string) => (missing.some((m) => m.includes(k)) && !v ? 'field-missing' : '');
 
   const finish = () => { upd(p => ({ complete: true, skills: {...Object.fromEntries(skillList.map(s=>[s,0])),...p.skills} })); nav('/analysis'); };
-  const canNext = step === 0 ? !!profile.stream && (profile.stream!=='other'||!!profile.otherInterest?.trim()) : step === 1 ? !!profile.name.trim() && /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(profile.email) : step === 2 ? !!profile.highest && (profile.highest!=='Secondary'||!!profile.secondaryQualification)&&(profile.highest!=='Pre-U'||!!profile.preUQualification)&&(profile.highest!=='Diploma'||!!profile.diploma?.field.trim()) : step === 3 ? skillList.length >= 3 : true;
+  const experienceIssue=experienceError(profile);
+  useEffect(()=>{window.scrollTo({top:0,behavior:"instant"});},[step]);
+  const canNext = step === 0 ? !!profile.stream && (profile.stream!=='other'||!!profile.otherInterest?.trim()) : step === 1 ? !experienceIssue && !!profile.name.trim() && /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(profile.email) : step === 2 ? !!profile.highest && (profile.highest!=='Secondary'||!!profile.secondaryQualification)&&(profile.highest!=='Pre-U'||!!profile.preUQualification)&&(profile.highest!=='Diploma'||!!profile.diploma?.field.trim()) : step === 3 ? skillList.length >= 3 : true;
 
   const cvPanel = (
     <div className="space-y-4 lg:sticky lg:top-6">
@@ -117,9 +120,9 @@ export default function Pathway() {
                   {profile.stream==='other'&&<Field label="Your interest"><input className="field mt-4" maxLength={100} value={profile.otherInterest??''} onChange={e=>upd(()=>({otherInterest:e.target.value}))} placeholder="For example: marine conservation"/></Field>}
                   {stream && (
                     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mt-8">
-                      <p className="text-sm font-medium">Career interests <span className="font-normal text-muted-foreground">(select any)</span></p>
-                      <div className="mt-3 flex flex-wrap gap-2">
-                        {(stream.id==='other'?CAREERS.map(c=>c.id):stream.careers).map((id) => { const c = careerById(id); if(!c)return null; const on = profile.careers.includes(id); return (
+                      <p className="text-sm font-medium">Career interests ({CAREERS.length} supported careers) <span className="font-normal text-muted-foreground">(select any)</span></p>
+                      <input className="field mt-3" aria-label="Search careers" placeholder="Search careers, e.g. chemical engineer" value={careerSearch} onChange={e=>setCareerSearch(e.target.value)}/><div className="mt-3 flex max-h-72 flex-wrap gap-2 overflow-auto">
+                        {(stream.id==='other'?CAREERS.map(c=>c.id):stream.careers).filter(id=>!careerSearch||careerById(id)?.title.toLowerCase().includes(careerSearch.toLowerCase())).slice(0,80).map((id) => { const c = careerById(id); if(!c)return null; const on = profile.careers.includes(id); return (
                           <button key={id} onClick={() => upd((p) => ({ careers: on ? p.careers.filter((x) => x !== id) : [...p.careers, id] }))} data-testid={`chip-career-${id}`}
                             className={cn('rounded-full border px-4 py-2 text-sm transition-all', on ? 'border-ink bg-ink text-white' : 'bg-white hover:border-[hsl(250_50%_80%)]')}>{c.title}</button>
                         ); })}
@@ -149,8 +152,8 @@ export default function Pathway() {
                   </div>
                   <div>
                     <h2 className="font-display text-3xl">Experience</h2>
-                    <p className="mt-3 text-sm text-muted-foreground">Add each role and its duration in years (maximum 99 years per role and in total). Total experience updates automatically and is capped at 99 years; If roles overlap, adjust the total below to count that time once.</p>
-                    <Field label="Total relevant experience in years (adjust if roles overlap)"><input type="number" min={0} max={99} step={0.25} className="field mt-3 max-w-xs" placeholder="0" value={profile.years||''} onChange={e=>upd(p=>withTotalYears(p,e.target.value))} data-testid="input-years"/></Field>
+                    <p className="mt-3 text-sm text-muted-foreground">Add each role and its duration in years (maximum 99 years per role and in total). For one role, total and role duration stay in sync. For multiple roles, their durations must add up to the total before you continue.</p>
+                    <Field label="Total experience in years"><input type="number" min={0} max={99} step={0.25} className="field mt-3 max-w-xs" placeholder="0" value={profile.years||''} onChange={e=>upd(p=>withTotalYears(p,e.target.value))} data-testid="input-years"/></Field>
                     <div className="mt-4 space-y-3">
                       {profile.roles.map((r,i)=><div key={i} className="rounded-2xl border bg-white/70 p-4"><div className="grid gap-3 sm:grid-cols-3">
                         <Field label="Job title"><input className="field" placeholder="For example: pharmacy assistant" value={r.title} onChange={e=>upd(p=>({roles:p.roles.map((x,j)=>j===i?{...x,title:e.target.value}:x)}))} data-testid={`input-role-title-${i}`}/></Field>
@@ -237,6 +240,7 @@ export default function Pathway() {
         <div className="mt-10 flex items-center justify-between border-t pt-6">
           <button onClick={() => setStep((s) => Math.max(0, s - 1))} disabled={step === 0} className="btn-ghost" data-testid="button-back"><ArrowLeft className="h-4 w-4" />Back</button>
           <span className="font-mono text-xs text-muted-foreground">{step + 1} / {STEPS.length}</span>
+          {step===1&&experienceIssue&&<p role="alert" className="text-sm text-red-700">{experienceIssue}</p>}
           {step < 4 ? <button onClick={() => setStep((s) => s + 1)} disabled={!canNext} className="btn-ink" data-testid="button-next">Next<ArrowRight className="h-4 w-4" /></button>
             : <button onClick={finish} className="btn-ink" data-testid="button-finish">See skill analysis<ArrowRight className="h-4 w-4" /></button>}
         </div>

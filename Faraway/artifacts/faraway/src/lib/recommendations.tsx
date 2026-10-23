@@ -1,3 +1,4 @@
+import expanded from '@/data/expanded-catalogue.json';
 import {loadObservations} from './market-data';
 import {observationsForRole} from '../../../../supabase/functions/faraway-recommendations/trends';
 import {enrichCatalogue,PATHWAY_VERSION} from '../../../../supabase/functions/faraway-recommendations/pathways';
@@ -12,12 +13,12 @@ import { setDatabaseCatalogue } from './catalogue-status';
 import { completionKey, digest, preferences, profileInput, type Catalogue, type Generated, type Module } from '../../../../supabase/functions/faraway-recommendations/core';
 
 export type Run = {id:string;kind:'explain'|'plan';result:Generated};
-type Context = {ready:boolean;error:string;catalogue:Catalogue|null;runs:Run[];active:Run|null;completed:Set<string>;reload:()=>Promise<void>;generate:(kind:'explain'|'plan',careerId?:string)=>Promise<Run>;activate:(run:Run)=>Promise<void>;tick:(module:Module,activityId:string)=>Promise<void>};
+type Context = {ready:boolean;error:string;catalogue:Catalogue|null;runs:Run[];active:Run|null;completed:Set<string>;reload:()=>Promise<void>;generate:(kind:'explain'|'plan',careerId?:string,careerIds?:string[])=>Promise<Run>;activate:(run:Run)=>Promise<void>;tick:(module:Module,activityId:string)=>Promise<void>};
 const Context = createContext<Context|null>(null);
 const originalCareers=structuredClone(CAREERS),originalCourses=structuredClone(COURSES);
 function replaceCatalogue(catalogue:Catalogue|null) {
-  CAREERS.splice(0,CAREERS.length,...(catalogue?catalogue.careers as Career[]:originalCareers));
-  COURSES.splice(0,COURSES.length,...(catalogue?catalogue.courses as unknown as Course[]:originalCourses));
+  CAREERS.splice(0,CAREERS.length,...(catalogue?[...catalogue.careers,...expanded.careers.filter(c=>!catalogue.careers.some(old=>old.id===c.id||old.title.toLowerCase()===c.title.toLowerCase()))] as Career[]:originalCareers));
+  COURSES.splice(0,COURSES.length,...(catalogue?[...catalogue.courses,...expanded.courses.filter(c=>!catalogue.courses.some(old=>old.id===c.id))] as unknown as Course[]:originalCourses));
   syncInterestCatalogue();
   setDatabaseCatalogue(Boolean(catalogue));
 }
@@ -54,7 +55,7 @@ export function RecommendationProvider({children}:{children:ReactNode}) {
     } catch(e){if(current===generation.current)setError(`Recommendation setup is unavailable: ${e instanceof Error?e.message:'database request failed'}. Apply 002_ai_recommendations.sql, then retry.`);}
   };
   useEffect(()=>{void reload();return()=>{generation.current++;replaceCatalogue(null);};},[userId]);
-  const generate=async(kind:'explain'|'plan',careerId?:string)=> {
+  const generate=async(kind:'explain'|'plan',careerId?:string,careerIds?:string[])=> {
     if(!userId)throw new Error('Sign in with an individual account to use real AI. Demo output is not substituted.');
     const current=generation.current;
     await auth.flush();
@@ -63,8 +64,8 @@ export function RecommendationProvider({children}:{children:ReactNode}) {
     const p=profileInput(state.profile),pref=preferences(state.plan);
     const profileHash=await digest(p),preferencesHash=await digest(pref);
     const role=CAREERS.find(r=>r.id===careerId);
-    const marketObservations=role?observationsForRole(role,loadObservations()).slice(0,40):[];
-    const {data,error}=await requireSupabase().functions.invoke('faraway-recommendations',{body:{kind,careerId,profileHash,preferencesHash,pathwayVersion:PATHWAY_VERSION,scenario:state.scenario,marketObservations}});
+    const marketObservations=(careerIds?loadObservations().filter(r=>CAREERS.filter(c=>careerIds.includes(c.id)).some(c=>observationsForRole(c,[r]).length>0)):role?observationsForRole(role,loadObservations()):[]).slice(0,40);
+    const {data,error}=await requireSupabase().functions.invoke('faraway-recommendations',{body:{kind,careerId,profileHash,preferencesHash,pathwayVersion:PATHWAY_VERSION,scenario:state.scenario,marketObservations,...(careerIds?{careerIds}:{})}});
     if(error){let detail='';try{detail=(await error.context?.json())?.error??'';}catch{}throw new Error(detail==='Invalid recommendation request.'?'The AI server needs the latest occupation-pathway update. Deploy the updated faraway-recommendations function, then retry.':detail||'AI function unavailable. Deploy faraway-recommendations and check the server secrets.');}
     if(data?.error)throw new Error(data.error);
     if(current!==generation.current||getState().session?.id!==userId)throw new Error('Your account changed during generation.');

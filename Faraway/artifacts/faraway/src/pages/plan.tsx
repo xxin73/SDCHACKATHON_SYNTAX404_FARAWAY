@@ -77,7 +77,7 @@ export default function PlanPage() {
   return (
     <div className="space-y-8">
       <PageTitle eyebrow={`Study plan · ${career.title}`} title={<>Your route,<br /><span className="text-muted-foreground">your pace.</span></>} >
-        AI sequences learning around your selected career and confirmed skill gaps. Faraway self-study modules are authored practice outlines with estimated hours; other catalogue offers remain illustrative. Completing a plan does not award a professional qualification.
+        AI sequences learning around your selected career and confirmed skill gaps. Faraway self-study modules are authored practice outlines with estimated hours; other catalogue offers remain illustrative. Completing a plan does not award a professional qualification. Costs cover selected catalogue modules; optional provider purchases are checked separately.
       </PageTitle>
 
       {career.qualificationNote&&<p className="rounded-2xl border p-4 text-sm">{career.qualificationNote}</p>}
@@ -128,7 +128,7 @@ export default function PlanPage() {
               <tbody>{rows.map((r) => (
                 <tr key={r.skill} className="border-t bg-white/70" data-testid={`row-course-${r.skill.replace(/\W/g, '')}`}>
                   <td className="p-3"><span className="flex items-center gap-2">{r.skill}<span className="text-[10px]">{r.have===0?'High priority · foundation':r.need-r.have>=2?'High priority · develop':'Build next'}</span><SdgPill n={skillSdg(r.skill)} small /></span></td>
-                  <td className="p-3 text-muted-foreground">{r.course ? <>{r.course.title}<span className="block text-xs">{r.course.provider}</span></> : 'No matching course — adjust preferences'}</td>
+                  <td className="p-3 text-muted-foreground">{r.course ? <>{r.course.title}<span className="block text-xs">{r.course.provider}</span><span className="mt-2 block space-y-1 text-xs">{resourcesFor([r.skill],plan.cost).slice(0,3).map(resource=><a key={resource.url} className="block underline" href={resource.url} target="_blank" rel="noreferrer">{resource.title}{resource.price?' · '+resource.price:''}</a>)}</span>{r.course.resourceUrl&&<a className="block text-xs underline" href={r.course.resourceUrl} target="_blank" rel="noreferrer">Open learning resource ↗</a>}</> : 'No matching course — adjust preferences'}</td>
                   <td className="hidden p-3 font-mono sm:table-cell">{r.course?duration(r.course.hours):'—'}</td>
                   <td className="p-3 text-right font-mono">{r.course ? (r.course.cost ? myr(r.course.cost) : 'Free') : '—'}</td>
                 </tr>
@@ -178,7 +178,7 @@ export default function PlanPage() {
                     <div className="flex items-center justify-between"><p className="font-medium">{m.skill}</p><span className="font-mono text-xs text-muted-foreground">{m.weeks} wk</span></div>
                     <p className="mt-1 text-sm text-muted-foreground">{m.why}</p>
                     <ul className="mt-3 space-y-1.5">{m.steps.map((s, j) => <li key={j} className="flex justify-between gap-3 text-sm"><span>{s.title}</span><span className="font-mono text-xs text-muted-foreground">{duration(s.hours)}</span></li>)}</ul>
-                    <p className="mt-3 flex items-center gap-1.5 text-xs text-muted-foreground"><BookOpen className="h-3 w-3" />{m.resource}</p><div className="mt-3 space-y-1">{resourcesFor(m.skill.split(', ')).map(r=><a key={r.url} href={r.url} target="_blank" rel="noopener noreferrer" className="block text-xs underline">{r.title} ↗</a>)}</div>
+                    <p className="mt-3 flex items-center gap-1.5 text-xs text-muted-foreground"><BookOpen className="h-3 w-3" />{m.resource}</p><div className="mt-3 space-y-1">{resourcesFor(m.skill.split(', '),plan.cost).map(r=><a key={r.url} href={r.url} target="_blank" rel="noopener noreferrer" className="block text-xs underline">{r.title} ↗</a>)}</div>
                   </motion.div>
                 ))}
               </div>

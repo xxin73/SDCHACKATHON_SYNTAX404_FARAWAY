@@ -2,7 +2,7 @@ export interface DepartmentSetup {name:string;teams:string[];skills:string[]}
 import { cleanSkill, skillError } from './skill-validation';
 import { CAREERS, ALL_SKILLS, type Scenario } from '@/data/careers';
 export interface Member {id:string;name:string;position:string;department:string;team?:string;target:string;skills:Record<string,number>}
-export interface Assignment {id:string;memberId:string;skill:string;courseId:string;title:string;hours:number;cost:number;done:boolean;created:string;scenario:Scenario}
+export interface Assignment {id:string;memberId:string;skill:string;courseId:string;title:string;hours:number;cost:number;done:boolean;created:string;scenario:Scenario;activities?:{id:string;title:string;hours:number;done:boolean}[];planId?:string;preferences?:{hoursPerWeek:number;duration:number;budget:number;format:string;schedule:string};mode?:"skill"|"people"}
 export interface OrganizationData {kind:'company'|'university';name:string;industry:string;headcount:number;departments?:string[];departmentCount?:number;departmentSetup?:DepartmentSetup[];members:Member[];assignments:Assignment[]}
 export const ORG_KEY='faraway_workspaces_v3';
 export const newOrg=(kind:OrganizationData['kind']):OrganizationData=>({kind,name:'',industry:'',headcount:0,departments:[],departmentCount:0,members:[],assignments:[]});
@@ -23,22 +23,22 @@ export function sampleOrg(kind:OrganizationData['kind']):OrganizationData{
 }
 /** RFC4180-style CSV parser; preserves quoted commas and quoted line breaks. */
 export function parseCsv(text:string):string[][]{const rows:string[][]=[];let row:string[]=[];let field='';let quoted=false;for(let i=0;i<text.length;i++){const c=text[i];if(c==='"'){if(quoted&&text[i+1]==='"'){field+='"';i++;}else quoted=!quoted;}else if(c===','&&!quoted){row.push(field);field='';}else if((c==='\n'||c==='\r')&&!quoted){if(c==='\r'&&text[i+1]==='\n')i++;row.push(field);if(row.some(v=>v.trim()))rows.push(row);row=[];field='';}else field+=c;}if(quoted)throw new Error('Unclosed quotation mark in CSV.');row.push(field);if(row.some(v=>v.trim()))rows.push(row);return rows;}
-export function importMembers(text:string,context?:{department:string;team:string;skills:string[]}):Member[]{
+export function importMembers(text:string,context?:{department:string;team:string;skills:string[];student?:boolean}):Member[]{
  const clean=text.replace(/^\uFEFF/,'');const first=clean.split(/\r?\n/)[0];
  const delimiter=first.includes(',')?',':first.includes('\t')?'\t':';';
  // Normalise delimiters only outside quoted fields, keeping quoted separators intact.
  let normal='',quoted=false;for(let i=0;i<clean.length;i++){const c=clean[i];if(c==='"'){if(quoted&&clean[i+1]==='"'){normal+='""';i++;continue;}quoted=!quoted;}normal+=c===delimiter&&!quoted?',':c;}
  const rows=parseCsv(normal);const header=rows.shift()?.map(s=>s.trim().toLowerCase().replace(/_/g,' '))??[];
- const aliases:Record<string,string>={'full name':'name','employee name':'name','group':'department','programme':'department','program':'department','current role':'position','role':'position','job title':'position'};
+ const aliases:Record<string,string>={'study year':'position','academic programme':'department','full name':'name','employee name':'name','group':'department','programme':'department','program':'department','current role':'position','role':'position','job title':'position'};
  const keys=header.map(h=>aliases[h]||h);
- for(const h of (context?['name','position']:['name','department']))if(!keys.includes(h))throw new Error(`Missing column: ${h}. Use the department CSV template.`);
+ for(const h of (context?(context.student?['name']:['name','position']):['name','department']))if(!keys.includes(h))throw new Error(`Missing column: ${h}. Use the department CSV template.`);
  if(new Set(keys).size!==keys.length)throw new Error('Duplicate CSV column names. Keep one column for each field or skill.');
  if(rows.length>500)throw new Error('Please import at most 500 people per file.');if(!rows.length)throw new Error('The CSV has headers but no people. Add one person per row.');
  return rows.map((row,i)=>{const get=(h:string)=>row[keys.indexOf(h)]?.trim()??'';
  if(row.length!==header.length)throw new Error(`Row ${i+2}: expected ${header.length} columns, found ${row.length}. Quote values that contain commas.`);
  if(!get('name')||!(context?.department||get('department')))throw new Error(`Row ${i+2}: name and department are required.`);
  const benchmark=get('target')||get('position');const c=CAREERS.find(c=>c.id.toLowerCase()===benchmark.toLowerCase()||c.title.toLowerCase()===benchmark.toLowerCase());
- const skills:Record<string,number>={};header.forEach((h,j)=>{const prefixed=h.startsWith('skill:');const raw=(prefixed?h.slice(6):h).trim().replace(/\s*\((?:1\s*[-–]\s*5|rating)\)$/i,'');const known=[...ALL_SKILLS,...(context?.skills??[]),'C++','C#','HTML','CSS'].find(s=>s.toLowerCase()===raw);if(!prefixed&&!known)return;const value=row[j]?.trim();if(!value)return;const name=known||cleanSkill(raw);const n=Number(value);if(skillError(name)||!Number.isInteger(n)||n<1||n>5)throw new Error(`Row ${i+2}: ${h} must have a skill rating from 1 to 5, or be blank if unassessed.`);if(context&&!context.skills.some(s=>s.toLowerCase()===name.toLowerCase()))throw new Error(`Row ${i+2}: ${name} is not an assessment skill for this department. Download its template.`);skills[name]=n;});
+ const skills:Record<string,number>={};header.forEach((h,j)=>{const prefixed=h.startsWith('skill:');const raw=(prefixed?h.slice(6):h).trim().replace(/\s*\((?:[01]\s*[-–]\s*5|rating)\)$/i,'');const known=[...ALL_SKILLS,...(context?.skills??[]),'C++','C#','HTML','CSS'].find(s=>s.toLowerCase()===raw);if(!prefixed&&!known)return;const value=row[j]?.trim();if(!value)return;const name=known||cleanSkill(raw);const n=Number(value);if(skillError(name)||!Number.isInteger(n)||n<0||n>5)throw new Error(`Row ${i+2}: ${h} must have a skill rating from 0 to 5, or be blank if unassessed.`);if(context&&!context.skills.some(s=>s.toLowerCase()===name.toLowerCase()))throw new Error(`Row ${i+2}: ${name} is not an assessment skill for this department. Download its template.`);skills[name]=n;});
  return{id:(globalThis.crypto?.randomUUID?.()??`id-${Date.now()}-${Math.random().toString(36).slice(2)}`),name:get('name'),department:context?.department||get('department'),team:context?.team||get('team'),position:get('position'),target:c?.id||'',skills};});
 }
 export function download(name:string,data:string,type='text/csv'){const url=URL.createObjectURL(new Blob([data],{type}));const a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}

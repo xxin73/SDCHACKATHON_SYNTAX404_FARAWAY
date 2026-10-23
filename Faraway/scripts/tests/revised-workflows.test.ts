@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {withTotalYears,withRoleYears} from '../../artifacts/faraway/src/lib/experience';
+import {withTotalYears,withRoleYears,experienceError} from '../../artifacts/faraway/src/lib/experience';
 import {defaults} from '../../artifacts/faraway/src/lib/store';
 import {personalDataSchema} from '../../artifacts/faraway/src/lib/personal-data';
 import {importMembers} from '../../artifacts/faraway/src/lib/org-model';
@@ -15,7 +15,7 @@ test('one-role totals synchronise both ways; numbers clamp to 99',()=>{
 });
 test('total overrides do not arbitrarily change multiple role durations',()=>{
  const p=one();p.roles.push({title:'Second',company:'Company',years:2});
- assert.equal(withTotalYears(p,2).roles,undefined);assert.equal(withRoleYears(p,1,'5').years,6);
+ assert.equal(withTotalYears(p,2).roles,undefined);const updated={...p,...withRoleYears(p,1,'5')};assert.equal(updated.years,1);assert.match(experienceError(updated),/6 years/);
 });
 
 test('Pre-U and Diploma entries persist independently from Degree',()=>{
@@ -30,7 +30,7 @@ test('department CSV imports human-readable ratings without department or target
 test('department import accepts semicolons, blanks, and rejects invalid or unrelated ratings',()=>{
  assert.equal(importMembers('Name;Position;SQL (1-5)\nAlex;Analyst;5',ctx)[0].skills.SQL,5);
  assert.deepEqual(importMembers('Name,Position,SQL (1-5)\nAlex,Analyst,',ctx)[0].skills,{});
- for(const n of ['0','6','1.5','hello'])assert.throws(()=>importMembers('Name,Position,SQL (1-5)\nAlex,Analyst,'+n,ctx),/1 to 5/);
+ for(const n of ['-1','6','1.5','hello'])assert.throws(()=>importMembers('Name,Position,SQL (1-5)\nAlex,Analyst,'+n,ctx),/0 to 5/);
  assert.throws(()=>importMembers('Name,Position,skill:Accounting\nAlex,Analyst,4',ctx),/not an assessment skill/);
  assert.throws(()=>importMembers('Name,Position,SQL (1-5)\nAlex,Analyst,3\n,Developer,4',ctx),/Row 3/);
 });

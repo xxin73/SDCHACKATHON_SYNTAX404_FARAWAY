@@ -1,3 +1,4 @@
+import expanded from './expanded-catalogue.json';
 import {PATHWAY_ROLES,interestRoles,interestSkills} from '../../../../supabase/functions/faraway-recommendations/pathways';
 import type { SkillEvidence } from '../../../../supabase/functions/faraway-recommendations/core';
 export type Scenario = 'fast' | 'moderate';
@@ -228,6 +229,7 @@ export const CAREERS: Career[] = [
 ];
 
 CAREERS.push(...PATHWAY_ROLES as unknown as Career[]);
+CAREERS.push(...expanded.careers.filter(c=>!CAREERS.some(old=>old.id===c.id||old.title.toLowerCase()===c.title.toLowerCase())) as unknown as Career[]);
 export function syncInterestCatalogue(){
  for(const stream of STREAMS){if(stream.id==='other')continue;stream.careers=interestRoles(stream.id,CAREERS).map(r=>r.id);stream.skills=interestSkills(stream.id,CAREERS);}
  ALL_SKILLS.splice(0,ALL_SKILLS.length,...new Set(CAREERS.flatMap(r=>Object.keys(r.required))));ALL_SKILLS.sort();

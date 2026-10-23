@@ -1,3 +1,4 @@
+import expanded from './expanded-catalogue.json';
 import {PATHWAY_COURSES} from '../../../../supabase/functions/faraway-recommendations/pathways';
 export type Category = 'Programming' | 'AI & Machine Learning' | 'Design' | 'Science' | 'Business' | 'Mathematics';
 export const CATEGORIES: Category[] = ['Programming', 'AI & Machine Learning', 'Design', 'Science', 'Business', 'Mathematics'];
@@ -5,6 +6,7 @@ export const CATEGORIES: Category[] = ['Programming', 'AI & Machine Learning', '
 export type Level = 'Beginner' | 'Intermediate' | 'Advanced';
 
 export interface Course {
+  version?:string; resourceUrl?:string; sourceType?:string; activityTitles?:string[];
   id: string;
   title: string;
   category: Category;
@@ -48,7 +50,7 @@ export const COURSES: Course[] = [
   { id: 'risk-quant', title: 'Quantitative Risk Management', category: 'Mathematics', level: 'Advanced', hours: 20, description: 'VaR, stress testing and credit models aligned with BNM guidelines.', skills: ['Risk Management', 'Statistics'], cost: 460, hrdc: false, online: false, setting: 'indoor', instructor: 'Dr. Kumar Pillai', provider: 'KL Finance Academy', rating: 4.6, learners: 1206, hue: 5 },
 ];
 
-COURSES.push(...PATHWAY_COURSES as unknown as Course[]);
+COURSES.push(...PATHWAY_COURSES as unknown as Course[],...expanded.courses as unknown as Course[]);
 
 export const courseById = (id: string) => COURSES.find((c) => c.id === id);
 

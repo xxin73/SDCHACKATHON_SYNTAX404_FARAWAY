@@ -47,7 +47,7 @@ export function Shell({ children }: { children: ReactNode }) {
   ];
   const mobileItems = isOrg ? [
     {href:'/organization?view=overview',label:'Home',icon:LayoutGrid,active:orgView==='overview'},
-    {href:'/organization?view=structure',label:'Teams',icon:Building2,active:orgView==='structure'},
+    {href:'/organization?view=structure',label:localStorage.getItem('faraway_org_kind')==='university'?'Programmes':'Departments',icon:Building2,active:orgView==='structure'},
     {href:'/organization?view=people',label:'People',icon:Building2,active:orgView==='people'},
     {href:'/organization?view=analysis',label:'Insights',icon:BarChart3,active:orgView==='analysis'},
     {href:'/organization?view=plan',label:'Plans',icon:Brain,active:orgView==='plan'},

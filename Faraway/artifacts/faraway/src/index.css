@@ -362,3 +362,5 @@
 @media(max-width:767px){.org-stats>.glass{padding:16px 13px}.org-stats .font-display{font-size:28px;line-height:1.1}.org-stats .eyebrow{font-size:9px;letter-spacing:1px}.app-main .grid{min-width:0}.app-main section{min-width:0}}
 
 @media(max-width:767px){.page-heading{margin-bottom:20px;gap:14px}.page-heading .text-base{font-size:14px;line-height:1.55}.org-workspace h1{font-size:28px;line-height:1.08}.org-workspace{--mobile-section-gap:20px}.org-workspace>:not(:first-child){margin-top:var(--mobile-section-gap)}.directory-tools{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.directory-tools button{font-size:12px;padding-inline:9px;justify-content:center}.directory-tools svg{width:14px}.member-actions .btn-ink{font-size:13px}.app-main [id=org-gap-detail]{scroll-margin-top:20px}}
+
+.org-workspace .glass,.org-workspace .grid>*{min-width:0}.org-workspace table{border-collapse:collapse}.org-workspace input[type=checkbox]{accent-color:#181b36}.org-workspace select{max-width:100%}
