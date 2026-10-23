@@ -1,3 +1,4 @@
+import { EscoReference } from '@/components/esco-reference';
 import { hasDatabaseCatalogue } from '@/lib/catalogue-status';
 import { useEffect, useMemo, useState } from 'react';
 import { Link, Redirect, useLocation, useParams } from 'wouter';
@@ -163,6 +164,8 @@ export default function JobDetail() {
           <button onClick={refresh} disabled={!dirty} className="btn-ink mt-6 w-full" data-testid="button-refresh-match"><RefreshCw className="h-4 w-4" />Refresh hexagon &amp; score {dirty && <span className="font-mono text-xs opacity-70">→ {preview.score.toFixed(1)}</span>}</button>
         </Card></Reveal>
       </div>
+
+      <EscoReference careerId={career.id} />
 
       {/* AI insight */}
       <Reveal><Card className="spectrum-border" testId="card-ai-insight">
