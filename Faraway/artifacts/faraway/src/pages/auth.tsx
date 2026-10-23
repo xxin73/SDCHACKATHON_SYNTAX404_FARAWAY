@@ -11,7 +11,7 @@ import { cn } from '@/lib/utils';
 export function Login() {
   const [, nav] = useLocation();
   const [email, setEmail] = useState('');
-  const [showEmail, setShowEmail] = useState(false);
+  const [showEmail, setShowEmail] = useState(new URLSearchParams(window.location.search).has('verify'));
   const auth = useAuth();
   const [password, setPassword] = useState('');
   const [busy, setBusy] = useState(false);
@@ -52,7 +52,7 @@ export function Login() {
                 <button disabled={busy} className="btn-ink w-full py-3" data-testid="button-login-submit">{busy ? 'Signing in…' : 'Sign in'} <ArrowRight className="h-4 w-4" /></button>
               </motion.form>
             )}
-            <p className="text-xs text-muted-foreground">Your profile and progress save securely to your account</p><p className="text-right text-sm text-muted-foreground">New to Faraway? <Link href="/register" className="font-medium text-foreground underline-offset-4 hover:underline" data-testid="link-signup">Create account</Link></p>
+            <p role="status" className="text-sm">{new URLSearchParams(window.location.search).has('verify') ? 'Account created. Open the confirmation email on any device, then sign in here. You can keep this page open.' : ''}</p><p className="text-xs text-muted-foreground">Your profile and progress save securely to your account</p><p className="text-right text-sm text-muted-foreground">New to Faraway? <Link href="/register" className="font-medium text-foreground underline-offset-4 hover:underline" data-testid="link-signup">Create account</Link></p>
           </motion.div>
         </div>
 
@@ -89,7 +89,7 @@ export function Register() {
     try {
       const signedIn = await auth.signUp(name.trim(), email.trim(), password);
       if (signedIn) nav('/mode');
-      else setNotice('Check your email for a confirmation link, then return here to sign in. If you already have an account, use Log in below.');
+      else nav('/login?verify=1');
     } catch (e) { setError(e instanceof Error ? e.message : String(e)); }
     finally { setBusy(false); }
   };
