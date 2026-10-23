@@ -17,8 +17,6 @@ export interface Profile {
   roles: Role[];
   highest: Highest;
   secondaryQualification?: string;
-  preUQualification?: string;
-  avatar?: string;
   otherInterest?: string;
   otherCareer?: string;
   ug: EduEntry;
@@ -138,3 +136,4 @@ export function useStore<T>(sel: (s: State) => T): T {
 }
 
 export const getState = () => state;
+

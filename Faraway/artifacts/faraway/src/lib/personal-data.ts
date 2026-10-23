@@ -6,9 +6,9 @@ const education = z.object({ field: z.string(), institution: z.string(), year: z
 export const personalDataSchema = z.object({
   profile: z.object({
     stream: z.string(), careers: z.array(z.string()), name: z.string(), email: z.string(), location: z.string(),
-    status: z.enum(['graduate', 'jobseeker', 'switcher']), years: z.number().nonnegative().max(99),
-    roles: z.array(z.object({ title: z.string(), company: z.string(), years: z.number().nonnegative().max(99), responsibilities: z.string().optional() })),
-    avatar: z.string().max(150000).optional(), preUQualification: z.string().optional(), secondaryQualification: z.string().optional(), otherInterest: z.string().optional(), otherCareer: z.string().optional(),
+    status: z.enum(['graduate', 'jobseeker', 'switcher']), years: z.number().nonnegative(),
+    roles: z.array(z.object({ title: z.string(), company: z.string(), years: z.number().nonnegative(), responsibilities: z.string().optional() })),
+    secondaryQualification: z.string().optional(), otherInterest: z.string().optional(), otherCareer: z.string().optional(),
     highest: z.enum(['', 'Secondary', 'Pre-U', 'SPM', 'Diploma', 'Degree', 'Masters', 'PhD']), ug: education, pg: education, phd: education,
     skills: z.record(z.number().int().min(0).max(5)), summary: z.string(), complete: z.boolean(),
   }),
@@ -23,3 +23,4 @@ export function personalData(state: State): PersonalData {
   const { session: _session, ...data } = state;
   return structuredClone(data);
 }
+
