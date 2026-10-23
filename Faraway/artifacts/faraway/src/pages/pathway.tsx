@@ -34,7 +34,7 @@ export default function Pathway() {
   const [drag, setDrag] = useState(false);
 
   const stream = STREAMS.find((s) => s.id === profile.stream);
-  const skillList = Array.from(new Set([...(stream?.skills ?? []), ...Object.keys(profile.skills)]));
+  const skillList = Array.from(new Set([...(stream?.skills ?? []), ...CAREERS.filter(c=>profile.careers.includes(c.id)||c.id===target).flatMap(c=>Object.keys(c.required)), ...Object.keys(profile.skills)]));
   const job = careerInScenario(careerById(target) ?? (profile.careers[0] ? careerById(profile.careers[0]) : undefined), scenario);
 
   const apply = (r: ParsedCv) => {

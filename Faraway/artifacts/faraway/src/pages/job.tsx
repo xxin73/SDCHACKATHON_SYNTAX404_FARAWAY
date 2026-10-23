@@ -89,6 +89,7 @@ export default function JobDetail() {
         </Card></Reveal>
         <Reveal delay={0.05}><Card className="h-full" testId="card-radar">
           <div className="flex flex-wrap items-center justify-between gap-2"><p className="font-display text-2xl">Skill hexagon</p><RadarLegend withNeed /></div>
+          <EscoReference careerId={career.id} />
           <div className="mx-auto max-w-[460px]"><SkillRadar axes={axes} size={440} showSdg hovered={hoverSkill} onHover={setHoverSkill} /></div>
         </Card></Reveal>
         <Reveal delay={0.1}><Card className="h-full" testId="panel-skill-sdg">
@@ -165,8 +166,6 @@ export default function JobDetail() {
         </Card></Reveal>
       </div>
 
-      <EscoReference careerId={career.id} />
-
       {/* AI insight */}
       <Reveal><Card className="spectrum-border" testId="card-ai-insight">
         <CardTitle eyebrow="AI explanation" title="Career fit explained" right={!insight.data && !insight.isPending && <Magnetic><button onClick={ask} className="btn-ink" data-testid="button-get-insight"><Sparkles className="h-4 w-4" />Generate insight</button></Magnetic>} />
@@ -198,3 +197,4 @@ export default function JobDetail() {
     </div>
   );
 }
+

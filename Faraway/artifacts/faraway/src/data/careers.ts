@@ -1,3 +1,4 @@
+import type { SkillEvidence } from '../../../../supabase/functions/faraway-recommendations/core';
 export type Scenario = 'fast' | 'moderate';
 
 export interface Stream {
@@ -68,6 +69,7 @@ export const SKILL_SDG: Record<string, number> = {
 };
 
 export interface Career {
+  skillEvidence?: SkillEvidence;
   id: string;
   title: string;
   stream: string;

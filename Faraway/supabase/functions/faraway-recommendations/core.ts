@@ -1,7 +1,8 @@
 // Shared deterministic rules. No network, model calls, browser storage or secrets.
 export type ProfileInput = { stream: string; careers: string[]; years: number; skills: Record<string, number>; complete: boolean };
 export type Preferences = { target: string; setting: string; cost: string; onlineOnly: boolean; minutesPerDay: number; mode: string; skills: string[] };
-export type Role = { id: string; title: string; stream: string; required: Record<string, number>; minYears: number; demand: { moderate: number } };
+export type SkillEvidence = { version:string; occupationLabel:string; occupationUri:string; rubric:string; groups:{skill:string;target:number;note:string;sourceSkills:{uri:string;label:string;relation:string}[]}[] };
+export type Role = { id: string; title: string; stream: string; skillEvidence?: SkillEvidence; required: Record<string, number>; minYears: number; demand: { moderate: number } };
 export type Course = { id: string; title: string; provider: string; version: string; skills: string[]; hours: number; cost: number; rating: number; online: boolean; setting: string; hrdc: boolean };
 export type Catalogue = { version: string; published_at: string; observed_at: string | null; status: 'illustrative'; careers: Role[]; courses: Course[] };
 export type Match = { careerId: string; score: number; gaps: { skill: string; have: number; need: number }[] };
@@ -9,7 +10,7 @@ export type Module = { courseId: string; courseVersion: string; title: string; p
 export type PlanResult = { overview: string; modules: Module[]; missing: string[]; totalHours: number; totalCost: number; totalWeeks: number };
 export type Explanation = { careerId: string; fitSummary: string; actions: string[] };
 export type Generated = { kind: 'explain' | 'plan'; rankings: Match[]; explanations?: Explanation[]; plan?: PlanResult; careerId?: string; meta: { catalogueVersion: string; cataloguePublishedAt: string; evidenceObservedAt: string | null; evidenceStatus: string; profileHash: string; preferencesHash: string; generatedAt: string; model: string; promptVersion: string; calculationVersion: string } };
-export const PROMPT_VERSION = 'grounded-personal-v1';
+export const PROMPT_VERSION = 'grounded-personal-esco-v2';
 export const CALCULATION_VERSION = 'weighted-baseline-v1';
 
 function object(value: unknown): asserts value is Record<string, unknown> {
@@ -111,3 +112,4 @@ export function progressFor(plan: PlanResult, completed: Set<string>) {
   const doneHours = Math.round(plan.modules.reduce((n,m)=>n+m.activities.filter(a=>completed.has(completionKey(m.courseId,m.courseVersion,a.id))).reduce((h,a)=>h+a.hours,0),0)*100)/100;
   return {doneHours,totalHours:plan.totalHours,percent:plan.totalHours?Math.min(100,Math.round(doneHours/plan.totalHours*100)):0};
 }
+
