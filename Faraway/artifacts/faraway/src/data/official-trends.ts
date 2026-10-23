@@ -1,0 +1,68 @@
+// Reviewed snapshots from the linked primary-source tables. These are not live feeds.
+export const DOSM_URL='https://www.dosm.gov.my/portal-main/release-content/big-data-analytics-job-market-insights-q22026';
+export const BLS_URL='https://www.bls.gov/emp/tables/occupational-projections-and-characteristics.htm';
+export const DOSM_GROUPS=[
+ {label:'Managers',first:99447,second:87950},
+ {label:'Professionals',first:315768,second:285907},
+ {label:'Technicians and associate professionals',first:93987,second:86512},
+ {label:'Clerical support',first:48784,second:40408},
+ {label:'Service and sales',first:42094,second:32511},
+ {label:'Skilled agriculture, forestry and fishery',first:239,second:101},
+ {label:'Craft and related trades',first:6094,second:4558},
+ {label:'Plant and machine operators',first:16378,second:12916},
+ {label:'Elementary occupations',first:4070,second:4646},
+];
+// BLS table 1.2, employment in thousands. The SOC occupation may be an analogue
+// of a Faraway career; display its actual title and code alongside every value.
+export const BLS_OCCUPATIONS:Record<string,{title:string;first:number;second:number}>={
+ '23-1011':{title:'Lawyers',first:863.7,second:904.3},
+ '23-2011':{title:'Paralegals and legal assistants',first:404.9,second:403.8},
+ '19-3094':{title:'Political scientists',first:6.1,second:6.0},
+ '29-1141':{title:'Registered nurses',first:3465.4,second:3660.1},
+ '21-1091':{title:'Health education specialists',first:70.4,second:74.4},
+ '17-2112':{title:'Industrial engineers',first:365.1,second:410.6},
+ '17-2141':{title:'Mechanical engineers',first:298.5,second:332.0},
+ '25-2021':{title:'Elementary school teachers',first:1419.3,second:1413.4},
+ '25-9031':{title:'Instructional coordinators',first:248.7,second:252.8},
+ '19-1029':{title:'Biological scientists, all other',first:59.6,second:62.4},
+ '19-2031':{title:'Chemists',first:84.9,second:90.3},
+ '19-2041':{title:'Environmental scientists and specialists',first:93.4,second:99.2},
+ '19-1013':{title:'Soil and plant scientists',first:19.9,second:21.3},
+ '19-1012':{title:'Food scientists and technologists',first:14.1,second:14.9},
+ '13-1081':{title:'Logisticians',first:255.1,second:300.0},
+ '11-9081':{title:'Lodging managers',first:54.8,second:56.9},
+ '17-2051':{title:'Civil engineers',first:380.6,second:405.1},
+ '11-9021':{title:'Construction managers',first:609.1,second:664.3},
+ '21-1021':{title:'Child, family, and school social workers',first:405.1,second:422.9},
+ '11-9151':{title:'Social and community service managers',first:231.0,second:247.7},
+ '27-3023':{title:'News analysts, reporters, and journalists',first:47.1,second:44.3},
+ '27-3031':{title:'Public relations specialists',first:314.5,second:320.2},
+ '11-1021':{title:'General and operations managers',first:3599.0,second:3780.3},
+ '11-3012':{title:'Administrative services managers',first:279.0,second:293.3},
+ '15-2051':{title:'Data scientists',first:275.6,second:371.0},
+ '15-1252':{title:'Software developers',first:1717.8,second:1892.6},
+ '15-1241':{title:'Computer network architects',first:181.8,second:195.8},
+ '15-1212':{title:'Information security analysts',first:192.9,second:233.4},
+ '13-2061':{title:'Financial examiners',first:70.0,second:76.5},
+ '13-2011':{title:'Accountants and auditors',first:1595.2,second:1674.6},
+ '13-1111':{title:'Management analysts',first:1077.1,second:1186.3},
+ '13-1161':{title:'Market research analysts and marketing specialists',first:952.7,second:1019.0},
+ '13-1071':{title:'Human resources specialists',first:939.7,second:999.7},
+ '11-2021':{title:'Marketing managers',first:421.6,second:450.8},
+ '15-1255':{title:'Web and digital interface designers',first:132.7,second:140.8},
+};
+// Deliberately reviewed career-to-SOC analogues; unmatched careers remain N/A.
+export const CAREER_SOC:Record<string,string>={
+ 'lawyer':'23-1011','legal-researcher':'23-2011','policy-analyst':'19-3094',
+ 'nurse':'29-1141','health-educator':'21-1091','industrial-engineer':'17-2112',
+ 'mechanical-engineer':'17-2141','teacher':'25-2021','instructional-designer':'25-9031',
+ 'biologist':'19-1029','research-scientist':'19-2031','environmental-scientist':'19-2041',
+ 'agricultural-scientist':'19-1013','food-scientist':'19-1012','logistician':'13-1081',
+ 'hotel-manager':'11-9081','civil-engineer':'17-2051','construction-manager':'11-9021',
+ 'social-worker':'21-1021','community-service-manager':'11-9151','journalist':'27-3023',
+ 'public-relations-specialist':'27-3031','business-owner':'11-1021','public-service-manager':'11-3012',
+ 'data-analyst':'15-2051','software-engineer':'15-1252','ml-engineer':'15-2051',
+ 'cloud-engineer':'15-1241','cyber-analyst':'15-1212','risk-analyst':'13-2061',
+ 'accountant':'13-2011','business-analyst':'13-1111','digital-marketer':'13-1161',
+ 'hr-specialist':'13-1071','product-manager':'11-2021','ux-designer':'15-1255',
+};
