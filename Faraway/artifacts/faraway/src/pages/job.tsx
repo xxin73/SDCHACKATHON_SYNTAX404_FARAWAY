@@ -1,3 +1,4 @@
+import {PathwayEvidence} from '@/components/pathway-evidence';
 import { OnetReference } from '@/components/onet-reference';
 import { scenarioRequirements } from '../../../../supabase/functions/faraway-recommendations/core';
 import { EscoReference } from '@/components/esco-reference';
@@ -47,7 +48,7 @@ export default function JobDetail() {
   if (!profile.stream || !profile.complete || !match) return <NeedProfile />;
 
   const merged = { ...profile.skills, ...draft };
-  const futureRequired=scenarioRequirements(career.required,scenario);
+  const futureRequired=scenarioRequirements(career.required,scenario,career.futureSkills);
   const axes = Object.entries(career.required).map(([skill, need]) => ({ skill, need, future:showFuture?futureRequired[skill]:undefined, have: merged[skill] ?? 0 }));
   const preview = computeMatch(career, profile, scenario, merged);
   const dirty = Object.keys(draft).length > 0;
@@ -93,8 +94,8 @@ export default function JobDetail() {
         </Card></Reveal>
         <Reveal delay={0.05}><Card className="h-full" testId="card-radar">
           <div className="flex flex-wrap items-center justify-between gap-2"><p className="font-display text-2xl">Skill hexagon</p><RadarLegend withNeed /></div>
-          <div className="mt-4 flex flex-wrap items-center gap-3"><label className="text-xs"><input type="checkbox" checked={showFuture} onChange={e=>setShowFuture(e.target.checked)}/> Show future target</label>{showFuture&&<ScenarioToggle id="radar-future" compact/>}</div><p className="mt-3 text-xs text-muted-foreground">Gold: current catalogue target. Purple dashed: selected future target. What-if assumption: digital skills +1 for moderate AI development, +2 for fast (maximum 5); not an ESCO forecast.</p>
-          <EscoReference careerId={career.id} /><OnetReference careerId={career.id} />
+          <div className="mt-4 flex flex-wrap items-center gap-3"><label className="text-xs"><input type="checkbox" checked={showFuture} onChange={e=>setShowFuture(e.target.checked)}/> Show future target</label>{showFuture&&<ScenarioToggle id="radar-future" compact/>}</div><p className="mt-3 text-xs text-muted-foreground">Gold: current catalogue target. Purple dashed: selected future target. What-if assumption: selected role skills +1 for moderate AI development, +2 for fast (maximum 5); not an ESCO forecast.</p>
+          <EscoReference careerId={career.id} /><OnetReference careerId={career.id} /><PathwayEvidence careerId={career.id}/>
           <div className="mx-auto max-w-[460px]"><SkillRadar axes={axes} size={440} showSdg hovered={hoverSkill} onHover={setHoverSkill} /></div>
         </Card></Reveal>
         <Reveal delay={0.1}><Card className="h-full" testId="panel-skill-sdg">
@@ -123,12 +124,12 @@ export default function JobDetail() {
       <div className="grid gap-6 lg:grid-cols-[1.4fr_1fr]">
         <Reveal><Card className="h-full" testId="card-description">
           <p className="flex items-center gap-2 font-medium"><SpectrumIcon icon={Bot} size={18} still />The role</p>
-          <p className="mt-3 leading-relaxed text-foreground/80">{career.description}</p>
+          <p className="mt-3 leading-relaxed text-foreground/80">{career.description}</p>{career.qualificationNote&&<p className="mt-4 rounded-xl border p-3 text-sm">{career.qualificationNote}</p>}
           <p className="mt-6 flex items-center gap-2 font-medium"><SpectrumIcon icon={TrendingUp} size={18} still />Illustrative prospects</p>
           <p className="mt-3 leading-relaxed text-foreground/80">{career.prospects}</p>
           <div className="mt-6 grid gap-4 sm:grid-cols-2">
-            <div className="rounded-2xl border bg-white/80 p-4"><p className="flex items-center gap-1.5 text-xs text-muted-foreground"><Wallet className="h-3.5 w-3.5" />Illustrative salary range</p><p className="mt-2 font-mono text-lg" data-testid="text-salary">{myr(career.salary[0])} – {myr(career.salary[1])}</p><p className="text-xs text-muted-foreground">per month, Malaysia</p></div>
-            <div className="rounded-2xl border bg-white/80 p-4"><div className="flex flex-wrap justify-between gap-2"><p className="flex items-center gap-1.5 text-xs text-muted-foreground"><TrendingUp className="h-3.5 w-3.5" />Illustrative growth scenario</p><ScenarioToggle id="growth-scenario" compact/></div><p className={cn('mt-2 font-mono text-lg', career.growth[scenario] < 0 && 'text-[hsl(350_60%_52%)]')}>{career.growth[scenario] > 0 ? '+' : ''}{career.growth[scenario]}%</p><p className="text-xs text-muted-foreground">{scenario} adoption</p></div>
+            <div className="rounded-2xl border bg-white/80 p-4"><p className="flex items-center gap-1.5 text-xs text-muted-foreground"><Wallet className="h-3.5 w-3.5" />Illustrative salary range</p><p className="mt-2 font-mono text-lg" data-testid="text-salary">{career.marketStatus==='unavailable'?'Not available':`${myr(career.salary[0])} – ${myr(career.salary[1])}`}</p><p className="text-xs text-muted-foreground">per month, Malaysia</p></div>
+            <div className="rounded-2xl border bg-white/80 p-4"><div className="flex flex-wrap justify-between gap-2"><p className="flex items-center gap-1.5 text-xs text-muted-foreground"><TrendingUp className="h-3.5 w-3.5" />Illustrative growth scenario</p><ScenarioToggle id="growth-scenario" compact/></div><p className={cn('mt-2 font-mono text-lg', career.growth[scenario] < 0 && 'text-[hsl(350_60%_52%)]')}>{career.marketStatus==='unavailable'?'Not available':`${career.growth[scenario]>0?'+':''}${career.growth[scenario]}%`}</p><p className="text-xs text-muted-foreground">{scenario} adoption</p></div>
           </div>
           <p className="mt-6 font-medium">Related SDGs</p>
           <div className="mt-3 flex flex-wrap gap-2">{career.sdgs.map((n) => <SdgPill key={n} n={n} />)}</div>

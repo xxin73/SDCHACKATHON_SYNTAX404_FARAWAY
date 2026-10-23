@@ -1,3 +1,4 @@
+import {PATHWAY_COURSES} from '../../../../supabase/functions/faraway-recommendations/pathways';
 export type Category = 'Programming' | 'AI & Machine Learning' | 'Design' | 'Science' | 'Business' | 'Mathematics';
 export const CATEGORIES: Category[] = ['Programming', 'AI & Machine Learning', 'Design', 'Science', 'Business', 'Mathematics'];
 
@@ -46,6 +47,8 @@ export const COURSES: Course[] = [
   { id: 'linear-algebra', title: 'Linear Algebra for Machine Learning', category: 'Mathematics', level: 'Advanced', hours: 18, description: 'Vectors, matrices, eigen-decomposition and gradient intuition.', skills: ['Machine Learning', 'Statistics'], cost: 160, hrdc: false, online: true, setting: 'indoor', instructor: 'Prof. Lim Wei Jie', provider: 'Faraway Academy', rating: 4.8, learners: 3015, hue: 250 },
   { id: 'risk-quant', title: 'Quantitative Risk Management', category: 'Mathematics', level: 'Advanced', hours: 20, description: 'VaR, stress testing and credit models aligned with BNM guidelines.', skills: ['Risk Management', 'Statistics'], cost: 460, hrdc: false, online: false, setting: 'indoor', instructor: 'Dr. Kumar Pillai', provider: 'KL Finance Academy', rating: 4.6, learners: 1206, hue: 5 },
 ];
+
+COURSES.push(...PATHWAY_COURSES as unknown as Course[]);
 
 export const courseById = (id: string) => COURSES.find((c) => c.id === id);
 

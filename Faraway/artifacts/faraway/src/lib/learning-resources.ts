@@ -1,6 +1,8 @@
 // Curated resource links, not enrolments or claims that the illustrative course is real.
 export type LearningResource={title:string;url:string;skills:string[]};
 const resources:LearningResource[]=[
+ {title:'OpenLearn: Starting with law (introductory UK context)',url:'https://www.open.edu/openlearn/society-politics-law/starting-law/content-section-0',skills:['Legal Research','Legal Writing','Law and Government','Debate & Argumentation']},
+ {title:'OpenLearn: society, politics and law',url:'https://www.open.edu/openlearn/society-politics-law',skills:['Policy Analysis','Research Methods','Writing','Critical Thinking','Negotiation']},
  {title:'Microsoft Excel help & learning',url:'https://support.microsoft.com/en-us/excel',skills:['Excel','Financial Modelling','Accounting']},
  {title:'Khan Academy: statistics and probability',url:'https://www.khanacademy.org/math/statistics-probability',skills:['Statistics','Risk Management']},
  {title:'Microsoft Learn: Power BI',url:'https://learn.microsoft.com/en-us/training/powerplatform/power-bi',skills:['Data Visualisation']},

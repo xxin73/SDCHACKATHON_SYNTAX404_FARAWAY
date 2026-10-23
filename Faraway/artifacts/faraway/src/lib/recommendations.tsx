@@ -1,8 +1,12 @@
+import {loadObservations} from './market-data';
+import {observationsForRole} from '../../../../supabase/functions/faraway-recommendations/trends';
+import {enrichCatalogue,PATHWAY_VERSION} from '../../../../supabase/functions/faraway-recommendations/pathways';
+import {CALCULATION_VERSION} from '../../../../supabase/functions/faraway-recommendations/core';
 import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from 'react';
 import { useAuth } from './auth-context';
 import { requireSupabase } from './supabase';
 import { getState, setState } from './store';
-import { CAREERS, type Career } from '@/data/careers';
+import { CAREERS, syncInterestCatalogue, type Career } from '@/data/careers';
 import { COURSES, type Course } from '@/data/courses';
 import { setDatabaseCatalogue } from './catalogue-status';
 import { completionKey, digest, preferences, profileInput, type Catalogue, type Generated, type Module } from '../../../../supabase/functions/faraway-recommendations/core';
@@ -14,6 +18,7 @@ const originalCareers=structuredClone(CAREERS),originalCourses=structuredClone(C
 function replaceCatalogue(catalogue:Catalogue|null) {
   CAREERS.splice(0,CAREERS.length,...(catalogue?catalogue.careers as Career[]:originalCareers));
   COURSES.splice(0,COURSES.length,...(catalogue?catalogue.courses as unknown as Course[]:originalCourses));
+  syncInterestCatalogue();
   setDatabaseCatalogue(Boolean(catalogue));
 }
 export function RecommendationProvider({children}:{children:ReactNode}) {
@@ -36,7 +41,7 @@ export function RecommendationProvider({children}:{children:ReactNode}) {
       if(current!==generation.current)return;
       for(const r of results)if(r.error)throw r.error;
       const row=results[0].data!;
-      const cat={...row.payload,version:row.version,published_at:row.published_at,observed_at:row.observed_at,status:row.status} as Catalogue;
+      const cat=enrichCatalogue({...row.payload,version:row.version,published_at:row.published_at,observed_at:row.observed_at,status:row.status} as Catalogue);
       if(!cat.careers?.length||!cat.courses?.length)throw new Error('The practice catalogue is empty.');
       const found=results[1].data as Run[];
       let selected=found.find(r=>r.id===results[2].data?.run_id)??null;
@@ -57,12 +62,16 @@ export function RecommendationProvider({children}:{children:ReactNode}) {
     if(state.session?.id!==userId)throw new Error('Your account changed. Sign in again.');
     const p=profileInput(state.profile),pref=preferences(state.plan);
     const profileHash=await digest(p),preferencesHash=await digest(pref);
-    const {data,error}=await requireSupabase().functions.invoke('faraway-recommendations',{body:{kind,careerId,profileHash,preferencesHash}});
-    if(error){let detail='';try{detail=(await error.context?.json())?.error??'';}catch{}throw new Error(detail||'AI function unavailable. Deploy faraway-recommendations and check the server secrets.');}
+    const role=CAREERS.find(r=>r.id===careerId);
+    const marketObservations=role?observationsForRole(role,loadObservations()).slice(0,40):[];
+    const {data,error}=await requireSupabase().functions.invoke('faraway-recommendations',{body:{kind,careerId,profileHash,preferencesHash,pathwayVersion:PATHWAY_VERSION,scenario:state.scenario,marketObservations}});
+    if(error){let detail='';try{detail=(await error.context?.json())?.error??'';}catch{}throw new Error(detail==='Invalid recommendation request.'?'The AI server needs the latest occupation-pathway update. Deploy the updated faraway-recommendations function, then retry.':detail||'AI function unavailable. Deploy faraway-recommendations and check the server secrets.');}
     if(data?.error)throw new Error(data.error);
     if(current!==generation.current||getState().session?.id!==userId)throw new Error('Your account changed during generation.');
     if(await digest(profileInput(getState().profile))!==profileHash || (kind==='plan'&&await digest(preferences(getState().plan))!==preferencesHash))throw new Error('Your inputs changed. Confirm them and generate again.');
+    if(kind==='explain'&&getState().scenario!==state.scenario)throw new Error('Your chart scenario changed. Generate its explanation again.');
     const run=data.run as Run;
+    if(run?.result?.meta.calculationVersion!==CALCULATION_VERSION||run?.result?.meta.pathwayVersion!==PATHWAY_VERSION)throw new Error('The AI server needs the latest occupation-pathway update. Deploy the updated faraway-recommendations function, then retry. Your saved plan is unchanged.');
     if(!run?.id||run.result?.meta.profileHash!==profileHash||run.result?.meta.catalogueVersion!==catalogue?.version)throw new Error('AI returned a different data version. Reload before continuing.');
     setRuns(before=>[run,...before.filter(r=>r.id!==run.id)]);
     return run;

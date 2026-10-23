@@ -42,7 +42,7 @@ export default function PlanPage() {
   if (!career) return <NeedProfile text="Pick a career target first." />;
 
   const match = computeMatch(career, profile, scenario);
-  const required=scenarioRequirements(career.required,plan.futureScenario);
+  const required=scenarioRequirements(career.required,plan.futureScenario,career.futureSkills);
   const gaps=Object.entries(required).map(([skill,need])=>({skill,need,have:profile.skills[skill]??0})).filter(g=>g.have<g.need).sort((a,b)=>(b.need-b.have)-(a.need-a.have));
   const recommended = gaps.map(g=>g.skill);
   const selected = plan.mode === 'recommended' ? recommended : plan.skills;
@@ -77,9 +77,10 @@ export default function PlanPage() {
   return (
     <div className="space-y-8">
       <PageTitle eyebrow={`Study plan · ${career.title}`} title={<>Your route,<br /><span className="text-muted-foreground">your pace.</span></>} >
-        Course catalogue. Prices, hours and claimability are illustrative, not verified provider offers. AI organises catalogue courses around your confirmed skill gaps and preferences. It does not predict market trends.
+        AI sequences learning around your selected career and confirmed skill gaps. Faraway self-study modules are authored practice outlines with estimated hours; other catalogue offers remain illustrative. Completing a plan does not award a professional qualification.
       </PageTitle>
 
+      {career.qualificationNote&&<p className="rounded-2xl border p-4 text-sm">{career.qualificationNote}</p>}
       <Reveal><Card testId="card-preferences">
         <CardTitle eyebrow="Preferences" title="How you like to learn" />
         <div className="grid gap-8 md:grid-cols-2">
@@ -96,7 +97,7 @@ export default function PlanPage() {
             <div className="flex justify-between text-sm"><span className="font-medium">Study time per day</span><span className="font-mono">{plan.minutesPerDay} min</span></div>
             <input type="range" min={15} max={240} step={15} value={plan.minutesPerDay} onChange={(e) => updPlan({ minutesPerDay: Number(e.target.value) })} className="range mt-3" data-testid="range-minutes"
               style={{ background: `linear-gradient(90deg, #8fb0ff, #c08bff ${((plan.minutesPerDay - 15) / 225) * 100}%, hsl(232 40% 94%) ${((plan.minutesPerDay - 15) / 225) * 100}%)` }} />
-            <div className="mt-5 rounded-2xl border bg-white/70 p-4"><p className="text-sm font-medium">Which future are you preparing for?</p><p className="mt-1 text-xs text-muted-foreground">Choose current requirements, or a what-if AI development scenario. This changes the target skill gaps used for this plan.</p><select className="field mt-3" aria-label="Plan future scenario" value={plan.futureScenario??'current'} onChange={e=>updPlan({futureScenario:e.target.value==='current'?undefined:e.target.value as 'moderate'|'fast'})}><option value="current">Current catalogue requirements</option><option value="moderate">Moderate AI development</option><option value="fast">Fast AI development</option></select><p className="mt-2 text-xs text-muted-foreground">Future digital skill targets increase by 1 (moderate) or 2 (fast), capped at 5. This is a transparent planning assumption, not a forecast.</p></div>
+            <div className="mt-5 rounded-2xl border bg-white/70 p-4"><p className="text-sm font-medium">Which future are you preparing for?</p><p className="mt-1 text-xs text-muted-foreground">Choose current requirements, or a what-if AI development scenario. This changes the target skill gaps used for this plan.</p><select className="field mt-3" aria-label="Plan future scenario" value={plan.futureScenario??'current'} onChange={e=>updPlan({futureScenario:e.target.value==='current'?undefined:e.target.value as 'moderate'|'fast'})}><option value="current">Current catalogue requirements</option><option value="moderate">Moderate AI development</option><option value="fast">Fast AI development</option></select><p className="mt-2 text-xs text-muted-foreground">Selected role-specific skill targets increase by 1 (moderate) or 2 (fast), capped at 5. This is a transparent planning assumption, not a forecast.</p></div>
             <p className="mb-2 mt-6 text-sm font-medium">Plan type</p>
             <div className="inline-flex rounded-full border bg-white p-1">
               {(['recommended', 'custom'] as const).map((m) => (

@@ -1,3 +1,4 @@
+import {PATHWAY_ROLES,interestRoles,interestSkills} from '../../../../supabase/functions/faraway-recommendations/pathways';
 import type { SkillEvidence } from '../../../../supabase/functions/faraway-recommendations/core';
 export type Scenario = 'fast' | 'moderate';
 
@@ -40,7 +41,7 @@ export const STREAMS: Stream[] = [
   },
 ];
 
-STREAMS.push(...[{"id": "health", "name": "Healthcare & public health", "tagline": "Health services, wellbeing and health data", "careers": ["data-analyst", "business-analyst"], "skills": ["Communication", "Problem Solving", "AI Tools", "Excel", "Project Management", "Statistics"]}, {"id": "engineering", "name": "Engineering & manufacturing", "tagline": "Industrial processes, automation and systems", "careers": ["cloud-engineer", "business-analyst"], "skills": ["Communication", "Problem Solving", "AI Tools", "Excel", "Project Management", "Statistics"]}, {"id": "education", "name": "Education & training", "tagline": "Teaching, learning design and student support", "careers": ["hr-specialist", "ux-designer"], "skills": ["Communication", "Problem Solving", "AI Tools", "Excel", "Project Management", "Statistics"]}, {"id": "science", "name": "Science & research", "tagline": "Research methods, analysis and discovery", "careers": ["data-analyst", "ml-engineer"], "skills": ["Communication", "Problem Solving", "AI Tools", "Excel", "Project Management", "Statistics"]}, {"id": "environment", "name": "Environment & sustainability", "tagline": "Climate, energy and responsible operations", "careers": ["risk-analyst", "business-analyst"], "skills": ["Communication", "Problem Solving", "AI Tools", "Excel", "Project Management", "Statistics"]}, {"id": "agriculture", "name": "Agriculture & food", "tagline": "Smart farming, food systems and agribusiness", "careers": ["data-analyst", "business-analyst"], "skills": ["Communication", "Problem Solving", "AI Tools", "Excel", "Project Management", "Statistics"]}, {"id": "law", "name": "Law & governance", "tagline": "Compliance, public policy and responsible AI", "careers": ["risk-analyst", "business-analyst"], "skills": ["Communication", "Problem Solving", "AI Tools", "Excel", "Project Management", "Statistics"]}, {"id": "logistics", "name": "Logistics & supply chain", "tagline": "Transport, procurement and operations", "careers": ["business-analyst", "data-analyst"], "skills": ["Communication", "Problem Solving", "AI Tools", "Excel", "Project Management", "Statistics"]}, {"id": "hospitality", "name": "Hospitality & tourism", "tagline": "Guest experience, travel and service operations", "careers": ["digital-marketer", "business-analyst"], "skills": ["Communication", "Problem Solving", "AI Tools", "Excel", "Project Management", "Statistics"]}, {"id": "construction", "name": "Construction & built environment", "tagline": "Projects, buildings and infrastructure", "careers": ["product-manager", "business-analyst"], "skills": ["Communication", "Problem Solving", "AI Tools", "Excel", "Project Management", "Statistics"]}, {"id": "social", "name": "Social services & community", "tagline": "People, inclusion and community programmes", "careers": ["hr-specialist", "business-analyst"], "skills": ["Communication", "Problem Solving", "AI Tools", "Excel", "Project Management", "Statistics"]}, {"id": "media", "name": "Media & communications", "tagline": "Content, storytelling and audience research", "careers": ["digital-marketer", "ux-designer"], "skills": ["Communication", "Problem Solving", "AI Tools", "Excel", "Project Management", "Statistics"]}, {"id": "entrepreneurship", "name": "Entrepreneurship & retail", "tagline": "Business creation, customers and sales", "careers": ["product-manager", "digital-marketer"], "skills": ["Communication", "Problem Solving", "AI Tools", "Excel", "Project Management", "Statistics"]}, {"id": "public", "name": "Public service", "tagline": "Government, policy and service delivery", "careers": ["business-analyst", "data-analyst"], "skills": ["Communication", "Problem Solving", "AI Tools", "Excel", "Project Management", "Statistics"]}, {"id": "other", "name": "Other / still exploring", "tagline": "Tell us your interest and explore related transferable careers", "careers": [], "skills": ["Communication", "Problem Solving", "AI Tools", "Excel", "Project Management", "Statistics"]}]);
+STREAMS.push(...[{"id": "health", "name": "Healthcare & public health", "tagline": "Health services, wellbeing and health data", "careers": [], "skills": []}, {"id": "engineering", "name": "Engineering & manufacturing", "tagline": "Industrial processes, automation and systems", "careers": [], "skills": []}, {"id": "education", "name": "Education & training", "tagline": "Teaching, learning design and student support", "careers": [], "skills": []}, {"id": "science", "name": "Science & research", "tagline": "Research methods, analysis and discovery", "careers": [], "skills": []}, {"id": "environment", "name": "Environment & sustainability", "tagline": "Climate, energy and responsible operations", "careers": [], "skills": []}, {"id": "agriculture", "name": "Agriculture & food", "tagline": "Smart farming, food systems and agribusiness", "careers": [], "skills": []}, {"id": "law", "name": "Law & governance", "tagline": "Legal research, advocacy and public policy", "careers": [], "skills": []}, {"id": "logistics", "name": "Logistics & supply chain", "tagline": "Transport, procurement and operations", "careers": [], "skills": []}, {"id": "hospitality", "name": "Hospitality & tourism", "tagline": "Guest experience, travel and service operations", "careers": [], "skills": []}, {"id": "construction", "name": "Construction & built environment", "tagline": "Projects, buildings and infrastructure", "careers": [], "skills": []}, {"id": "social", "name": "Social services & community", "tagline": "People, inclusion and community programmes", "careers": [], "skills": []}, {"id": "media", "name": "Media & communications", "tagline": "Content, storytelling and audience research", "careers": [], "skills": []}, {"id": "entrepreneurship", "name": "Entrepreneurship & retail", "tagline": "Business creation, customers and sales", "careers": [], "skills": []}, {"id": "public", "name": "Public service", "tagline": "Government, policy and service delivery", "careers": [], "skills": []}, {"id": "other", "name": "Other / still exploring", "tagline": "Tell us your interest and explore related transferable careers", "careers": [], "skills": []}]);
 
 export const ALL_SKILLS = Array.from(new Set(STREAMS.flatMap((s) => s.skills))).sort();
 
@@ -71,6 +72,11 @@ export const SKILL_SDG: Record<string, number> = {
 };
 
 export interface Career {
+  interests?:string[];
+  futureSkills?:string[];
+  qualificationNote?:string;
+  pathwayEvidence?:import('../../../../supabase/functions/faraway-recommendations/pathways').PathwayEvidence;
+  marketStatus?:string;
   skillEvidence?: SkillEvidence;
   id: string;
   title: string;
@@ -221,6 +227,13 @@ export const CAREERS: Career[] = [
   },
 ];
 
+CAREERS.push(...PATHWAY_ROLES as unknown as Career[]);
+export function syncInterestCatalogue(){
+ for(const stream of STREAMS){if(stream.id==='other')continue;stream.careers=interestRoles(stream.id,CAREERS).map(r=>r.id);stream.skills=interestSkills(stream.id,CAREERS);}
+ ALL_SKILLS.splice(0,ALL_SKILLS.length,...new Set(CAREERS.flatMap(r=>Object.keys(r.required))));ALL_SKILLS.sort();
+}
+syncInterestCatalogue();
+
 export const careerById = (id: string) => CAREERS.find((c) => c.id === id);
 
 export interface SkillTrend {
@@ -292,6 +305,5 @@ export const SDG_WHY: Record<number, string> = {
 export function careerInScenario(c: Career | undefined, scenario: Scenario): Career | undefined {
  if (!c) return undefined;
  const base = CAREERS.find(x => x.id === c.id) ?? c;
- const growing = ['AI Tools','Python','SQL','Machine Learning','Data Visualisation','Cloud Computing'];
- return {...base,required:Object.fromEntries(Object.entries(base.required).map(([skill,n])=>[skill,Math.min(5,n+(scenario==='fast'&&growing.includes(skill)?1:0))]))};
+ return {...base,required:{...base.required}};
 }

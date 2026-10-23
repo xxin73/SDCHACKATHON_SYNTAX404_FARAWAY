@@ -1,17 +1,19 @@
+// @ts-ignore Explicit extension for the Supabase Deno runtime.
+import {enrichCatalogue,relevantRole,PATHWAY_VERSION} from './pathways.ts';
 // Shared deterministic rules. No network, model calls, browser storage or secrets.
 export type ProfileInput = { stream: string; careers: string[]; years: number; skills: Record<string, number>; complete: boolean };
 export type Preferences = { target: string; setting: string; cost: string; onlineOnly: boolean; minutesPerDay: number; mode: string; skills: string[]; delivery?: 'online'|'in-person'|'hybrid'|'any'; futureScenario?: 'moderate'|'fast' };
 export type SkillEvidence = { version:string; occupationLabel:string; occupationUri:string; rubric:string; groups:{skill:string;target:number;note:string;sourceSkills:{uri:string;label:string;relation:string}[]}[] };
-export type Role = { id: string; title: string; stream: string; skillEvidence?: SkillEvidence; required: Record<string, number>; minYears: number; demand: { moderate: number } };
-export type Course = { id: string; title: string; provider: string; version: string; skills: string[]; hours: number; cost: number; rating: number; online: boolean; setting: string; hrdc: boolean };
+export type Role = { id: string; title: string; stream: string; skillEvidence?: SkillEvidence; interests?:string[]; futureSkills?:string[]; qualificationNote?:string; pathwayEvidence?:import('./pathways').PathwayEvidence; marketStatus?:string; required: Record<string, number>; minYears: number; demand: { moderate: number } };
+export type Course = { id: string; title: string; provider: string; version: string; skills: string[]; hours: number; cost: number; rating: number; online: boolean; setting: string; hrdc: boolean; activityTitles?:string[] };
 export type Catalogue = { version: string; published_at: string; observed_at: string | null; status: 'illustrative'; careers: Role[]; courses: Course[] };
 export type Match = { careerId: string; score: number; gaps: { skill: string; have: number; need: number }[] };
 export type Module = { courseId: string; courseVersion: string; title: string; provider: string; skills: string[]; hours: number; cost: number; weeks: number; why: string; activities: { id: string; title: string; hours: number }[] };
 export type PlanResult = { overview: string; modules: Module[]; missing: string[]; totalHours: number; totalCost: number; totalWeeks: number };
-export type Explanation = { careerId: string; fitSummary: string; actions: string[] };
-export type Generated = { kind: 'explain' | 'plan'; rankings: Match[]; explanations?: Explanation[]; plan?: PlanResult; careerId?: string; meta: { catalogueVersion: string; cataloguePublishedAt: string; evidenceObservedAt: string | null; evidenceStatus: string; profileHash: string; preferencesHash: string; generatedAt: string; model: string; promptVersion: string; calculationVersion: string } };
-export const PROMPT_VERSION = 'grounded-personal-esco-v4';
-export const CALCULATION_VERSION = 'weighted-baseline-v1';
+export type Explanation = { careerId: string; fitSummary: string; actions: string[]; trendSummary?:string; sourceIds?:string[] };
+export type Generated = { kind: 'explain' | 'plan'; rankings: Match[]; explanations?: Explanation[]; plan?: PlanResult; careerId?: string; meta: { catalogueVersion: string; cataloguePublishedAt: string; evidenceObservedAt: string | null; evidenceStatus: string; profileHash: string; preferencesHash: string; generatedAt: string; model: string; promptVersion: string; calculationVersion: string; pathwayVersion?:string; scenario?:'moderate'|'fast'; chartEvidenceHash?:string; trendContext?:unknown } };
+export const PROMPT_VERSION = 'grounded-pathways-trends-v5';
+export const CALCULATION_VERSION = 'interest-pathway-fit-v2';
 
 function object(value: unknown): asserts value is Record<string, unknown> {
   if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error('Expected an object.');
@@ -45,33 +47,32 @@ export async function digest(value: unknown) {
   return Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(stable(value))))).map(x => x.toString(16).padStart(2,'0')).join('');
 }
 export function rank(profile: ProfileInput, catalogue: Catalogue): Match[] {
+  catalogue=enrichCatalogue(catalogue);
   return catalogue.careers.map(c => {
     const required = Object.entries(c.required);
     if (!required.length || required.some(([,v]) => !Number.isFinite(v) || v <= 0 || v > 5)) throw new Error('Invalid catalogue requirements.');
     const skillFit = required.reduce((n,[s,v]) => n + Math.min((profile.skills[s] ?? 0)/v,1),0)/required.length;
-    const interest = profile.careers.includes(c.id) ? 1 : profile.stream === c.stream ? .6 : .25;
+    const interest = profile.careers.includes(c.id) ? 1 : relevantRole(c,profile) ? .8 : .1;
     const experience = Math.min((profile.years+.5)/(c.minYears+.5),1);
-    // Existing practice heuristic: the 10% market component is an illustrative
-    // fixture, never a forecast. It is not sent to Gemini as evidence.
-    const marketFit = c.demand.moderate / 100;
-    const score = Math.round((100 * (.65*skillFit+.15*interest+.1*experience+.1*marketFit)) * 10) / 10;
+    const score = Math.round((100 * (.7*skillFit+.2*interest+.1*experience)) * 10) / 10;
     return { careerId: c.id, score, gaps: required.map(([skill,need]) => ({skill,need,have:profile.skills[skill]??0})).filter(g => g.have<g.need).sort((a,b) => (b.need-b.have)-(a.need-a.have)) };
-  }).sort((a,b) => b.score-a.score || a.careerId.localeCompare(b.careerId));
+  }).sort((a,b) => Number(relevantRole(catalogue.careers.find(c=>c.id===b.careerId)!,profile))-Number(relevantRole(catalogue.careers.find(c=>c.id===a.careerId)!,profile)) || b.score-a.score || a.careerId.localeCompare(b.careerId));
 }
 export const FUTURE_SKILLS = ['AI Tools','Python','SQL','Machine Learning','Data Visualisation','Cloud Computing'];
 // Explicit what-if rule; ESCO does not supply future proficiency targets.
-export function scenarioRequirements(required:Record<string,number>,scenario?:'moderate'|'fast') {
- return Object.fromEntries(Object.entries(required).map(([skill,level])=>[skill,Math.min(5,level+(scenario&&FUTURE_SKILLS.includes(skill)?scenario==='fast'?2:1:0))]));
+export function scenarioRequirements(required:Record<string,number>,scenario?:'moderate'|'fast',futureSkills?:string[]) {
+ return Object.fromEntries(Object.entries(required).map(([skill,level])=>[skill,Math.min(5,level+(scenario&&(futureSkills??FUTURE_SKILLS).includes(skill)?scenario==='fast'?2:1:0))]));
 }
 export function courseMatches(c:{setting:string;online:boolean;cost:number;hrdc:boolean;delivery?:string;hrdcVerifiedUrl?:string},pref:Preferences){
  const delivery=c.delivery??(c.online?'online':'in-person');
  return (pref.setting==='either'||pref.setting===c.setting)&&(!pref.onlineOnly||delivery==='online')&&(!pref.delivery||pref.delivery==='any'||pref.delivery===delivery)&&(pref.cost!=='free'||c.cost===0)&&(pref.cost!=='low'||c.cost<=200)&&(pref.cost!=='moderate'||c.cost<=500)&&(pref.cost!=='hrdc'||(c.hrdc&&Boolean(c.hrdcVerifiedUrl)));
 }
 export function candidates(catalogue: Catalogue, profile: ProfileInput, pref: Preferences) {
+  catalogue=enrichCatalogue(catalogue);
   const match = rank(profile,catalogue).find(m => m.careerId === pref.target);
   const role = catalogue.careers.find(r => r.id === pref.target);
   if (!match || !role) throw new Error('Choose a career from the current catalogue.');
-  const required=scenarioRequirements(role.required,pref.futureScenario);
+  const required=scenarioRequirements(role.required,pref.futureScenario,role.futureSkills);
   const gaps=Object.entries(required).map(([skill,need])=>({skill,need,have:profile.skills[skill]??0})).filter(g=>g.have<g.need).sort((a,b)=>(b.need-b.have)-(a.need-a.have));
   const selected = [...new Set(pref.mode === 'recommended' ? gaps.map(g=>g.skill) : pref.skills)];
   const vocabulary = new Set(catalogue.careers.flatMap(r=>Object.keys(r.required)));
@@ -80,20 +81,24 @@ export function candidates(catalogue: Catalogue, profile: ProfileInput, pref: Pr
   const modules = new Map<string, {course: Course; skills: string[]}>();
   const missing: string[] = [];
   for (const skill of selected) {
-    const course = pool.filter(c=>c.skills.includes(skill)).sort((a,b)=>a.cost-b.cost || b.rating-a.rating || a.id.localeCompare(b.id))[0];
+    const course = pool.filter(c=>c.skills.includes(skill)).sort((a,b)=>(role.pathwayEvidence?Number(b.id.startsWith('pathway-'))-Number(a.id.startsWith('pathway-')):0)||a.cost-b.cost || b.rating-a.rating || a.id.localeCompare(b.id))[0];
     if (!course) { missing.push(skill); continue; }
     const entry = modules.get(course.id) ?? {course,skills:[]}; entry.skills.push(skill); modules.set(course.id,entry);
   }
   return {match:{...match,gaps},role:{...role,required},selected,modules:[...modules.values()],missing};
 }
 export function activities(course: Course) {
-  return [{id:'foundations',title:'Core concepts',w:.25},{id:'practice',title:'Guided practice exercises',w:.3},{id:'project',title:'Mini project applying the skill',w:.3},{id:'assess',title:'Self-assessment and reflection',w:.15}].map(a=>({id:a.id,title:a.title,hours:Math.round(course.hours*a.w*100)/100}));
+  return [{id:'foundations',title:'Core concepts',w:.25},{id:'practice',title:'Guided practice exercises',w:.3},{id:'project',title:'Mini project applying the skill',w:.3},{id:'assess',title:'Self-assessment and reflection',w:.15}].map((a,i)=>({id:a.id,title:course.activityTitles?.[i]??a.title,hours:Math.round(course.hours*a.w*100)/100}));
 }
 function text(value: unknown, max = 1200): string {
   if (typeof value !== 'string' || !value.trim() || value.length > max) throw new Error('AI returned an invalid explanation. Please retry.');
   // Facts and references are rendered from the catalogue, never model text.
   if (/https?:|www\.|\b(?:salary|salaries|guarantee[ds]?|2030|forecast|jobstreet|linkedin|coursera|udemy)\b|(?:RM|USD|MYR|\$)\s*\d/i.test(value)) throw new Error('AI returned unsupported claims or external resources. Please retry.');
   return value.trim();
+}
+function trendText(value:string){
+ if(!value.trim()||value.length>1000||/[0-9%]|https?:|www\.|\b(?:guarantee[ds]?|salary|salaries)\b/i.test(value))throw new Error('AI returned unsupported trend claims. Please retry.');
+ return value.trim();
 }
 export function validateExplanation(raw: unknown, matches: Match[]): Explanation[] {
   object(raw);
@@ -104,7 +109,7 @@ export function validateExplanation(raw: unknown, matches: Match[]): Explanation
     if (typeof v.careerId !== 'string' || !matches.some(m=>m.careerId===v.careerId) || ids.has(v.careerId)) throw new Error('AI returned an unknown or duplicate career.');
     ids.add(v.careerId);
     if (!Array.isArray(v.actions)||v.actions.length<1||v.actions.length>4) throw new Error('AI returned invalid actions.');
-    return {careerId:v.careerId,fitSummary:text(v.fitSummary),actions:v.actions.map(x=>text(x,400))};
+    return {careerId:v.careerId,fitSummary:text(v.fitSummary),actions:v.actions.map(x=>text(x,400)),...(typeof v.trendSummary==='string'?{trendSummary:trendText(v.trendSummary)}:{})};
   });
 }
 export function organise(raw: unknown, selection: ReturnType<typeof candidates>, minutes: number): PlanResult {

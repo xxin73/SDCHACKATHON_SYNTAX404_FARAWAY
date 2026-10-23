@@ -36,3 +36,30 @@ The source registry labels these as references, not connected datasets. No inven
 - https://www.isis.org.my/2026/06/04/connecting-skills-to-jobs ; https://asean.org/wp-content/uploads/2025/02/Regional-mapping-of-labour-market-information-for-skills-and-employment-policies-in-ASEAN-Member-States_e-version-for-website.pdf
 
 The additional O*NET abilities, interests and work-styles API references identify different constructs from software skills. They are not imported in this revision and require their own schemas, scales and mappings. API access is not configured. Interests must remain separate from careers and abilities; no automatic inference of personality or proficiency is made.
+
+## Occupation-linked recommendations (pathway revision)
+
+The initial reference-only integration is now connected to the existing recommendation flow. An explicit shared graph links interests → occupation IDs → sourced skill concepts → Faraway practice targets → authored learning modules. The graph extends the 13 existing careers with 29 occupation pathways across every named interest area. Law/governance includes Lawyer, Legal Researcher/Paralegal, Public Policy Analyst and Politician/Legislator. Occupational analogues and interest links are curated by Faraway, not official crosswalks. Legislator practice skills use Political Scientists as an explicitly labelled proxy because the legislator profile has no measured skill ratings.
+
+The importer uses actual O*NET 31.0 Essential Skills, Transferable Skills and Knowledge rows. Source element IDs, occupation codes, native importance values, update dates and full-file hashes are retained. Source importance is never converted into proficiency. All new practice targets start at Faraway's 3/5 routine independent practice level. Clinical/professional/elected paths display entry/qualification limitations. ESCO-backed existing requirements are preserved.
+
+Regenerate `pathway-data.ts`: download `essential_skills.json`, `transferable_skills.json`, `knowledge.json` from `https://www.onetcenter.org/dl_files/database/db_31_0_json/`, save them as `essential.json`, `transferable.json`, `knowledge.json`, then run `python scripts/data/build-occupation-pathways.py /path/to/downloads`. Review mappings, suppression flags and output; commit the result. Data is not refreshed automatically.
+
+Both browser and Edge Function merge the shared graph into the current database catalogue. No catalogue SQL migration or service-role key in the browser is needed. Existing saved plans and progress are preserved. Suggestions prioritise roles connected to interests or explicitly selected by the user, then rank fit by 70% skills + 20% interest + 10% experience. Synthetic demand and unverified browser counts do not affect scores. Explore other careers remains an explicit option.
+
+New study modules are authored Faraway self-study outlines with estimated practice time, not invented external provider offers or qualifications. Core selection prefers these domain-linked modules for new pathways, preventing a law Communication gap from selecting an unrelated legacy data-visualisation course. AI sequences the supplied modules and explains the selected career, source concepts, gaps, qualification caveats and exercise context; it cannot invent courses. Professional admission requirements must be checked separately. OpenLearn's Starting with law is an external beginner reference in a UK context, not Malaysian professional training or legal advice.
+
+The same career drives the skill chart and optional AI explanation. Scenario targets use an explicit, curated list of role skills and a capped +1/+2 planning assumption. JobStreet/Indeed historical bars display same-role comparable dated observations only. The AI function validates and labels browser-imported observations as unverified, sends only comparable facts for the chosen occupation, and includes the observations and scenario in its cache key. AI trend prose cannot introduce numeric chart facts. This does not establish a live job-board connection or produce measured future demand. No role salary/growth values are manufactured when data is missing.
+
+### Activate server AI after the website deployment
+
+The website can deploy through GitHub/Vercel, but the Supabase Edge Function is a separate deployment:
+
+1. Open Supabase → Edge Functions → `faraway-recommendations` → its code editor.
+2. Replace `index.ts` with the entire contents of the repository file `Faraway/supabase/deploy-faraway-recommendations.ts` and deploy. This is a bundled single-file function with the graph included.
+3. Keep the existing `GEMINI_API_KEY`, `GEMINI_MODEL` and origin settings. No new key or SQL is needed for this revision, assuming the existing authenticated AI setup works.
+4. Reload the website, confirm Law & governance and skill ratings, select Lawyer, and generate an explanation and study plan.
+
+CLI alternative for an already authenticated Supabase CLI: `supabase functions deploy faraway-recommendations --project-ref YOUR_PROJECT_REF` from the Faraway directory. Source entry imports sibling files; the ready-to-paste bundle avoids manual multi-file setup.
+
+The website checks pathway/calculation versions and does not present an old server response as a new pathway recommendation. Old saved plans remain available in progress, but old AI explanations are not reused for changed graphs, scenarios or chart observations. Test coverage includes authenticated handler requests with a mocked provider; a real live Gemini invocation still requires the user's Supabase deployment and credentials.

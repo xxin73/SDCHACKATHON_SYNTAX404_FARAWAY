@@ -104,10 +104,10 @@ export default function Pathway() {
               <div className="grid gap-8 lg:grid-cols-[1fr_340px]">
                 <section>
                   <h2 className="font-display text-3xl">Interest</h2>
-                  <p className="mt-1 text-sm text-muted-foreground">Choose an interest area, then select careers you want to explore. The supported career catalogue is currently strongest in digital and business roles.</p>
+                  <p className="mt-1 text-sm text-muted-foreground">Choose an interest area, then select careers you want to explore. Careers and assessment skills below follow the occupation links for your chosen interest.</p>
                   <div className="mt-6 grid gap-3 sm:grid-cols-2">
                     {STREAMS.map((s) => (
-                      <motion.button whileTap={{ scale: 0.98 }} key={s.id} onClick={() => upd((p) => ({ stream: s.id, careers: p.stream === s.id ? p.careers : [] }))} data-testid={`button-stream-${s.id}`}
+                      <motion.button whileTap={{ scale: 0.98 }} key={s.id} onClick={() => {upd((p) => ({ stream: s.id, careers: p.stream === s.id ? p.careers.filter(id=>s.id==='other'||s.careers.includes(id)) : [] }));if(s.id!=='other'&&!s.careers.includes(target))setState(state=>({...state,plan:{...state.plan,target:s.careers[0]??'',skills:[],saved:false}}));}} data-testid={`button-stream-${s.id}`}
                         className={cn('relative rounded-2xl border bg-white/70 p-5 text-left transition-all hover:shadow-md', profile.stream === s.id && 'spectrum-border border-transparent bg-white shadow-md')}>
                         <p className="font-medium">{s.name}</p><p className="mt-1 text-sm text-muted-foreground">{s.tagline}</p>
                         {profile.stream === s.id && <Check className="absolute right-4 top-4 h-4 w-4" />}
@@ -119,7 +119,7 @@ export default function Pathway() {
                     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mt-8">
                       <p className="text-sm font-medium">Career interests <span className="font-normal text-muted-foreground">(select any)</span></p>
                       <div className="mt-3 flex flex-wrap gap-2">
-                        {Array.from(new Set([...stream.careers,...CAREERS.map(c=>c.id)])).map((id) => { const c = careerById(id); if(!c)return null; const on = profile.careers.includes(id); return (
+                        {(stream.id==='other'?CAREERS.map(c=>c.id):stream.careers).map((id) => { const c = careerById(id); if(!c)return null; const on = profile.careers.includes(id); return (
                           <button key={id} onClick={() => upd((p) => ({ careers: on ? p.careers.filter((x) => x !== id) : [...p.careers, id] }))} data-testid={`chip-career-${id}`}
                             className={cn('rounded-full border px-4 py-2 text-sm transition-all', on ? 'border-ink bg-ink text-white' : 'bg-white hover:border-[hsl(250_50%_80%)]')}>{c.title}</button>
                         ); })}
