@@ -111,9 +111,10 @@ export default function JobDetail() {
       {/* scenario chart + toggle */}
       <div className="grid gap-6 lg:grid-cols-1">
         <Reveal><Card className="h-full" testId="card-scenario-chart">
-          <CardTitle eyebrow="Illustrative scenario comparison" title={`Current vs ${scenario} AI development`} right={<ScenarioToggle id="job-compare" compact/>}/>
-          <p className="mb-4 text-xs text-muted-foreground">Current labour-market measurements are not connected. Future numbers below are scenario assumptions, not measured demand or predictions.</p>
-          <table className="w-full text-left text-sm"><thead><tr><th className="p-2">Measure</th><th className="p-2">Current</th><th className="p-2">{scenario==='fast'?'Fast':'Moderate'} AI future</th></tr></thead><tbody>{[{label:'Demand index (0–100)',value:career.demand[scenario]+'/100'},{label:'Tasks exposed to automation',value:career.automationRisk[scenario]+'%'},{label:'Job growth',value:career.growth[scenario]+'%'}].map(r=><tr key={r.label} className="border-t"><td className="p-2">{r.label}</td><td className="p-2 text-muted-foreground">No verified baseline</td><td className="p-2 font-mono">{r.value}</td></tr>)}</tbody></table>
+          <CardTitle eyebrow="Skill priorities for this role" title={`Core skills and ${scenario==='fast'?'rapid':'moderate'} AI development`} right={<ScenarioToggle id="job-skill-priorities" compact/>}/>
+          <div className="overflow-x-auto"><table className="w-full text-left text-sm"><thead><tr><th className="p-3">Skill</th><th className="p-3">Core for this role?</th><th className="p-3">Future priority</th><th className="p-3">Current → future target</th></tr></thead><tbody>{Object.entries(career.required).map(([skill,level])=><tr key={skill} className="border-t"><td className="p-3">{skill}</td><td className="p-3">{career.core.includes(skill)?'Core':'Supporting'}</td><td className="p-3">{futureRequired[skill]>level?'Growing in selected scenario':'Maintained'}</td><td className="p-3">{level}/5 → {futureRequired[skill]}/5</td></tr>)}</tbody></table></div>
+          <p className="mt-4 text-xs text-muted-foreground">Core labels are Faraway’s curated role priorities. Growing means a higher target under the selected planning scenario; it is not measured demand growth or an ESCO prediction.</p>
+
         </Card></Reveal>
       </div>
 
@@ -177,4 +178,3 @@ export default function JobDetail() {
     </div>
   );
 }
-

@@ -18,6 +18,7 @@ import PlanPage from '@/pages/plan';
 import Progress from '@/pages/progress';
 import Organization from '@/pages/organization';
 import EvidencePage from '@/pages/evidence';
+import ProfilePage from '@/pages/profile';
 import { RecommendationProvider, useRecommendations } from '@/lib/recommendations';
 
 const queryClient = new QueryClient();
@@ -50,6 +51,7 @@ function Router() {
           <Route path="/progress" component={Progress} />
           <Route path="/organization" component={Organization} />
           <Route path="/evidence" component={EvidencePage} />
+          <Route path="/profile" component={ProfilePage} />
           <Route component={NotFound} />
         </Switch>
       </RoutedErrorBoundary>

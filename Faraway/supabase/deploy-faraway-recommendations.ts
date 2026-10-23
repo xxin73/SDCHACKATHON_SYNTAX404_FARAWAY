@@ -1,4 +1,4 @@
-// ../../supabase/functions/faraway-recommendations/core.ts
+// supabase/functions/faraway-recommendations/core.ts
 var PROMPT_VERSION = "grounded-personal-esco-v4";
 var CALCULATION_VERSION = "weighted-baseline-v1";
 function object(value) {
@@ -9,7 +9,7 @@ function profileInput(value) {
   if (value.complete !== true) throw new Error("Confirm your profile and skills on the pathway Summary step first.");
   if (typeof value.stream !== "string" || !value.stream || value.stream.length > 100) throw new Error("Choose an interest stream.");
   if (!Array.isArray(value.careers) || value.careers.length > 30 || value.careers.some((x) => typeof x !== "string" || x.length > 100)) throw new Error("Invalid career interests.");
-  if (typeof value.years !== "number" || !Number.isFinite(value.years) || value.years < 0 || value.years > 80) throw new Error("Experience must be between 0 and 80 years.");
+  if (typeof value.years !== "number" || !Number.isFinite(value.years) || value.years < 0 || value.years > 99) throw new Error("Experience must be between 0 and 99 years.");
   object(value.skills);
   if (!Object.keys(value.skills).length || Object.keys(value.skills).length > 100) throw new Error("Confirm between 1 and 100 skills.");
   for (const [skill, rating] of Object.entries(value.skills)) if (!skill || skill.length > 100 || !Number.isInteger(rating) || Number(rating) < 0 || Number(rating) > 5) throw new Error("Skill ratings must be whole numbers from 0 to 5.");
@@ -112,7 +112,7 @@ function organise(raw, selection, minutes) {
   return { overview: text(raw.overview), modules, missing: selection.missing, totalHours, totalCost: modules.reduce((n, m) => n + m.cost, 0), totalWeeks: Math.ceil(totalHours * 60 / minutes / 7) };
 }
 
-// ../../supabase/functions/faraway-recommendations/index.ts
+// supabase/functions/faraway-recommendations/index.ts
 function generationSettings(model, schema) {
   const thinking = /^gemini-[34](?:[.-]|$)/.test(model) ? { thinkingLevel: model.includes("flash-lite") ? "minimal" : "low" } : /^gemini-2\.5-flash/.test(model) ? { thinkingBudget: 0 } : void 0;
   return {

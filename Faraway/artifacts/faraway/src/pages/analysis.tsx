@@ -1,3 +1,4 @@
+import { TrendPanels } from '@/components/trend-panels';
 import { useState } from 'react';
 import { Link, useLocation } from 'wouter';
 import { motion } from 'framer-motion';
@@ -32,27 +33,11 @@ export default function Analysis() {
   return (
     <div className="space-y-8">
       <PageTitle eyebrow="Skill analysis" title={<>How the market moves<br /><span className="text-muted-foreground">when AI arrives.</span></>} >
-        Rankings use baseline catalogue requirements; 10% of the score uses illustrative market fixtures. These charts and scenario switches do not change the authenticated recommendation baseline. Illustrative scenario charts, not live market statistics. Imported evidence updates match rankings; the charts below remain labelled scenario fixtures. Two possible adoption futures for Malaysia to 2030. <strong className="font-medium text-foreground">Moderate</strong>: gradual rollout, most firms pilot AI. <strong className="font-medium text-foreground">Fast</strong>: rapid, economy-wide automation of routine tasks.
+        Compare past and latest example job indices, then explore a moderate or rapid AI planning scenario. The two chart datasets are synthetic fixtures; verified current-year market evidence is not connected. Your personal match uses the versioned career catalogue and your confirmed ratings.
+
       </PageTitle>
 
-      <Reveal>
-        <Card testId="card-skill-trend"><CardTitle eyebrow="Skill demand" title={future?'Future skill estimate':'Historical skill trend'} right={<div className="flex flex-wrap gap-3"><div className="inline-flex rounded-xl border bg-white p-1" role="tablist" aria-label="Skill chart view"><button role="tab" aria-selected={!future} className={future?'btn-ghost':'btn-ink'} onClick={()=>setFuture(false)} data-testid="button-chart-history">Historical trend</button><button role="tab" aria-selected={future} className={future?'btn-ink':'btn-ghost'} onClick={()=>setFuture(true)} data-testid="button-chart-future">Future estimate</button></div>{future&&<ScenarioToggle id="an-scn" compact/>}</div>}/><p className="mb-4 text-xs text-muted-foreground">Illustrative figures. {future?'2030 what-if estimate; choose an AI development scenario above.':'2021–2025 example baseline; live sources are not connected yet.'}</p><HBars data={SKILL_TRENDS} field={future?scenario:'now'}/></Card>
-      </Reveal>
-
-      <div className="grid gap-6 lg:grid-cols-2">
-        {[JOB_TRENDS, JOB_TRENDS_LINKEDIN].map((d, i) => (
-          <Reveal key={i} delay={i * 0.08}>
-            <Card className="h-full" testId={`card-source-${i + 1}`}>
-              <CardTitle eyebrow={`Source ${i + 1} · ${JOB_SOURCES[i].note}`} title={JOB_SOURCES[i].name} />
-              <VBars data={d} value={(x) => x.history[4]} max={max * 0.7} height={170} />
-            </Card>
-          </Reveal>
-        ))}
-      </div>
-
-      <Reveal>
-        <Card testId="card-future-job-trend"><CardTitle eyebrow="Future job demand · illustrative index" title={`2030 · ${scenario} AI development`} right={<ScenarioToggle id="future-jobs" compact/>}/><VBars data={JOB_TRENDS} value={x=>x[scenario]} reflect max={max} height={200}/><p className="mt-3 text-xs text-muted-foreground">Index values are scenario assumptions, not percentages or measured hiring forecasts.</p></Card>
-      </Reveal>
+      <TrendPanels careerId={target}/>
 
       <section>
         <Reveal><div className="mb-6 flex flex-wrap items-end justify-between gap-3"><div><p className="eyebrow mb-2">Suggested for you</p><h2 className="font-display text-4xl">Careers that fit</h2></div><p className="text-xs text-muted-foreground">Match = 100 × (0.65 skill + 0.15 interest + 0.10 experience + 0.10 market)</p></div></Reveal>
@@ -107,4 +92,3 @@ function JobCard({ m, i, isTarget }: { m: MatchResult; i: number; isTarget: bool
     </Reveal>
   );
 }
-

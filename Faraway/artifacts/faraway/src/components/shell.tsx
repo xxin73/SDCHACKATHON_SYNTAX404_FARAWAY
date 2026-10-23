@@ -1,3 +1,4 @@
+import { AccountAvatar } from './account-avatar';
 import { useEffect, type ReactNode } from 'react';
 import { Link, useLocation, useSearch } from 'wouter';
 import { motion } from 'framer-motion';
@@ -10,7 +11,7 @@ import { cn } from '@/lib/utils';
 import { Aurora, LOGO, Magnetic, SpectrumIcon } from './spectrum';
 
 const CRUMB: Record<string, string> = {
-  '/': 'Personal', '/pathway': 'Explore pathway', '/analysis': 'Skill analysis', '/plan': 'Study plan', '/progress': 'Learning progress', '/organization': 'Organization', '/evidence': 'Evidence & assumptions',
+  '/profile':'Profile & settings', '/': 'Personal', '/pathway': 'Explore pathway', '/analysis': 'Skill analysis', '/plan': 'Study plan', '/progress': 'Learning progress', '/organization': 'Organization', '/evidence': 'Evidence & assumptions',
 };
 
 export function initials(name: string) {
@@ -32,6 +33,7 @@ export function Shell({ children }: { children: ReactNode }) {
 
   const isOrg = loc.startsWith('/organization');
   const items = isOrg ? [
+    {href:'/organization?view=structure',label:'Departments & teams',icon:Building2,match:()=>orgView==='structure'},
     {href:'/organization?view=people',label:'People directory',icon:Building2,match:()=>orgView==='people'},
     {href:'/organization?view=analysis',label:'Workforce intelligence',icon:BarChart3,match:()=>orgView==='analysis'},
     {href:'/organization?view=plan',label:'Learning plans',icon:Brain,match:()=>orgView==='plan'},
@@ -45,6 +47,7 @@ export function Shell({ children }: { children: ReactNode }) {
   ];
   const mobileItems = isOrg ? [
     {href:'/organization?view=overview',label:'Home',icon:LayoutGrid,active:orgView==='overview'},
+    {href:'/organization?view=structure',label:'Teams',icon:Building2,active:orgView==='structure'},
     {href:'/organization?view=people',label:'People',icon:Building2,active:orgView==='people'},
     {href:'/organization?view=analysis',label:'Insights',icon:BarChart3,active:orgView==='analysis'},
     {href:'/organization?view=plan',label:'Plans',icon:Brain,active:orgView==='plan'},
@@ -98,13 +101,14 @@ export function Shell({ children }: { children: ReactNode }) {
             <div className="flex items-center gap-3"><Link href="/evidence" className="hidden text-xs text-muted-foreground underline sm:block">Evidence & sources</Link><Link href="/mode" className="btn-ghost text-xs" data-testid="switch-workspace"><span className="sm:hidden">Switch</span><span className="hidden sm:inline">Switch workspace</span></Link><DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button className="group flex flex-col items-center gap-1 outline-none" data-testid="button-avatar">
-                  <span className="spectrum-border relative grid h-10 w-10 place-items-center rounded-full bg-white font-mono text-xs font-medium shadow-md transition-transform group-hover:scale-105">{initials(name)}</span>
+                  <span className="spectrum-border relative grid h-10 w-10 place-items-center rounded-full bg-white font-mono text-xs font-medium shadow-md transition-transform group-hover:scale-105"><AccountAvatar avatar={profile.avatar} name={name}/></span>
                   <span className="hidden max-w-[110px] truncate text-[10.5px] text-muted-foreground sm:block">{name.split(' ')[0]}</span>
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56 rounded-2xl">
                 <DropdownMenuLabel><p className="font-medium">{name}</p><p className="text-xs font-normal text-muted-foreground">{session?.email}</p></DropdownMenuLabel>
                 <DropdownMenuSeparator />
+                <DropdownMenuItem asChild><Link href="/profile">Profile & settings</Link></DropdownMenuItem>
                 <DropdownMenuItem asChild><Link href="/organization" data-testid="menu-organization"><Building2 className="mr-2 h-4 w-4" />Organization view</Link></DropdownMenuItem>
                 <DropdownMenuItem onClick={() => resetJourney()} data-testid="menu-reset"><RotateCcw className="mr-2 h-4 w-4" />Restart journey</DropdownMenuItem>
                 <DropdownMenuItem onClick={() => void auth.signOut()} data-testid="menu-signout"><LogOut className="mr-2 h-4 w-4" />Sign out</DropdownMenuItem>
@@ -124,4 +128,3 @@ export function Shell({ children }: { children: ReactNode }) {
     </div>
   );
 }
-
