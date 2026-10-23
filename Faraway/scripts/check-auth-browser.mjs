@@ -213,6 +213,14 @@ try {
   const activityId=await activity.getAttribute('data-testid');
   await page.getByRole('link',{name:'Revise plan',exact:true}).click();
   await page.getByTestId('range-minutes').fill('120');await saved();
+  await expect(page.getByTestId('button-save-plan')).toBeDisabled();
+  await expect(page.getByTestId('button-generate-plan')).toBeEnabled();
+  await expect(page.getByTestId('plan-next-step')).toContainText('Generate a new plan');
+  await page.getByTestId('button-cost-hrdc').click();await saved();
+  await expect(page.getByTestId('plan-next-step')).toContainText('No matching course for:');
+  await expect(page.getByTestId('button-generate-plan')).toBeDisabled();
+  await page.getByTestId('button-broaden-course-filters').click();await saved();
+  await expect(page.getByTestId('button-generate-plan')).toBeEnabled();
   await page.getByTestId('button-generate-plan').click();
   await expect(page.getByTestId('result-ai-plan')).toBeVisible();
   await page.getByTestId('button-save-plan').click();
@@ -239,3 +247,4 @@ try {
   await browser?.close();
   server.kill('SIGTERM');
 }
+

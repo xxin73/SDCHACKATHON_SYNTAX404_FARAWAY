@@ -2,7 +2,7 @@ import { hasDatabaseCatalogue } from '@/lib/catalogue-status';
 import { useState } from 'react';
 import { useLocation } from 'wouter';
 import { motion } from 'framer-motion';
-import { ArrowRight, Sparkles, Home, Trees, Shuffle, Wifi, AlertTriangle, BookOpen, RefreshCw } from 'lucide-react';
+import { ArrowRight, Sparkles, Home, Trees, Shuffle, Wifi, AlertTriangle, BookOpen } from 'lucide-react';
 import { useGenerateStudyPlan } from '@/lib/ai-engine';
 import { useRecommendations } from '@/lib/recommendations';
 import { RecommendationMeta } from '@/components/recommendation-meta';
@@ -12,7 +12,7 @@ import { careerById, careerInScenario, ALL_SKILLS } from '@/data/careers';
 import { setState, useStore, type Plan } from '@/lib/store';
 import { computeMatch, courseForSkill, myr } from '@/lib/match';
 import { Card, CardTitle, NeedProfile, PageTitle, Reveal, ScenarioToggle, SdgPill, skillSdg } from '@/components/bits';
-import { AiStage, Magnetic, SpectrumIcon } from '@/components/spectrum';
+import { AiStage, SpectrumIcon } from '@/components/spectrum';
 import { cn } from '@/lib/utils';
 
 
@@ -39,6 +39,9 @@ export default function PlanPage() {
   const pool = Array.from(new Set([...Object.keys(career.required), ...ALL_SKILLS]));
   const options = plan.mode === 'recommended' ? recommended : pool;
   const rows = selected.map((s) => ({ skill: s, course: courseForSkill(s, plan), have: profile.skills[s] ?? 0, need: career.required[s] ?? 4 }));
+  const missingSkills = rows.filter(r=>!r.course).map(r=>r.skill);
+  const canGenerate = selected.length > 0 && missingSkills.length === 0;
+  const hasPreviousPlan = recommendations.runs.some(r=>r.kind==='plan');
   const uniqueRows = Array.from(new Map(rows.filter(r=>r.course).map(r=>[r.course!.id,r])).values());
   const total = uniqueRows.reduce((a, r) => a + (r.course?.cost ?? 0), 0);
   const hours = uniqueRows.reduce((a, r) => a + (r.course?.hours ?? 0), 0);
@@ -50,7 +53,7 @@ export default function PlanPage() {
       updPlan({ mode: 'custom', skills: selected.filter((x) => x !== s), saved: false });
     } else updPlan({ mode: 'custom', skills: [...selected, s], saved: false });
   };
-  const generate = () => { void gen.mutate({}); };
+  const generate = () => { setSaveError(''); if(canGenerate) void gen.mutate({}); };
   const save = async () => {
     setSaveError('');setSaving(true);
     try {
@@ -136,12 +139,29 @@ export default function PlanPage() {
             <div className="rounded-2xl border bg-white/80 p-3"><p className="font-mono text-xl">{hours}h</p><p className="text-xs text-muted-foreground">study</p></div>
             <div className="rounded-2xl border bg-white/80 p-3"><p className="font-mono text-xl">{weeks || 0} wk</p><p className="text-xs text-muted-foreground">at {plan.minutesPerDay} min/day</p></div>
           </div>
-          {saveError && <p role="alert" className="mt-4 text-sm">{saveError}</p>}<p className="mt-4 text-xs text-muted-foreground">{rows.some(r=>!r.course) ? "Some selected skills have no matching course. This estimate covers matching modules only; adjust preferences to continue." : "Estimated study time assumes seven study days each week."}</p><button onClick={save} disabled={saving || !gen.run || !selected.length || rows.some(r => !r.course)} className="btn-ink mt-6 w-full" data-testid="button-save-plan">Save plan &amp; start<ArrowRight className="h-4 w-4" /></button>
+          {saveError && <p role="alert" className="mt-4 text-sm">{saveError}</p>}
+          <div className="mt-4 text-sm" role="status" data-testid="plan-next-step">
+            {!selected.length ? <p>Select at least one skill to learn.</p>
+              : missingSkills.length ? <>
+                <p className="font-medium">No matching course for: {missingSkills.join(', ')}.</p>
+                <p className="mt-2 text-muted-foreground">Your current cost, setting or online-only filters exclude the available courses, or the catalogue has no coverage. AI cannot fill this with invented courses.</p>
+                {plan.cost==='hrdc' && <p className="mt-2">There are no verified HRD Corp courses in this catalogue yet.</p>}
+                <button className="btn-ghost mt-3" data-testid="button-broaden-course-filters" onClick={()=>updPlan({cost:'any',setting:'either',onlineOnly:false})}>Show any cost and setting</button>
+                <p className="mt-2 text-xs text-muted-foreground">This button changes filters only. It does not buy or enrol in a course. You can also remove an unavailable skill from a custom plan.</p>
+              </> : gen.isPending ? <p>Generating a plan for your current preferences…</p>
+              : !gen.run ? <p>{hasPreviousPlan ? 'Your preferences or skills differ from the saved plan. Generate a new plan below, then save it. Your existing progress is kept.' : 'Step 1: Generate your plan below. Step 2: Review it and save.'}</p>
+              : <p>Your plan matches these preferences. Review the outline below, then save.</p>}
+          </div>
+          <button onClick={generate} disabled={!canGenerate||gen.isPending||saving} className="btn-ink mt-5 w-full" data-testid="button-generate-plan">
+            <Sparkles className="h-4 w-4" />{gen.isPending ? 'Generating…' : ai ? 'Regenerate plan' : 'Generate plan'}
+          </button>
+          <button onClick={save} disabled={saving || gen.isPending || !gen.run || !canGenerate} className="btn-ghost mt-3 w-full" data-testid="button-save-plan">{saving?'Saving…':'Save plan & start'}<ArrowRight className="h-4 w-4" /></button>
+          <p className="mt-3 text-xs text-muted-foreground">Estimated study time assumes seven study days each week. Changing preferences requires generating a matching plan before saving.</p>
         </Card></Reveal>
       </div>
 
       <Reveal><Card className="spectrum-border" testId="card-ai-plan">
-        <CardTitle eyebrow="AI organiser" title="Your weekly learning outline" right={!gen.isPending && <Magnetic><button onClick={generate} disabled={!selected.length} className="btn-ink" data-testid="button-generate-plan">{ai ? <RefreshCw className="h-4 w-4" /> : <Sparkles className="h-4 w-4" />}{ai ? 'Regenerate' : 'Generate plan'}</button></Magnetic>} />
+        <CardTitle eyebrow="AI organiser" title="Your weekly learning outline" />
         <AiStage pending={gen.isPending} error={gen.error} onRetry={generate} testId="plan" phases={['Sequencing skills by dependency', `Fitting ${plan.minutesPerDay} minutes a day`, 'Matching resources to your budget', 'Breaking modules into steps']}>
           {ai ? (
             <div data-testid="result-ai-plan"><RecommendationMeta meta={ai.meta}/>
@@ -176,3 +196,4 @@ export default function PlanPage() {
     </div>
   );
 }
+
