@@ -1,0 +1,121 @@
+import { useState } from 'react';
+import { Link, useLocation } from 'wouter';
+import { motion } from 'framer-motion';
+import { ArrowRight, Check, ChevronDown, Briefcase, Cloud, Shield, Cpu, LineChart, Users, Palette, Calculator, Megaphone, Target } from 'lucide-react';
+import { JOB_SOURCES, JOB_TRENDS, JOB_TRENDS_LINKEDIN, SKILL_TRENDS } from '@/data/careers';
+import { setState, useStore } from '@/lib/store';
+import { suggested, type MatchResult } from '@/lib/match';
+import { Card, CardTitle, NeedProfile, PageTitle, Reveal, ScenarioToggle, SdgPill } from '@/components/bits';
+import { FlipCard, HBars, VBars } from '@/components/charts';
+import { SpectrumIcon, Tilt } from '@/components/spectrum';
+import { useToast } from '@/hooks/use-toast';
+import { cn } from '@/lib/utils';
+
+const JOB_ICON: Record<string, typeof Briefcase> = {
+  'data-analyst': LineChart, 'software-engineer': Cpu, 'cloud-engineer': Cloud, 'cyber-analyst': Shield, 'ml-engineer': Cpu,
+  'financial-analyst': Calculator, 'risk-analyst': Shield, accountant: Calculator, 'business-analyst': LineChart, 'digital-marketer': Megaphone,
+  'hr-specialist': Users, 'product-manager': Target, 'ux-designer': Palette,
+};
+export const jobIcon = (id: string) => JOB_ICON[id] ?? Briefcase;
+
+export default function Analysis() {
+  const profile = useStore((s) => s.profile);
+  const scenario = useStore((s) => s.scenario);
+  const target = useStore((s) => s.plan.target);
+  const [more, setMore] = useState(false);
+  const [future, setFuture] = useState(false);
+  const has = !!profile.stream && Object.keys(profile.skills).length > 0;
+  const list = has ? suggested(profile, scenario, more) : [];
+  const shown = more ? list : list.slice(0, 3);
+  const max = Math.max(...[...JOB_TRENDS, ...JOB_TRENDS_LINKEDIN].map((d) => Math.max(d.fast, d.moderate, d.history[4])));
+
+  return (
+    <div className="space-y-8">
+      <PageTitle eyebrow="Skill analysis" title={<>How the market moves<br /><span className="text-muted-foreground">when AI arrives.</span></>} right={<ScenarioToggle id="an-scn" />}>
+        Illustrative scenario charts, not live market statistics. Imported evidence updates match rankings; the charts below remain labelled scenario fixtures. Two possible adoption futures for Malaysia to 2030. <strong className="font-medium text-foreground">Moderate</strong>: gradual rollout, most firms pilot AI. <strong className="font-medium text-foreground">Fast</strong>: rapid, economy-wide automation of routine tasks.
+      </PageTitle>
+
+      <Reveal>
+        <FlipCard testId="card-flip-skill-trend" hint={['Click to flip to 2030 scenarios', 'Click to flip back to 2021–2025']}
+          front={<><CardTitle eyebrow="Postings change 2021 → 2025" title="Skill trend · today" /><HBars data={SKILL_TRENDS} field="now" /></>}
+          back={<><CardTitle eyebrow={`Projected to 2030 · ${scenario} adoption`} title={<span>Skill trend · <span className="spectrum-text">future</span></span>} /><HBars data={SKILL_TRENDS} field={scenario} /></>} />
+      </Reveal>
+
+      <div className="grid gap-6 lg:grid-cols-2">
+        {[JOB_TRENDS, JOB_TRENDS_LINKEDIN].map((d, i) => (
+          <Reveal key={i} delay={i * 0.08}>
+            <Card className="h-full" testId={`card-source-${i + 1}`}>
+              <CardTitle eyebrow={`Source ${i + 1} · ${JOB_SOURCES[i].note}`} title={JOB_SOURCES[i].name} />
+              <VBars data={d} value={(x) => x.history[4]} max={max * 0.7} height={170} />
+            </Card>
+          </Reveal>
+        ))}
+      </div>
+
+      <Reveal>
+        <div className="flip-3d">
+          <motion.div className="preserve-3d relative grid" animate={{ rotateX: future ? 180 : 0 }} transition={{ duration: 1, ease: [0.2, 0.8, 0.2, 1] }}>
+            {[false, true].map((f) => (
+              <div key={String(f)} className={cn('glass backface-hidden col-start-1 row-start-1 rounded-[1.75rem] p-6', f && 'spectrum-border')} style={f ? { transform: 'rotateX(180deg)' } : undefined}>
+                <CardTitle eyebrow="Job trend · bar reflection" title={f ? <>2030 · <span className="spectrum-text">{scenario} AI</span></> : '2025 · demo baseline'}
+                  right={<div className="flex flex-wrap items-center gap-2"><ScenarioToggle id={`refl-${f}`} compact /><button onClick={() => setFuture(!f)} className="btn-ghost py-1.5 text-xs" data-testid={`button-flip-reflection-${f ? 'back' : 'future'}`}>{f ? 'Back to today' : 'Flip to future'}</button></div>} />
+                <VBars data={JOB_TRENDS} value={(x) => (f ? x[scenario] : x.history[4])} reflect max={max} height={200} />
+              </div>
+            ))}
+          </motion.div>
+        </div>
+      </Reveal>
+
+      <section>
+        <Reveal><div className="mb-6 flex flex-wrap items-end justify-between gap-3"><div><p className="eyebrow mb-2">Suggested for you</p><h2 className="font-display text-4xl">Careers that fit</h2></div><p className="text-xs text-muted-foreground">Match = 100 × (0.65 skill + 0.15 interest + 0.10 experience + 0.10 market)</p></div></Reveal>
+        {!has ? <NeedProfile text="Rate your skills to see matches." /> : (
+          <>
+            <div className="grid gap-6 md:grid-cols-3">
+              {shown.map((m, i) => <JobCard key={m.career.id} m={m} i={i} isTarget={target === m.career.id} />)}
+            </div>
+            <div className="mt-8 flex justify-center">
+              <button onClick={() => setMore((x) => !x)} className="btn-ghost" data-testid="button-explore-more">{more ? 'Show top three' : 'Explore more'}<ChevronDown className={cn('h-4 w-4 transition-transform', more && 'rotate-180')} /></button>
+            </div>
+          </>
+        )}
+      </section>
+    </div>
+  );
+}
+
+function JobCard({ m, i, isTarget }: { m: MatchResult; i: number; isTarget: boolean }) {
+  const [, nav] = useLocation();
+  const { toast } = useToast();
+  const [hot, setHot] = useState(false);
+  const Icon = jobIcon(m.career.id);
+  const set = () => {
+    setState((s) => ({ ...s, plan: { ...s.plan, target: m.career.id, skills: m.gaps.map((g) => g.skill), saved: false } }));
+    toast({ title: 'Career target set', description: `${m.career.title} is now your bearing.` });
+    nav(`/jobs/${m.career.id}`);
+  };
+  return (
+    <Reveal delay={(i % 3) * 0.08}>
+      <Tilt max={7}>
+        <div onMouseEnter={() => setHot(true)} onMouseLeave={() => setHot(false)} data-testid={`card-job-${m.career.id}`}
+          className={cn('glass glass-hover flex h-full flex-col rounded-[1.75rem] p-6', isTarget && 'spectrum-border')}>
+          <div className="flex items-center justify-between gap-2">
+            <span className="truncate rounded-full border bg-white px-3 py-1 text-sm font-medium">{m.career.title}</span>
+            {isTarget && <span className="flex items-center gap-1 text-xs text-muted-foreground"><Check className="h-3 w-3" />Target</span>}
+          </div>
+          <Link href={`/jobs/${m.career.id}`} className="relative my-6 grid h-32 place-items-center overflow-hidden rounded-2xl bg-gradient-to-br from-[hsl(222_100%_97%)] via-white to-[hsl(330_100%_97.5%)]" data-testid={`link-job-${m.career.id}`}>
+            <motion.div animate={hot ? { scale: 1.12, rotate: -4 } : { scale: 1, rotate: 0 }} transition={{ type: 'spring', stiffness: 200, damping: 14 }}>
+              <SpectrumIcon icon={Icon} size={56} still={!hot} />
+            </motion.div>
+            <span className="absolute bottom-2 right-3 font-mono text-[10px] text-muted-foreground">demand {m.career.demand.moderate}/{m.career.demand.fast}</span>
+          </Link>
+          <p className="text-sm text-muted-foreground">{m.career.blurb}</p>
+          <div className="mt-4 flex items-center justify-between text-sm"><span>Match score</span><span className="font-mono font-medium" data-testid={`text-score-${m.career.id}`}>{m.score.toFixed(1)}</span></div>
+          <div className="mt-2 h-2 overflow-hidden rounded-full bg-[hsl(232_40%_95%)]"><motion.div className="spectrum-bar h-full rounded-full" initial={{ width: 0 }} whileInView={{ width: `${m.score}%` }} viewport={{ once: true }} transition={{ duration: 1.1, ease: [0.2, 0.8, 0.2, 1] }} /></div>
+          <div className="mt-4 flex flex-wrap gap-1.5">{m.career.sdgs.map((n) => <SdgPill key={n} n={n} small />)}</div>
+          <div className="flex-1" />
+          <button onClick={set} className="btn-ink mt-6 w-full" data-testid={`button-set-target-${m.career.id}`}>Set career target<ArrowRight className="h-4 w-4" /></button>
+        </div>
+      </Tilt>
+    </Reveal>
+  );
+}

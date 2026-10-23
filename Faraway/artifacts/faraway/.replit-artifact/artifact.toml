@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "Faraway"
+description = "Faraway is an AI-driven career and education compass. Users sign in, choose personal or organization mode, build their profile (interests, CV upload with AI auto-fill, education, experience, self-rated skills with a live radar map), explore skill and job trends under moderate vs fast AI adoption scenarios, pick a career target with a match score and SDG links, then follow a personalised study plan with progress tracking and badges."
+version = "1.0.0"
+id = "artifacts/faraway"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 20831
+
+[services.development]
+run = "pnpm --filter @workspace/faraway run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/faraway", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/faraway/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "20831"
+BASE_PATH = "/"

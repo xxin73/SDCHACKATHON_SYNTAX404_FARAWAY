@@ -1,0 +1,7 @@
+# Local configuration must never be committed.
+.env
+.env.*
+!.env.example
+node_modules/
+dist/
+*.tsbuildinfo
