@@ -11,6 +11,7 @@ import { motion } from 'framer-motion';
 import { ArrowRight, Sparkles, Home, Trees, Shuffle, Wifi, AlertTriangle, BookOpen } from 'lucide-react';
 import { useGenerateStudyPlan } from '@/lib/ai-engine';
 import { useRecommendations } from '@/lib/recommendations';
+import { useAuth } from '@/lib/auth-context';
 import { RecommendationMeta } from '@/components/recommendation-meta';
 
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
