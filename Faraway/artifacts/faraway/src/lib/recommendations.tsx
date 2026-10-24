@@ -13,7 +13,7 @@ import { setDatabaseCatalogue } from './catalogue-status';
 import { completionKey, digest, preferences, profileInput, type Catalogue, type Generated, type Module } from '../../../../supabase/functions/faraway-recommendations/core';
 
 export type Run = {id:string;kind:'explain'|'plan';result:Generated};
-type Context = {ready:boolean;error:string;catalogue:Catalogue|null;runs:Run[];active:Run|null;completed:Set<string>;reload:()=>Promise<void>;generate:(kind:'explain'|'plan',careerId?:string,careerIds?:string[])=>Promise<Run>;activate:(run:Run)=>Promise<void>;tick:(module:Module,activityId:string)=>Promise<void>};
+type Context = {ready:boolean;error:string;catalogue:Catalogue|null;runs:Run[];active:Run|null;completed:Set<string>;reload:()=>Promise<void>;clearJourneyHistory:()=>Promise<void>;generate:(kind:'explain'|'plan',careerId?:string,careerIds?:string[])=>Promise<Run>;activate:(run:Run)=>Promise<void>;tick:(module:Module,activityId:string)=>Promise<void>};
 const Context = createContext<Context|null>(null);
 const originalCareers=structuredClone(CAREERS),originalCourses=structuredClone(COURSES);
 function replaceCatalogue(catalogue:Catalogue|null) {
@@ -77,6 +77,13 @@ export function RecommendationProvider({children}:{children:ReactNode}) {
     setRuns(before=>[run,...before.filter(r=>r.id!==run.id)]);
     return run;
   };
+  const clearJourneyHistory=async()=> {
+    const current=++generation.current;
+    if(!userId){setRuns([]);setActive(null);setCompleted(new Set());return;}
+    const {error}=await requireSupabase().rpc('clear_personal_journey_history',{expected_user_id:userId});
+    if(error)throw new Error('Your empty profile was saved, but old plans and progress were not cleared. Apply 006_clear_personal_journey.sql in Supabase SQL Editor, then choose Restart journey again.');
+    if(current===generation.current&&getState().session?.id===userId){setRuns([]);setActive(null);setCompleted(new Set());}
+  };
   const activate=async(run:Run)=> {
     const current=generation.current;
     await auth.flush();
@@ -103,6 +110,6 @@ export function RecommendationProvider({children}:{children:ReactNode}) {
     if(error)throw new Error('Completion was not saved. Please retry.');
     if(current===generation.current)setCompleted(before=>{const copy=new Set(before);if(next)copy.add(key);else copy.delete(key);return copy;});
   };
-  return <Context.Provider value={{ready,error,catalogue,runs,active,completed,reload,generate,activate,tick}}>{children}</Context.Provider>;
+  return <Context.Provider value={{ready,error,catalogue,runs,active,completed,reload,clearJourneyHistory,generate,activate,tick}}>{children}</Context.Provider>;
 }
 export function useRecommendations(){const value=useContext(Context);if(!value)throw new Error('RecommendationProvider is required');return value;}
