@@ -32,6 +32,7 @@ export default function PlanPage() {
   const [, nav] = useLocation();
   const [confirm, setConfirm] = useState<string | null>(null);
   const recommendations = useRecommendations();
+  const auth = useAuth();
   const [saveError, setSaveError] = useState('');
   const [saving, setSaving] = useState(false);
   const [review,setReview]=useState(false);
@@ -163,7 +164,7 @@ export default function PlanPage() {
               : !gen.run ? <p>{hasPreviousPlan ? 'Your preferences or skills differ from the saved plan. Generate a new plan below, then save it. Your existing progress is kept.' : 'Step 1: Generate your plan below. Step 2: Review it and save.'}</p>
               : <p>Your plan matches these preferences. Review the outline below, then save.</p>}
           </div>
-          <button onClick={generate} disabled={Boolean(pricingError)||!selected.length||gen.isPending||saving} className="btn-ink mt-5 w-full" data-testid="button-generate-plan">
+          {auth.syncStatus.phase==='saving'&&<p role="status" className="mt-3 text-xs text-muted-foreground">Saving your selected preferences to your account…</p>}{auth.syncStatus.phase==='save-error'&&<div role="alert" className="mt-3 rounded-xl bg-red-50 p-3 text-sm text-red-800"><p>Your preferences could not be saved: {auth.syncStatus.error}</p><button className="mt-2 underline" onClick={()=>void auth.retry()}>Retry saving preferences</button></div>}<button onClick={generate} disabled={Boolean(pricingError)||!selected.length||gen.isPending||saving} className="btn-ink mt-5 w-full" data-testid="button-generate-plan">
             <Sparkles className="h-4 w-4" />{gen.isPending ? 'Generating…' : ai ? 'Regenerate plan' : 'Generate plan'}
           </button>
           <button onClick={()=>setReview(true)} disabled={Boolean(pricingError)||saving || gen.isPending || !gen.run || !canGenerate} className="btn-ghost mt-3 w-full" data-testid="button-save-plan">{saving?'Saving…':'Review & start plan'}<ArrowRight className="h-4 w-4" /></button>
