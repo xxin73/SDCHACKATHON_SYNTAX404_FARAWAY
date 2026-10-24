@@ -14,7 +14,7 @@ or republish the existing hosted website.
 
 A career and education compass for exploring skills, comparing possible AI futures, and turning career goals into practical learning plans.
 
-**[Open Faraway](https://faraway-practice-faraway.vercel.app)**
+**[Open Faraway](https://faraway-targeted-ui-refinements.replit.app)**
 
 Faraway brings individual learners, HR teams, and universities/TVET institutions into one platform. It combines explainable skill matching, dated public labour-market evidence, and AI-assisted explanations and learning plans.
 
@@ -36,7 +36,7 @@ Faraway brings individual learners, HR teams, and universities/TVET institutions
 | Resource | Link |
 | --- | --- |
 | **GitHub Repository** | [xxin73/SDCHACKATHON_SYNTAX404_FARAWAY](https://github.com/xxin73/SDCHACKATHON_SYNTAX404_FARWAY.git) |
-| **Live Demo** | [Open Faraway](https://faraway-practice-faraway.vercel.app) |
+| **Live Demo** | [Open Faraway](https://faraway-targeted-ui-refinements.replit.app) |
 | **RunPod Endpoint** | https://api.runpod.ai/v2/cahs1vicz7t1iu |
 | **Slide Deck** | **TO COMPLETE — viewable pitching slide deck URL** |
 | **Pitching / Demo Video** | **TO COMPLETE — viewable pitching video URL** |
