@@ -86,7 +86,7 @@ export function runpodChatRequest(model: string, system: string, data: unknown, 
   return {
     model,
     messages: [
-      { role: 'system', content: system + '\nReturn only JSON that matches the supplied output schema.' },
+      { role: 'system', content: system + '\n/no_think\nReturn only JSON that matches the supplied output schema.' },
       { role: 'user', content: JSON.stringify(data) },
     ],
     temperature: 0.2,
