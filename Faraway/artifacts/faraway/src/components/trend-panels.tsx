@@ -9,6 +9,12 @@ import {Card,CardTitle} from './bits';
 
 type Pair={label:string;first:number|null;second:number|null};
 function Scenario({value,onChange}:{value:Scenario;onChange:(s:Scenario)=>void}){return <div className="flex gap-1 rounded-full border p-1 text-xs">{(['moderate','fast'] as const).map(s=><button key={s} aria-pressed={s===value} className={'rounded-full px-3 py-1 '+(s===value?'bg-ink text-white':'')} onClick={()=>onChange(s)}>{s==='fast'?'Rapid AI':'Moderate AI'}</button>)}</div>;}
+const DOSM_CAREER_GROUPS:Record<string,string>={
+ 'hotel-manager':'Managers','construction-manager':'Managers','community-service-manager':'Managers','business-owner':'Managers','public-service-manager':'Managers','product-manager':'Managers',
+ 'agricultural-scientist':'Professionals','lawyer':'Professionals','legal-researcher':'Professionals','policy-analyst':'Professionals','nurse':'Professionals','health-educator':'Professionals','industrial-engineer':'Professionals','mechanical-engineer':'Professionals','teacher':'Professionals','instructional-designer':'Professionals','biologist':'Professionals','research-scientist':'Professionals','environmental-scientist':'Professionals','food-scientist':'Professionals','logistician':'Professionals','civil-engineer':'Professionals','social-worker':'Professionals','journalist':'Professionals','public-relations-specialist':'Professionals','data-analyst':'Professionals','software-engineer':'Professionals','ml-engineer':'Professionals','cloud-engineer':'Professionals','cyber-analyst':'Professionals','risk-analyst':'Professionals','accountant':'Professionals','business-analyst':'Professionals','digital-marketer':'Professionals','hr-specialist':'Professionals','ux-designer':'Professionals'
+};
+function dosmGroupForCareer(role:Career){return DOSM_CAREER_GROUPS[role.id]??(role.stream==='hospitality'?'Service and sales':role.stream==='agriculture'?'Skilled agriculture, forestry and fishery':role.stream==='construction'?'Craft and related trades':role.stream==='entrepreneurship'?'Service and sales':'Professionals');}
+
 export function VerticalPairs({data,labels}:{data:Pair[];labels:[string,string]}){const max=Math.max(1,...data.flatMap(d=>[d.first??0,d.second??0]));return <div><div className="mb-4 flex gap-4 text-xs"><span className="text-teal-700">■ {labels[0]}</span><span className="text-amber-600">■ {labels[1]}</span></div><div className="overflow-auto"><div className="flex min-w-max gap-5">{data.map(d=><div className="w-28" key={d.label}><div className="flex h-44 items-end gap-2">{[d.first,d.second].map((n,i)=><div className="flex h-full w-1/2 flex-col justify-end text-center" key={i}><span className="text-[11px]">{n===null?'—':n.toLocaleString('en-US',{maximumFractionDigits:1})}</span><div role="img" aria-label={`${d.label}, ${labels[i]}: ${n===null?'no data':n}`} className={'min-h-1 rounded-t '+(n===null?'bg-slate-100':i?'bg-amber-400':'bg-teal-500')} style={{height:n===null?'4px':`${n/max*80}%`}}/></div>)}</div><p className="mt-2 text-center text-[11px]">{d.label}</p></div>)}</div></div></div>;}
 
 export function TrendPanels({careerId,departmentSkills,rolesOverride,organization=false}:{careerId?:string;departmentSkills?:string[];rolesOverride?:Career[];organization?:boolean}){
@@ -20,6 +26,10 @@ export function TrendPanels({careerId,departmentSkills,rolesOverride,organizatio
  const selectedRole=related.find(r=>r.id===skillRole)||related.find(r=>r.id===careerId);
  const roles=[...new Map([...(selectedRole?[selectedRole]:[]),...(preferred.length?preferred:related)].map(r=>[r.id,r])).values()].slice(0,6);
  const role=selectedRole||roles[0];
+ const groupCareers=new Map<string,string[]>();
+ roles.forEach(r=>{const group=dosmGroupForCareer(r);groupCareers.set(group,[...(groupCareers.get(group)??[]),r.title]);});
+ const dosmRelevant=DOSM_GROUPS.filter(g=>groupCareers.has(g.label));
+
  if(!role)return <Card><CardTitle title="Skill and job trends"/><p className="text-sm text-muted-foreground">Set up your interest, industry or academic programmes to show relevant occupations.</p></Card>;
  const history=sourceHistory(role), index=roleIndex(role,scenario), baseline=roleIndex(role,'moderate');
  const skillHistory=Object.keys(role.required).filter(skill=>history[skill]?.previous!==null&&history[skill]?.previous!==undefined&&history[skill]?.current!==null&&history[skill]?.current!==undefined).map(skill=>({label:skill,first:history[skill].previous!,second:history[skill].current!}));
@@ -40,7 +50,7 @@ export function TrendPanels({careerId,departmentSkills,rolesOverride,organizatio
   <div><CardTitle eyebrow="Job trend analysis" title="Previous vs current"/></div>
   <div className="grid gap-6 lg:grid-cols-2">
    <Card><CardTitle eyebrow="Occupation reference index · /100" title="O*NET previous vs current"/><VerticalPairs data={onetHistory} labels={['O*NET 30.3','O*NET 31.0']}/><p className="mt-3 text-[11px] text-muted-foreground">Mean hard-skill importance index. Occupational requirements, not vacancy counts; mapped careers use occupational analogues.</p></Card>
-   <Card><CardTitle eyebrow="Malaysia · online job offerings" title="DOSM Q1 vs Q2 2026"/><VerticalPairs data={DOSM_GROUPS} labels={['Q1 2026','Q2 2026']}/><p className="mt-3 text-xs text-muted-foreground">Broad occupational groups; these counts cannot be assigned to an individual career. <a className="underline" href={DOSM_URL} target="_blank" rel="noreferrer">DOSM source, published 18 Aug 2026</a>.</p></Card>
+   <Card><CardTitle eyebrow="Malaysia · online job offerings" title="DOSM groups related to your selected careers"/>{dosmRelevant.length?<><VerticalPairs data={dosmRelevant} labels={['Q1 2026','Q2 2026']}/><p className="mt-3 text-[11px] text-muted-foreground">Matched careers: {[...groupCareers.entries()].map(([group,titles])=>`${titles.join(', ')} → ${group}`).join(' · ')}. DOSM publishes these counts for the broader group, not for each named career. <a className="underline" href={DOSM_URL} target="_blank" rel="noreferrer">DOSM source, published 18 Aug 2026</a>.</p></>:<p className="text-sm text-muted-foreground">No DOSM group mapping is available for the selected careers.</p>}</Card>
   </div>
   <div><CardTitle eyebrow={scenario==='fast'?'Rapid AI scenario':'Moderate AI scenario'} title="Current vs future"/></div>
   <div className="grid gap-6 lg:grid-cols-2">
