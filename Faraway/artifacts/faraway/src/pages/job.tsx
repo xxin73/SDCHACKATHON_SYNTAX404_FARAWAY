@@ -1,3 +1,5 @@
+import {useTrendEvidence} from '@/lib/live-trends';
+import {OpportunityDetails} from '@/components/trend-updates';
 import {jobRadarAxes} from '@/lib/radar-model';
 import {skillRating,skillKey} from '../../../../supabase/functions/faraway-recommendations/skill-policy';
 import {PathwayEvidence} from '@/components/pathway-evidence';
@@ -30,6 +32,7 @@ export function JobsIndex() {
 }
 
 export default function JobDetail() {
+  const liveTrends=useTrendEvidence();
   const { id } = useParams<{ id: string }>();
   const profile = useStore((s) => s.profile);
   const scenario = useStore((s) => s.scenario);
@@ -45,7 +48,7 @@ export default function JobDetail() {
   const insight = useGetCareerInsight(id??'');
 
 
-  const match = useMemo(() => (career ? computeMatch(career, profile, scenario) : null), [career, profile, scenario]);
+  const match = useMemo(() => (career ? computeMatch(career, profile, scenario) : null), [career, profile, scenario, liveTrends]);
   if (!career) return <NotFound />;
   if (!profile.stream || !profile.complete || !match) return <NeedProfile />;
 
@@ -87,6 +90,7 @@ export default function JobDetail() {
         </div>
       </Reveal>
 
+      <p className="text-sm">Personal fit: {preview.score.toFixed(1)}/100 · Opportunity score under the {scenario==='fast'?'rapid':'moderate'} AI scenario: {preview.opportunityScore.toFixed(1)}/100</p><OpportunityDetails career={career} score={preview.opportunityScore} readiness={preview.scenarioReadiness}/>
       {/* three column: job SDG | radar | skill SDG */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[260px_1fr_260px]">
         <Reveal><Card className="h-full" testId="panel-job-sdg">
@@ -182,3 +186,4 @@ export default function JobDetail() {
     </div>
   );
 }
+

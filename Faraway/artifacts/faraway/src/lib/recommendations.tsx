@@ -1,3 +1,4 @@
+import {markPlanEvidence} from './live-trends';
 import expanded from '@/data/expanded-catalogue.json';
 import {loadObservations} from './market-data';
 import {observationsForRole} from '../../../../supabase/functions/faraway-recommendations/trends';
@@ -74,6 +75,7 @@ export function RecommendationProvider({children}:{children:ReactNode}) {
     const run=data.run as Run;
     if(run?.result?.meta.calculationVersion!==CALCULATION_VERSION||run?.result?.meta.pathwayVersion!==PATHWAY_VERSION)throw new Error('The AI server needs the latest occupation-pathway update. Deploy the updated faraway-recommendations function, then retry. Your saved plan is unchanged.');
     if(!run?.id||run.result?.meta.profileHash!==profileHash||run.result?.meta.catalogueVersion!==catalogue?.version)throw new Error('AI returned a different data version. Reload before continuing.');
+    if(kind==='plan')markPlanEvidence(userId,run.id,CAREERS.find(c=>c.id===careerId));
     setRuns(before=>[run,...before.filter(r=>r.id!==run.id)]);
     return run;
   };
@@ -113,3 +115,4 @@ export function RecommendationProvider({children}:{children:ReactNode}) {
   return <Context.Provider value={{ready,error,catalogue,runs,active,completed,reload,clearJourneyHistory,generate,activate,tick}}>{children}</Context.Provider>;
 }
 export function useRecommendations(){const value=useContext(Context);if(!value)throw new Error('RecommendationProvider is required');return value;}
+

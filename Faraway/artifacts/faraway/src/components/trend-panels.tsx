@@ -1,3 +1,6 @@
+import {TrendUpdates} from './trend-updates';
+import {useTrendEvidence} from '@/lib/live-trends';
+import {useStore as useGlobalStore,setState} from '@/lib/store';
 import {useState} from 'react';
 import {CAREERS,type Scenario,type Career} from '@/data/careers';
 import {useStore} from '@/lib/store';
@@ -21,7 +24,9 @@ export function VerticalPairs({data,labels}:{data:Pair[];labels:[string,string]}
 
 export function TrendPanels({careerId,departmentSkills,rolesOverride,organization=false}:{careerId?:string;departmentSkills?:string[];rolesOverride?:Career[];organization?:boolean}){
  const profile=useStore(s=>s.profile);
- const [scenario,setScenario]=useState<Scenario>('moderate');
+ const {evidence}=useTrendEvidence();
+ const scenario=useGlobalStore(s=>s.scenario);
+ const setScenario=(scenario:Scenario)=>setState(s=>({...s,scenario}));
  const [skillRole,setSkillRole]=useState('');
  const related=rolesOverride??CAREERS.filter(r=>departmentSkills?Object.keys(r.required).filter(s=>departmentSkills.includes(s)).length>=2:profile.stream==='other'||relevantRole(r,profile));
  const preferred=organization?[]:related.filter(r=>profile.careers.includes(r.id));
@@ -36,13 +41,16 @@ export function TrendPanels({careerId,departmentSkills,rolesOverride,organizatio
  const history=sourceHistory(role), index=roleIndex(role,scenario), baseline=roleIndex(role,'moderate');
  const skillHistory=Object.keys(role.required).filter(skill=>history[skill]?.previous!==null&&history[skill]?.previous!==undefined&&history[skill]?.current!==null&&history[skill]?.current!==undefined).map(skill=>({label:skill,first:history[skill].previous!,second:history[skill].current!}));
  const skillFuture=Object.entries(role.required).map(([skill,current])=>({label:skill,first:current,second:scenarioRequirements(role.required,scenario,role.futureSkills)[skill]??current}));
- const blsRows=roles.map(r=>{const code=CAREER_SOC[r.id],occupation=BLS_OCCUPATIONS[code];const baseIndex=roleIndex(r,'moderate'),scenarioIndex=roleIndex(r,scenario);const adjustment=baseIndex.future&&scenarioIndex.future?scenarioIndex.future/baseIndex.future:1;return {role:r,code,occupation,scenarioFuture:occupation?.second===null||occupation?.second===undefined?null:occupation.second*adjustment};});
+ const liveBls=evidence?.bls.status==='live'?evidence.bls.data:null;
+ const baseYear=liveBls?.baseYear??2025,futureYear=liveBls?.futureYear??2035;
+ const blsRows=roles.map(r=>{const code=CAREER_SOC[r.id]??r.pathwayEvidence?.code?.slice(0,7)??'',occupation=liveBls?liveBls.occupations[code]:BLS_OCCUPATIONS[code];const baseIndex=roleIndex(r,'moderate'),scenarioIndex=roleIndex(r,scenario);const adjustment=baseIndex.future&&scenarioIndex.future?scenarioIndex.future/baseIndex.future:1;return {role:r,code,occupation,scenarioFuture:occupation?.second===null||occupation?.second===undefined?null:occupation.second*adjustment};});
  const onetHistory=roles.map(r=>{const d=roleIndex(r,scenario);return {label:r.title,first:d.previous,second:d.current};});
  const onetFuture=roles.map(r=>{const d=roleIndex(r,scenario);return {label:r.title,first:d.current,second:d.future};});
  const maxSkillHistory=Math.max(5,...skillHistory.flatMap(d=>[d.first,d.second]));
  const maxSkillFuture=5;
  const SkillBars=({data,max,labels}:{data:Pair[];max:number;labels:[string,string]})=><div className="space-y-3">{data.map(d=><div key={d.label} className="grid gap-2 sm:grid-cols-[130px_1fr]"><span className="text-xs">{d.label}</span><div className="space-y-1">{[d.first,d.second].map((n,i)=><div key={i} className="flex items-center gap-2 text-[10px]"><span className="w-20 shrink-0 text-muted-foreground">{labels[i]}</span><div className="h-2 flex-1 rounded bg-slate-100"><div className={'h-full rounded '+(i?'bg-amber-400':'bg-teal-500')} style={{width:`${Math.max(0,Math.min(100,(n??0)/max*100))}%`}}/></div><span className="w-8 text-right">{n===null?'N/A':n.toFixed(1)}</span></div>)}</div></div>)}</div>;
  return <div className="min-w-0 space-y-6">
+  <TrendUpdates/>
   <Card><CardTitle title="Skill trends" right={<><label className="sr-only" htmlFor="skill-trend-career">Career</label><select id="skill-trend-career" className="field max-w-[220px]" value={role.id} onChange={e=>setSkillRole(e.target.value)}>{related.map(r=><option key={r.id} value={r.id}>{r.title}</option>)}</select><Scenario value={scenario} onChange={setScenario}/></>}/>
    <div className="grid gap-6 lg:grid-cols-2">
     <section><h3 className="mb-3 text-sm font-medium">O*NET skill importance · previous vs current</h3>{skillHistory.length?<SkillBars data={skillHistory} max={maxSkillHistory} labels={['Previous','Current']}/>:<p className="text-sm text-muted-foreground">No mapped O*NET skill history for this career.</p>}<p className="mt-3 text-[11px] text-muted-foreground">Importance ratings describe occupational requirements, not hiring demand.</p><OnetSource previous/></section>
@@ -57,7 +65,8 @@ export function TrendPanels({careerId,departmentSkills,rolesOverride,organizatio
   <div><CardTitle eyebrow={scenario==='fast'?'Rapid AI scenario':'Moderate AI scenario'} title="Current vs future"/></div>
   <div className="grid gap-6 lg:grid-cols-2">
    <Card><CardTitle eyebrow="Occupation reference index · /100" title="O*NET current vs future" right={<Scenario value={scenario} onChange={setScenario}/>}/><VerticalPairs data={onetFuture} labels={['Current index',scenario==='fast'?'Rapid AI scenario':'Moderate AI scenario']}/><p className="mt-3 text-[11px] text-muted-foreground">Future = current index adjusted by the role’s scenario skill-target ratio. A planning sensitivity measure, not an employment forecast.</p><OnetSource/></Card>
-   <Card><CardTitle eyebrow="United States · employment, thousands" title="BLS current vs future estimate" right={<Scenario value={scenario} onChange={setScenario}/>}/><VerticalPairs data={blsRows.map(({role:r,occupation:o,scenarioFuture})=>({label:r.title,first:o?.first??null,second:scenarioFuture}))} labels={['BLS 2025 estimate',scenario==='fast'?'2035 rapid AI estimate':'2035 moderate AI estimate']}/><div className="mt-4 space-y-1 text-xs text-muted-foreground">{blsRows.map(({role:r,code,occupation:o})=><p key={r.id}>{r.title}: {o?`${o.title} (SOC ${code}); occupational analogue`:'No verified BLS occupation mapping; N/A'}</p>)}</div><p className="mt-3 text-xs text-muted-foreground">BLS publishes the 2025 estimate and 2035 baseline projection, not AI scenarios. The future bar applies the selected Faraway skill-target ratio to the BLS projection; this is an illustrative scenario estimate, not an official BLS forecast. <a className="underline" href={BLS_URL} target="_blank" rel="noreferrer">BLS Table 1.2, 2025–2035</a>.</p></Card>
+   <Card><CardTitle eyebrow="United States · employment, thousands" title="BLS current vs future estimate" right={<Scenario value={scenario} onChange={setScenario}/>}/><VerticalPairs data={blsRows.map(({role:r,occupation:o,scenarioFuture})=>({label:r.title,first:o?.first??null,second:scenarioFuture}))} labels={[`BLS ${baseYear} estimate`,`${futureYear} ${scenario==='fast'?'rapid':'moderate'} AI estimate`]}/><div className="mt-4 space-y-1 text-xs text-muted-foreground">{blsRows.map(({role:r,code,occupation:o})=><p key={r.id}>{r.title}: {o?`${o.title} (SOC ${code}); occupational analogue`:'No verified BLS occupation mapping; N/A'}</p>)}</div><p className="mt-3 text-xs text-muted-foreground">BLS publishes the {baseYear} estimate and {futureYear} baseline projection, not AI scenarios. The future bar applies the selected Faraway skill-target ratio to the BLS projection; this is an illustrative scenario estimate, not an official BLS forecast. <a className="underline" href={BLS_URL} target="_blank" rel="noreferrer">BLS Table 1.2, {baseYear}–{futureYear}</a>.</p></Card>
   </div>
  </div>;
 }
+

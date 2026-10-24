@@ -1,3 +1,4 @@
+import {opportunity} from './live-trends';
 import {skillRating} from '../../../../supabase/functions/faraway-recommendations/skill-policy';
 import {relevantRole} from '../../../../supabase/functions/faraway-recommendations/pathways';
 import { courseMatches, preferences } from '../../../../supabase/functions/faraway-recommendations/core';
@@ -10,6 +11,8 @@ import { hasDatabaseCatalogue } from './catalogue-status';
 export interface MatchResult {
   career: Career;
   score: number;
+  opportunityScore: number;
+  scenarioReadiness: number;
   skillFit: number;
   interestFit: number;
   experienceFit: number;
@@ -30,11 +33,12 @@ export function computeMatch(c: Career, p: Profile, scenario: Scenario, skillsOv
     .map(([skill, need]) => ({ skill, have: skillRating(skills,skill) ?? 0, need }))
     .filter((g) => g.have < g.need)
     .sort((a, b) => b.need - b.have - (a.need - a.have));
-  return { career: c, score: Math.round(score * 10) / 10, skillFit, interestFit, experienceFit, marketFit, gaps };
+  const outlook=opportunity(c,skills,interestFit,experienceFit,scenario);
+  return { opportunityScore:outlook.score,scenarioReadiness:outlook.readiness,career: c, score: Math.round(score * 10) / 10, skillFit, interestFit, experienceFit, marketFit, gaps };
 }
 
 export function rankCareers(p: Profile, scenario: Scenario) {
-  return CAREERS.map((c) => computeMatch(c, p, scenario)).sort((a, b) => Number(relevantRole(b.career,p))-Number(relevantRole(a.career,p)) || b.score - a.score || a.career.id.localeCompare(b.career.id));
+  return CAREERS.map((c) => computeMatch(c, p, scenario)).sort((a, b) => Number(relevantRole(b.career,p))-Number(relevantRole(a.career,p)) || b.opportunityScore - a.opportunityScore || b.score - a.score || a.career.id.localeCompare(b.career.id));
 }
 
 export function suggested(p: Profile, scenario: Scenario, more: boolean) {
@@ -66,3 +70,4 @@ export function checklistFor(skill: string, hours: number) {
   ];
   return parts.map((p) => ({ ...p, hours: Math.round(hours * p.w * 100) / 100 }));
 }
+

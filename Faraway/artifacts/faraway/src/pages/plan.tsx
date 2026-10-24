@@ -1,3 +1,4 @@
+import {TrendUpdates,PlanEvidenceNotice} from '@/components/trend-updates';
 import {ResourceChoice} from '@/components/resource-choice';
 import {resourceCost,resourceIssue} from '@/lib/resource-pricing';
 import { cleanSkill, skillError } from '@/lib/skill-validation';
@@ -87,6 +88,7 @@ export default function PlanPage() {
         AI sequences learning around your selected career and confirmed skill gaps. Faraway self-study modules are authored practice outlines with estimated hours; other catalogue offers remain illustrative. Completing a plan does not award a professional qualification. Costs cover selected catalogue modules; optional provider purchases are checked separately.
       </PageTitle>
 
+      <TrendUpdates/><PlanEvidenceNotice/>
       {career.qualificationNote&&<p className="rounded-2xl border p-4 text-sm">{career.qualificationNote}</p>}
       <Reveal><Card testId="card-preferences">
         <CardTitle eyebrow="Preferences" title="How you like to learn" />
@@ -213,3 +215,4 @@ export default function PlanPage() {
     </div>
   );
 }
+
