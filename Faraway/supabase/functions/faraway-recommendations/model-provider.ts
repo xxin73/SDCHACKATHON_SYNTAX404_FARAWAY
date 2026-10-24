@@ -12,12 +12,12 @@ export class ModelProviderError extends Error {
 type Env = (name: string) => string | undefined;
 
 export function resolveModelProvider(env: Env): ModelProvider {
-  const provider = (env('AI_PROVIDER') || 'gemini').trim().toLowerCase();
+  const provider = (env('AI_PROVIDER') || (env('RUNPOD_ENDPOINT_ID') ? 'runpod' : 'gemini')).trim().toLowerCase();
   if (provider === 'runpod') {
     const apiKey = env('RUNPOD_API_KEY')?.trim();
     const endpointId = env('RUNPOD_ENDPOINT_ID')?.trim();
     const model = env('RUNPOD_MODEL')?.trim();
-    if (!apiKey || !endpointId || !model || !/^[a-zA-Z0-9_-]{3,128}$/.test(endpointId) || /\\s/.test(model) || model.length > 200) {
+    if (!apiKey || !endpointId || !model || !/^[a-zA-Z0-9_-]{3,128}$/.test(endpointId) || /\s/.test(model) || model.length > 200) {
       throw new Error('RunPod is selected but not configured. Add RUNPOD_API_KEY, RUNPOD_ENDPOINT_ID and RUNPOD_MODEL as Supabase Edge Function secrets.');
     }
     return { provider: 'runpod', apiKey, endpointId, model };
@@ -40,7 +40,7 @@ export function modelLabel(provider: ModelProvider): string {
 export function generationSettings(model: string, schema: unknown) {
   const thinking = /^gemini-[34](?:[.-]|$)/.test(model)
     ? { thinkingLevel: model.includes('flash-lite') ? 'minimal' : 'low' }
-    : /^gemini-2\\.5-flash/.test(model) ? { thinkingBudget: 0 } : undefined;
+    : /^gemini-2\.5-flash/.test(model) ? { thinkingBudget: 0 } : undefined;
   return {
     temperature: /^gemini-[34](?:[.-]|$)/.test(model) ? 1 : 0.2,
     maxOutputTokens: 4096,
@@ -84,7 +84,7 @@ export function runpodChatRequest(model: string, system: string, data: unknown, 
   return {
     model,
     messages: [
-      { role: 'system', content: system + '\\nReturn only JSON that matches the supplied output schema.' },
+      { role: 'system', content: system + '\nReturn only JSON that matches the supplied output schema.' },
       { role: 'user', content: JSON.stringify(data) },
     ],
     temperature: 0.2,
@@ -103,7 +103,7 @@ export async function generateStructuredJson(
   provider: ModelProvider,
   input: { system: string; data: unknown; schema: unknown; maxTokens: number },
 ): Promise<any> {
-  const timeout = AbortSignal.timeout(130000);
+  const timeout = AbortSignal.timeout(110000);
   let response: Response;
   try {
     if (provider.provider === 'runpod') {
@@ -142,7 +142,7 @@ export async function generateStructuredJson(
     }
     if (response.status === 401 || response.status === 403) throw new ModelProviderError(503, 'RunPod rejected the server API key. Check RUNPOD_API_KEY and endpoint access.');
     if (response.status === 400 || response.status === 404) throw new ModelProviderError(503, 'RunPod rejected the model or structured-output request. Check RUNPOD_MODEL matches the deployed vLLM model.');
-    if (response.status === 429 || response.status === 503) throw new ModelProviderError(503, 'RunPod has no worker available yet or the endpoint is busy. Wait for its worker to become ready and retry once.');
+    if (response.status === 429 || response.status === 503) throw new ModelProviderError(503, 'RunPod has no worker available yet or the endpoint is busy. Check endpoint status before trying again.');
     throw new ModelProviderError(502, 'RunPod is unavailable. No automatic retry was made.');
   }
 
