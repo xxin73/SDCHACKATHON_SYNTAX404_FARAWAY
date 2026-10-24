@@ -1,4 +1,5 @@
-# Faraway
+
+.# Faraway
 ### Where Possibilities Take You
 
 ## Current Replit source package
@@ -38,7 +39,6 @@ Faraway brings individual learners, HR teams, and universities/TVET institutions
 | **GitHub Repository** | [xxin73/SDCHACKATHON_SYNTAX404_FARAWAY](https://github.com/xxin73/SDCHACKATHON_SYNTAX404_FARWAY.git) |
 | **Live Demo** | [Open Faraway](https://faraway-targeted-ui-refinements.replit.app) |
 | **RunPod Endpoint** | https://api.runpod.ai/v2/cahs1vicz7t1iu |
-| **Slide Deck** | **TO COMPLETE — viewable pitching slide deck URL** |
 | **Pitching / Demo Video** | **TO COMPLETE — viewable pitching video URL** |
 
 
