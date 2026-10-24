@@ -29,17 +29,23 @@ export function importMembers(text:string,context?:{department:string;team:strin
  const delimiter=first.includes(',')?',':first.includes('\t')?'\t':';';
  // Normalise delimiters only outside quoted fields, keeping quoted separators intact.
  let normal='',quoted=false;for(let i=0;i<clean.length;i++){const c=clean[i];if(c==='"'){if(quoted&&clean[i+1]==='"'){normal+='""';i++;continue;}quoted=!quoted;}normal+=c===delimiter&&!quoted?',':c;}
- const rows=parseCsv(normal);const header=rows.shift()?.map(s=>s.trim().toLowerCase().replace(/_/g,' '))??[];
+ const rows=parseCsv(normal);const rawHeader=rows.shift()??[];
+ // Excel may export unused trailing columns. Ignore only columns with no heading
+ // and no data; never silently discard ratings entered under unnamed columns.
+ const included=rawHeader.map((_,i)=>i).filter(j=>rawHeader[j].trim()||rows.some(row=>row[j]?.trim()));
+ for(const j of included)if(!rawHeader[j].trim())throw new Error(`Column ${j+1} has ratings or other data but no heading. Add its skill heading or clear that column in Excel, then save the CSV again.`);
+ for(const [i,row] of rows.entries())if(row.slice(rawHeader.length).some(value=>value.trim()))throw new Error(`Row ${i+2}: data extends beyond the CSV headings. Add a heading for every skill rating.`);
+ const header=included.map(j=>rawHeader[j].trim().toLowerCase().replace(/_/g,' '));
  const aliases:Record<string,string>={'study year':'position','academic programme':'department','full name':'name','employee name':'name','group':'department','programme':'department','program':'department','current role':'position','role':'position','job title':'position'};
  const keys=header.map(h=>aliases[h]||h);
  for(const h of (context?(context.student?['name']:['name','position']):['name','department']))if(!keys.includes(h))throw new Error(`Missing column: ${h}. Use the department CSV template.`);
  if(new Set(keys).size!==keys.length)throw new Error('Duplicate CSV column names. Keep one column for each field or skill.');
  if(rows.length>500)throw new Error('Please import at most 500 people per file.');if(!rows.length)throw new Error('The CSV has headers but no people. Add one person per row.');
- return rows.map((row,i)=>{const get=(h:string)=>row[keys.indexOf(h)]?.trim()??'';
- if(row.length!==header.length)throw new Error(`Row ${i+2}: expected ${header.length} columns, found ${row.length}. Quote values that contain commas.`);
+ return rows.map((row,i)=>{const get=(h:string)=>row[included[keys.indexOf(h)]]?.trim()??'';
+ if(row.length<rawHeader.length&&included.some(j=>j>=row.length))throw new Error(`Row ${i+2}: missing columns. Keep a cell for every heading, including blank ratings.`);
  if(!get('name')||!(context?.department||get('department')))throw new Error(`Row ${i+2}: name and department are required.`);
  const benchmark=get('target')||get('position');const c=CAREERS.find(c=>c.id.toLowerCase()===benchmark.toLowerCase())||roleForPosition(benchmark);
- const skills:Record<string,number>={};header.forEach((h,j)=>{const prefixed=h.startsWith('skill:');const raw=(prefixed?h.slice(6):h).trim().replace(/\s*\((?:[01]\s*[-–]\s*5|rating)\)$/i,'');const known=[...ALL_SKILLS,...(context?.skills??[]),'C++','C#','HTML','CSS'].find(s=>s.toLowerCase()===raw);if(!prefixed&&!known)return;const value=row[j]?.trim();if(!value)return;const name=known||cleanSkill(raw);const n=Number(value);if(skillError(name)||!Number.isInteger(n)||n<0||n>5)throw new Error(`Row ${i+2}: ${h} must have a skill rating from 0 to 5, or be blank if unassessed.`);if(context&&!context.skills.some(s=>s.toLowerCase()===name.toLowerCase()))throw new Error(`Row ${i+2}: ${name} is not an assessment skill for this department. Download its template.`);skills[name]=n;});
+ const skills:Record<string,number>={};header.forEach((h,j)=>{const prefixed=h.startsWith('skill:');const raw=(prefixed?h.slice(6):h).trim().replace(/\s*\((?:[01]\s*[-–]\s*5|rating)\)$/i,'');const known=[...ALL_SKILLS,...(context?.skills??[]),'C++','C#','HTML','CSS'].find(s=>s.toLowerCase()===raw);if(!prefixed&&!known)return;const value=row[included[j]]?.trim();if(!value)return;const name=known||cleanSkill(raw);const n=Number(value);if(skillError(name)||!Number.isInteger(n)||n<0||n>5)throw new Error(`Row ${i+2}: ${h} must have a skill rating from 0 to 5, or be blank if unassessed.`);if(context&&!context.skills.some(s=>s.toLowerCase()===name.toLowerCase()))throw new Error(`Row ${i+2}: ${name} is not an assessment skill for this department. Download its template.`);skills[name]=n;});
  return{id:(globalThis.crypto?.randomUUID?.()??`id-${Date.now()}-${Math.random().toString(36).slice(2)}`),name:get('name'),department:context?.department||get('department'),team:context?.team||get('team'),position:get('position'),target:c?.id||'',skills};});
 }
 export function download(name:string,data:string,type='text/csv'){const url=URL.createObjectURL(new Blob([data],{type}));const a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
