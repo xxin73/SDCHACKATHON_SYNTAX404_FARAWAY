@@ -39,7 +39,7 @@ Faraway brings individual learners, HR teams, and universities/TVET institutions
 | **GitHub Repository** | [xxin73/SDCHACKATHON_SYNTAX404_FARAWAY](https://github.com/xxin73/SDCHACKATHON_SYNTAX404_FARAWAY.git) |
 | **Live Demo** | [Open Faraway](https://faraway-targeted-ui-refinements.replit.app) |
 | **RunPod Endpoint** | https://api.runpod.ai/v2/cahs1vicz7t1iu |
-| **Pitching / Demo Video** | **[Video](https://youtu.be/Yi_fygVxWfg?si=USv5CvG7k49QvJVD)** |
+| **Pitching / Demo Video** | **[Video]([https://youtu.be/Yi_fygVxWfg?si=USv5CvG7k49QvJVD](https://youtu.be/dzCbC4tJUv4))** |
 
 
 ## Overview
