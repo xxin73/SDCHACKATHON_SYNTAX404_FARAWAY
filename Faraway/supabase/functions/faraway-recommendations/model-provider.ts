@@ -3,8 +3,10 @@ export type ModelProvider =
   | { provider: 'runpod'; model: string; apiKey: string; endpointId: string };
 
 export class ModelProviderError extends Error {
-  constructor(public status: number, message: string) {
+  public status: number;
+  constructor(status: number, message: string) {
     super(message);
+    this.status = status;
     this.name = 'ModelProviderError';
   }
 }
