@@ -996,8 +996,8 @@
     "ms": "Mulakan pelan"
   },
   "Edit preferences": {
-    "zh": "编辑偏好",
-    "ms": "Sunting keutamaan"
+    "zh": "修改学习偏好",
+    "ms": "Ubah pilihan"
   },
   "Back to preferences": {
     "zh": "返回偏好设置",
@@ -2222,5 +2222,41 @@
   "Planning assumptions, not forecasts.": {
     "zh": "仅为规划假设，并非预测。",
     "ms": "Andaian perancangan, bukan ramalan."
+  },
+  "HR / Manager / Employer": {
+    "zh": "人力资源 / 经理 / 雇主",
+    "ms": "HR / Pengurus / Majikan"
+  },
+  "Choose how to cover the remaining skills": {
+    "zh": "选择其余技能的学习方式",
+    "ms": "Pilih cara meliputi kemahiran selebihnya"
+  },
+  "No catalogue module fits your current preferences for:": {
+    "zh": "以下技能暂无符合当前偏好的目录模块：",
+    "ms": "Tiada modul katalog yang memenuhi pilihan semasa anda untuk:"
+  },
+  "Use free guided self-study, or create a plan for the available modules. You can also go back to change your preferences.": {
+    "zh": "您可以选择免费的指导式自学，或先为已有模块创建计划；也可以返回修改学习偏好。",
+    "ms": "Gunakan pembelajaran kendiri berpandu percuma, atau bina pelan dengan modul yang tersedia. Anda juga boleh kembali untuk mengubah pilihan."
+  },
+  "Use free guided self-study": {
+    "zh": "使用免费的指导式自学",
+    "ms": "Gunakan pembelajaran kendiri berpandu percuma"
+  },
+  "Continue with available modules": {
+    "zh": "使用已有模块继续",
+    "ms": "Teruskan dengan modul tersedia"
+  },
+  "Guided self-study uses your chosen reference materials and a practical task. Allow 4 hours per skill; no external course enrolment is included.": {
+    "zh": "指导式自学结合所选参考资料与实践任务。每项技能预留 4 小时，不包含外部课程报名。",
+    "ms": "Pembelajaran kendiri berpandu menggunakan bahan rujukan pilihan anda dan tugasan praktikal. Peruntukkan 4 jam bagi setiap kemahiran; pendaftaran kursus luar tidak disertakan."
+  },
+  "Not included in this plan:": {
+    "zh": "本计划未包含：",
+    "ms": "Tidak disertakan dalam pelan ini:"
+  },
+  "Review excluded skills": {
+    "zh": "重新查看未包含的技能",
+    "ms": "Semak kemahiran yang dikecualikan"
   }
 }

@@ -20,29 +20,29 @@ const POP = 'Lower-secondary teachers, OECD averages (TALIS 2024)';
 
 export const EDUCATION_AI_STATS: EducationAiStat[] = [
   {
-    id: 'teachers-using-ai', value: 36, title: 'Teachers Using AI',
-    caption: 'Teacher-reported adoption: share who said they used AI in their teaching in the 12 months before the survey.',
+    id: 'teachers-using-ai', value: 36, title: 'Teachers using AI',
+    caption: 'Reported using AI in teaching during the previous year.',
     type: 'teacher-reported adoption', sourceOrg: 'OECD', publicationYear: 2026, surveyYear: 2024, population: POP,
     definition: 'Having used AI in their teaching during the 12 months prior to the survey.',
     sourceUrl: SOURCE_URL, locator: 'Figure 1.4',
   },
   {
-    id: 'ai-lesson-planning', value: 53, title: 'AI Supports Lesson Planning',
-    caption: 'Teacher perception: share who said AI helps them write or improve lesson plans. Not a measured learning outcome.',
+    id: 'ai-lesson-planning', value: 53, title: 'AI supports lesson planning',
+    caption: 'Agreed that AI helps with lesson planning.',
     type: 'teacher perception', sourceOrg: 'OECD', publicationYear: 2026, surveyYear: 2024, population: POP,
     definition: 'AI helps teachers write or improve lesson plans.',
     sourceUrl: SOURCE_URL, locator: 'Figure 1.4',
   },
   {
-    id: 'academic-integrity', value: 72, title: 'Academic Integrity Concerns',
-    caption: 'Teacher perception: share who said AI enables students to misrepresent others\u2019 work as their own. A concern, not measured misconduct.',
+    id: 'academic-integrity', value: 72, title: 'Academic integrity concerns',
+    caption: 'Concerned that AI can enable misrepresentation of work.',
     type: 'teacher perception', sourceOrg: 'OECD', publicationYear: 2026, surveyYear: 2024, population: POP,
     definition: 'AI enables students to misrepresent others\u2019 work as their own.',
     sourceUrl: SOURCE_URL, locator: 'Figure 1.4',
   },
   {
-    id: 'inaccurate-recommendations', value: 66, title: 'Inaccurate AI Recommendations',
-    caption: 'Teacher perception: share who said AI makes incorrect or inappropriate recommendations. Self-reported, not an audit of AI output.',
+    id: 'inaccurate-recommendations', value: 66, title: 'Inaccurate AI recommendations',
+    caption: 'Agreed that AI can give incorrect recommendations.',
     type: 'teacher perception', sourceOrg: 'OECD', publicationYear: 2026, surveyYear: 2024, population: POP,
     definition: 'AI makes incorrect or inappropriate recommendations.',
     sourceUrl: SOURCE_URL, locator: 'Figure 1.4',
@@ -53,13 +53,13 @@ export const EVIDENCE_NOTE =
   'All four figures are self-reports and perceptions from the 2024 TALIS survey, published in OECD Digital Education Outlook 2026 (19 January 2026). They do not show actual harms, benefits or causal outcomes.';
 
 export const VERIFICATION_NOTE =
-  'Verification: values were read directly from Figure 1.4 of the full OECD PDF. A web summary gave 37% and 57% for the first two indicators; the primary figure shows 36% and 53%, so those are used here. The proposed 62% student AI-literacy figure was not used because its survey definition and population could not be confirmed; the verified 66% teacher concern about incorrect recommendations is shown instead.';
+  'Values are taken from Figure 1.4 of OECD Digital Education Outlook 2026. The survey covers lower-secondary teachers (TALIS 2024); the figures describe reported use and perceptions, not measured Faraway results.';
 
 export interface InsightTab { id: string; label: string; kind: string; summary: string; points: string[] }
 
 export const EDUCATION_INSIGHTS: InsightTab[] = [
   {
-    id: 'opportunities', label: 'Learning Opportunities', kind: 'Potential benefit',
+    id: 'opportunities', label: 'Learning opportunities', kind: 'Potential benefit',
     summary: 'AI can offer explanations, practice and tutoring-style support, but benefits depend on how the tool is designed and used.',
     points: [
       'Explanations can be adapted to a learner\u2019s pace and prior knowledge.',
@@ -68,7 +68,7 @@ export const EDUCATION_INSIGHTS: InsightTab[] = [
     ],
   },
   {
-    id: 'teacher-support', label: 'Teacher Support', kind: 'Perceived benefit',
+    id: 'teacher-support', label: 'Teacher support', kind: 'Perceived benefit',
     summary: 'Teachers describe AI mainly as a time-saver for preparation and routine work.',
     points: [
       'Planning: drafting and improving lesson plans.',
@@ -77,7 +77,7 @@ export const EDUCATION_INSIGHTS: InsightTab[] = [
     ],
   },
   {
-    id: 'risks', label: 'Challenges and Risks', kind: 'Potential risk',
+    id: 'risks', label: 'Challenges and risks', kind: 'Potential risk',
     summary: 'Risks are about trust and skill: what AI gets wrong, who it may disadvantage, and whether people know how to use it.',
     points: [
       'Integrity: students may pass off AI-generated work as their own.',

@@ -1,12 +1,11 @@
-import { useEffect, useState, type MouseEvent } from 'react';
-import { ArrowDown } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { SdgConstellation } from './sdg-constellation';
 import './sdc-mission.css';
 
 const PILLARS = [
-  ['🌍 Focus on real-world challenges', "From combating climate change and promoting clean energy to fostering quality education (SDG 4), good health and well-being (SDG 3), and reducing inequalities, we use technology to address the world's most pressing needs."],
-  ['💻 Empowering sustainability through code', 'Transform cutting-edge AI technologies—such as large language models, machine learning, and data analytics—into practical digital solutions, giving every line of code the power to create social value.'],
-  ['🤝 Co-creating a green and inclusive future', 'Break down the barriers between technology and reality, ensuring that innovation goes beyond the surface to genuinely serve humanity and the sustainable development of our planet.'],
+  ['Learning with purpose', 'Identify the skills you need and find practical ways to develop them.'],
+  ['Preparing for change', 'Compare AI adoption scenarios to explore how future skill requirements could change.'],
+  ['Growing together', 'Support learning across individuals, teams and academic programmes.'],
 ];
 
 export function SdcMission() {
@@ -26,18 +25,15 @@ export function SdcMission() {
 
   const hub = (
     <div className="sdc-hub-copy">
-      <h2>About the SDGs (Sustainable Development Goals) &amp; our mission</h2>
-      <p>At the SDC (Sustainably Developing Code) AI Hackathon, we see an opportunity to explore how artificial intelligence (AI) and innovative thinking can help address real-world challenges and shape a better future.</p>
-      <p>As participants, we aim to go beyond solving technical problems by developing meaningful solutions inspired by the 17 United Nations Sustainable Development Goals (SDGs). Through creativity, technology, and collaboration, we hope to demonstrate how AI can contribute to a more sustainable and inclusive future.</p>
+      <h2>Skills for a sustainable future</h2>
+      <p>Faraway helps learners, employers and educators prepare for a changing world of work. Explore career possibilities, understand skill gaps and turn your next step into a practical learning plan.</p>
+      <p>Our work supports relevant skills and decent work, inspired by the United Nations Sustainable Development Goals (SDGs). Explore the 17 goals below and discover how learning can contribute to a more inclusive future.</p>
     </div>
   );
 
   return (
     <>
-      <div className="sdc-jump">
-        <a href="#sdc-mission" onClick={jump} data-testid="link-sdc-mission">SDC AI Hackathon mission <ArrowDown size={16} aria-hidden /></a>
-      </div>
-      <section id="sdc-mission" className={`sdc-mission${reduce ? ' sdc-reduce' : ''}`} aria-label="SDC AI Hackathon mission" data-testid="section-sdc-mission">
+      <section id="sdc-mission" className={`sdc-mission${reduce ? ' sdc-reduce' : ''}`} aria-label="Faraway mission" data-testid="section-sdc-mission">
         <div className="sdc-inner">
           <SdgConstellation reduce={reduce} hub={hub} />
           <div className="sdc-pillars">
@@ -48,7 +44,7 @@ export function SdcMission() {
               </article>
             ))}
           </div>
-          <p className="sdc-cta">Join us to ignite the spark of sustainable innovation with artificial intelligence and build a better tomorrow through technology!</p>
+          <p className="sdc-cta">Build your skills. Explore your possibilities. Shape your next step.</p>
         </div>
       </section>
     </>

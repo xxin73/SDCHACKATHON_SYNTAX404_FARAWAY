@@ -1,3 +1,4 @@
+import {InteractiveStars} from './interactive-stars';
 import {t as localeLabel,ui as localeText,useLanguage as useUiLanguage} from '@/lib/i18n';
 import { useEffect, useRef, useState, type ReactNode, type ComponentType } from 'react';
 import { motion, useMotionValue, useSpring, useTransform, useReducedMotion } from 'framer-motion';
@@ -95,6 +96,7 @@ export function Aurora() {
         <div className="absolute bottom-[5%] right-[5%] h-[35vh] w-[30vw] rounded-full opacity-[.2] blur-[90px]" style={{ background: 'radial-gradient(closest-side, #c8f3e6, transparent)', animation: 'aurora-b 31s ease-in-out infinite' }} />
       </motion.div>
       <MosaicField />
+      <InteractiveStars />
     </>
   );
 }

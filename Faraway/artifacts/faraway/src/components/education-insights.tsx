@@ -7,8 +7,8 @@ export function EducationInsights() {
   const cur = EDUCATION_INSIGHTS.find((t) => t.id === id) ?? EDUCATION_INSIGHTS[0];
   return (
     <div className="glass fwl-card eai" data-testid="education-insights">
-      <p className="eyebrow">Qualitative perspectives, not comparable percentages</p>
-      <h3>Three ways to read AI in education</h3>
+      <p className="eyebrow">Learning with AI</p>
+      <h3>Opportunities, support and risks</h3>
       <div className="eai-tabs" role="tablist" aria-label="AI in education perspectives">
         {EDUCATION_INSIGHTS.map((t) => (
           <button key={t.id} type="button" role="tab" id={`eai-tab-${t.id}`} aria-selected={t.id === id} aria-controls="eai-panel" tabIndex={t.id === id ? 0 : -1}

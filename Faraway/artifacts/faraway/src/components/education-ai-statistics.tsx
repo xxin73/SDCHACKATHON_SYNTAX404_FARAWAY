@@ -45,7 +45,7 @@ export function OverviewEducationStats() {
       </div>
       <p className="eas-note">{EVIDENCE_NOTE}</p>
       <details className="eas-det eas-ver">
-        <summary>Why 36 and 53, not 37 and 57?</summary>
+        <summary>How these figures were checked</summary>
         <p>{VERIFICATION_NOTE}</p>
       </details>
     </div>

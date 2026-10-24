@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { useReducedMotion } from 'framer-motion';
 import { ClipboardList, Compass, GitCompare, GraduationCap, Layers, Search } from 'lucide-react';
-import { CAREERS, SDGS } from '@/data/careers';
+import { CAREERS, SDGS, STREAMS } from '@/data/careers';
 import { scenarioRequirements } from '../../../../supabase/functions/faraway-recommendations/core';
 import { SpectrumIcon, Tilt } from '@/components/spectrum';
 import { OverviewEducationStats } from '@/components/education-ai-statistics';
@@ -110,7 +110,7 @@ export function LandingSections() {
             </div>
             {career && (
               <div className="glass spectrum-border fwl-card" data-testid="card-career-preview">
-                <p className="eyebrow">{career.stream}</p>
+                <p className="eyebrow">{STREAMS.find(stream=>stream.id===career.stream)?.name ?? 'Career field'}</p>
                 <h3 data-testid="text-career-title">{career.title}</h3>
                 <p>{career.blurb}</p>
                 <div className="fwl-chips" role="group" aria-label="AI adoption assumption">

@@ -21,3 +21,5 @@
 .flv-spark{width:9px;height:9px;margin:-4.5px}
 .flv[data-paused="true"] *,.flv[data-paused="true"] *::before{animation-play-state:paused!important}
 @media (prefers-reduced-motion:reduce){.flv *{animation:none!important}.flv-comet{display:none}.flv svg,.flv-fxl{transform:none!important}}
+
+.flv-field{perspective:1000px}.flv-node{filter:drop-shadow(0 0 4px hsl(260 90% 78% / .7));animation-duration:3.2s}.flv svg{transform-origin:50% 50%}

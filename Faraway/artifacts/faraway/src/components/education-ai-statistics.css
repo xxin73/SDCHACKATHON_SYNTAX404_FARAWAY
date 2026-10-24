@@ -31,3 +31,13 @@
 .eai-panel ul{margin:10px 0 0;padding-left:18px;list-style:disc;font-size:14px;line-height:1.6;color:hsl(var(--muted-foreground))}
 @keyframes eai-in{from{opacity:0;transform:translateY(8px)}}
 @media(prefers-reduced-motion:reduce){.eas-hstat,.eai-tab,.eai-panel,.eas-num{transition:none!important;animation:none!important}.eas-hstat:hover,.eai-tab:hover{transform:none}.eas-hstat:hover .eas-num,.eas-item:hover .eas-num{animation:none}}
+
+/* Keep evidence readable within narrow cards and expanded source panels. */
+.eas-grid{grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));align-items:start;gap:24px}
+.eas-item{min-width:0;padding:16px;border:1px solid hsl(var(--border));border-radius:18px;background:rgba(255,255,255,.55)}
+.eas-t{line-height:1.4;min-height:2.8em}
+.eas-cap{min-height:3em}
+.eas-det dl{display:block;padding:12px;border-radius:12px;background:rgba(255,255,255,.7)}
+.eas-det dt{margin-top:10px}
+.eas-det dt:first-child{margin-top:0}
+.eas-det dd,.eas-det p,.eas-note{overflow-wrap:anywhere;max-width:65ch}
