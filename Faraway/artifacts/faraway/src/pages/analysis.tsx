@@ -44,6 +44,7 @@ export default function Analysis() {
 
       <section>
         <Reveal><div className="mb-6 flex flex-wrap items-end justify-between gap-3"><div><p className="eyebrow mb-2">Suggested for you</p><h2 className="font-display text-4xl">Careers that fit</h2></div><p className="text-xs text-muted-foreground">Related interests first · match = 60% scenario readiness + 20% interest + 10% experience + 10% market outlook</p></div></Reveal>
+        <div className="mb-6 flex flex-wrap items-center gap-3" data-testid="match-scenario-control"><span className="text-sm font-medium">Match score scenario</span><ScenarioToggle id="career-match-scenario" compact/><p className="text-xs text-muted-foreground">Switch scenarios to recalculate career match scores and skill gaps.</p></div>
         {!has ? <NeedProfile text="Rate your skills to see matches." /> : (
           <>
             <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
