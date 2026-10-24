@@ -1,3 +1,4 @@
+import {t as translateUi,useLanguage} from '@/lib/i18n';
 import { AccountAvatar } from './account-avatar';
 import { useEffect, useState, type ReactNode } from 'react';
 import { Link, useLocation, useSearch } from 'wouter';
@@ -20,6 +21,7 @@ export function initials(name: string) {
 }
 
 export function Shell({ children }: { children: ReactNode }) {
+  useLanguage();
   const [loc] = useLocation();
   const auth = useAuth();
   const recommendations = useRecommendations();
@@ -70,38 +72,38 @@ export function Shell({ children }: { children: ReactNode }) {
     <div className="relative min-h-[100dvh]">
       <Aurora />
       {/* Left icon rail */}
-      <nav aria-label="Primary" className="fixed inset-y-0 left-0 z-40 hidden w-[76px] flex-col items-center border-r bg-white/80 pt-5 backdrop-blur-xl md:flex">
-        <Link href={isOrg ? "/organization" : "/"} className="hidden md:mb-[8vh] md:block" data-testid="link-home-logo" aria-label="Faraway home">
+      <nav aria-label={translateUi("Primary")} className="fixed inset-y-0 left-0 z-40 hidden w-[76px] flex-col items-center border-r bg-white/80 pt-5 backdrop-blur-xl md:flex">
+        <Link href={isOrg ? "/organization" : "/"} className="hidden md:mb-[8vh] md:block" data-testid="link-home-logo" aria-label={translateUi("Faraway home")}>
           <motion.img src={LOGO} alt="Faraway" className="h-11 w-11 object-contain drop-shadow-[0_2px_6px_rgba(200,150,0,.25)]" whileHover={{ rotate: 25 }} transition={{ type: 'spring', stiffness: 200 }} />
         </Link>
-        <Link href={isOrg ? "/organization" : "/"} className="md:hidden" data-testid="link-home-mobile" aria-label="Dashboard"><div className={cn('grid h-11 w-11 place-items-center rounded-2xl', loc === '/' && 'bg-white shadow-md')}><SpectrumIcon icon={LayoutGrid} size={20} still={loc !== '/'} /></div></Link>
+        <Link href={isOrg ? "/organization" : "/"} className="md:hidden" data-testid="link-home-mobile" aria-label={translateUi("Dashboard")}><div className={cn('grid h-11 w-11 place-items-center rounded-2xl', loc === '/' && 'bg-white shadow-md')}><SpectrumIcon icon={LayoutGrid} size={20} still={loc !== '/'} /></div></Link>
         {items.map((it, i) => {
           const active = it.match(loc);
           return (
             <Magnetic key={it.label} strength={0.35} className={cn(i === 2 && 'md:mt-[10vh]', i === 1 && 'md:mt-[8vh]', i === 3 && 'md:mt-[6vh]')}>
-              <Link href={it.href} data-testid={`nav-${it.label.toLowerCase().replace(/\W+/g, '-')}`} aria-label={it.label} className="group relative block">
+              <Link href={it.href} data-testid={`nav-${it.label.toLowerCase().replace(/\W+/g, '-')}`} aria-label={translateUi(it.label)} className="group relative block">
                 <div className={cn('relative grid h-12 w-12 place-items-center rounded-2xl transition-all duration-300', active ? 'bg-white shadow-[0_10px_30px_-12px_hsl(250_60%_40%/.45)]' : 'hover:bg-white hover:shadow-md')}>
                   {active && <motion.span layoutId="rail-active" className="spectrum-border absolute inset-0 rounded-2xl" />}
                   <SpectrumIcon icon={it.icon} size={22} still={!active} />
                 </div>
-                <span className="pointer-events-none absolute left-[60px] top-1/2 hidden -translate-y-1/2 whitespace-nowrap rounded-lg bg-ink px-2.5 py-1 text-xs text-white opacity-0 transition-all group-hover:translate-x-1 group-hover:opacity-100 md:block">{it.label}</span>
+                <span className="pointer-events-none absolute left-[60px] top-1/2 hidden -translate-y-1/2 whitespace-nowrap rounded-lg bg-ink px-2.5 py-1 text-xs text-white opacity-0 transition-all group-hover:translate-x-1 group-hover:opacity-100 md:block">{translateUi(it.label)}</span>
               </Link>
             </Magnetic>
           );
         })}
       </nav>
 
-      <nav aria-label="Mobile navigation" className="mobile-bottom-nav md:hidden" style={{gridTemplateColumns:`repeat(${mobileItems.length},minmax(0,1fr))`}}>{mobileItems.map(({href,label,icon:I,active})=><Link key={label} href={href} aria-current={active?'page':undefined} className={cn('mobile-nav-item',active&&'is-active')}><span className="mobile-nav-icon"><I size={21} strokeWidth={active?2.2:1.7}/></span><span>{label}</span></Link>)}</nav>
+      <nav aria-label={translateUi("Mobile navigation")} className="mobile-bottom-nav md:hidden" style={{gridTemplateColumns:`repeat(${mobileItems.length},minmax(0,1fr))`}}>{mobileItems.map(({href,label,icon:I,active})=><Link key={label} href={href} aria-current={active?'page':undefined} className={cn('mobile-nav-item',active&&'is-active')}><span className="mobile-nav-icon"><I size={21} strokeWidth={active?2.2:1.7}/></span><span>{translateUi(label)}</span></Link>)}</nav>
       <div className="md:pl-[76px]">
         <header className="app-header mx-auto max-w-[1280px] px-4 pt-4 sm:px-8 md:px-12">
           <div className="flex items-center justify-between">
-            <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-sm" data-testid="text-breadcrumb">
+            <nav aria-label={translateUi("Breadcrumb")} className="flex items-center gap-2 text-sm" data-testid="text-breadcrumb">
               <img src={LOGO} alt="" className="h-7 w-7 object-contain md:hidden" />
-              <Link href="/mode" className="hidden text-muted-foreground transition-colors hover:text-foreground sm:block" data-testid="link-crumb-workspace">Workspace</Link>
+              <Link href="/mode" className="hidden text-muted-foreground transition-colors hover:text-foreground sm:block" data-testid="link-crumb-workspace">{translateUi("Workspace")}</Link>
               <span className="hidden text-muted-foreground/50 sm:block">/</span>
-              <span className="font-medium">{crumb}</span>
+              <span className="font-medium">{translateUi(crumb)}</span>
             </nav>
-            <div className="flex items-center gap-3"><Link href="/evidence" className="hidden text-xs text-muted-foreground underline sm:block">Evidence & sources</Link><Link href="/mode" className="btn-ghost text-xs" data-testid="switch-workspace"><span className="sm:hidden">Switch</span><span className="hidden sm:inline">Switch workspace</span></Link><DropdownMenu>
+            <div className="flex items-center gap-3"><Link href="/evidence" className="hidden text-xs text-muted-foreground underline sm:block">{translateUi("Evidence & sources")}</Link><Link href="/mode" className="btn-ghost text-xs" data-testid="switch-workspace"><span className="sm:hidden">{translateUi("Switch")}</span><span className="hidden sm:inline">{translateUi("Switch workspace")}</span></Link><DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button className="group flex flex-col items-center gap-1 outline-none" data-testid="button-avatar">
                   <span className="spectrum-border relative grid h-10 w-10 place-items-center rounded-full bg-white font-mono text-xs font-medium shadow-md transition-transform group-hover:scale-105"><AccountAvatar avatar={profile.avatar} name={name}/></span>
@@ -111,10 +113,10 @@ export function Shell({ children }: { children: ReactNode }) {
               <DropdownMenuContent align="end" className="w-56 rounded-2xl">
                 <DropdownMenuLabel><p className="font-medium">{name}</p><p className="text-xs font-normal text-muted-foreground">{session?.email}</p></DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem asChild><Link href="/profile">Profile & settings</Link></DropdownMenuItem>
-                <DropdownMenuItem asChild><Link href="/organization" data-testid="menu-organization"><Building2 className="mr-2 h-4 w-4" />Organization view</Link></DropdownMenuItem>
-                <DropdownMenuItem onClick={async () => { setResetError(""); resetJourney(); try { await auth.flush(); await recommendations.clearJourneyHistory(); } catch (e) { setResetError(e instanceof Error ? e.message : String(e)); } }} data-testid="menu-reset"><RotateCcw className="mr-2 h-4 w-4" />Restart journey</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => void auth.signOut()} data-testid="menu-signout"><LogOut className="mr-2 h-4 w-4" />Sign out</DropdownMenuItem>
+                <DropdownMenuItem asChild><Link href="/profile">{translateUi("Profile & settings")}</Link></DropdownMenuItem>
+                <DropdownMenuItem asChild><Link href="/organization" data-testid="menu-organization"><Building2 className="mr-2 h-4 w-4" />{translateUi("Organization view")}</Link></DropdownMenuItem>
+                <DropdownMenuItem onClick={async () => { setResetError(""); resetJourney(); try { await auth.flush(); await recommendations.clearJourneyHistory(); } catch (e) { setResetError(e instanceof Error ? e.message : String(e)); } }} data-testid="menu-reset"><RotateCcw className="mr-2 h-4 w-4" />{translateUi("Restart journey")}</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => void auth.signOut()} data-testid="menu-signout"><LogOut className="mr-2 h-4 w-4" />{translateUi("Sign out")}</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu></div>
           </div>
@@ -122,11 +124,11 @@ export function Shell({ children }: { children: ReactNode }) {
         </header>
         <motion.main key={loc} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease: [0.2, 0.8, 0.2, 1] }}
           className="app-main mx-auto max-w-[1280px] px-4 pb-28 pt-6 sm:px-8 md:px-12 md:pb-20">
-          {auth.user && <div className="mb-4 text-sm" role="status" aria-live="polite">{auth.syncStatus.phase === 'saving' ? 'Saving your personal profile…' : auth.syncStatus.phase === 'save-error' ? <><span role="alert">{auth.syncStatus.error} Keep this tab open.</span> <button className="underline" onClick={() => void auth.retry()}>Retry save</button></> : 'Personal profile and skills saved to your account.'}</div>}
+          {auth.user && <div className="mb-4 text-sm" role="status" aria-live="polite">{auth.syncStatus.phase === 'saving' ? translateUi("Saving your personal profile…") : auth.syncStatus.phase === 'save-error' ? <><span role="alert">{auth.syncStatus.error} Keep this tab open.</span> <button className="underline" onClick={() => void auth.retry()}>{translateUi("Retry save")}</button></> : translateUi("Personal profile and skills saved to your account.")}</div>}
           {auth.error && <p className="mb-4 text-sm" role="alert">{auth.error}</p>}
           {resetError && <p className="mb-4 rounded-xl bg-red-50 p-3 text-sm text-red-800" role="alert">{resetError}</p>}
           {children}
-          <footer className="mt-12 border-t pt-5 text-xs text-muted-foreground">Faraway · Personal profiles and learning progress sync to your account. Organisation records are stored in this browser. Scenario figures and catalogue course estimates are illustrative; source links and learning resources are identified separately. <Link href="/evidence" className="underline">Review or update evidence</Link></footer>
+          <footer className="mt-12 border-t pt-5 text-xs text-muted-foreground">Faraway · Personal profiles and learning progress sync to your account. Organisation records are stored in this browser. Scenario figures and catalogue course estimates are illustrative; source links and learning resources are identified separately. <Link href="/evidence" className="underline">{translateUi("Review or update evidence")}</Link></footer>
         </motion.main>
       </div>
     </div>
