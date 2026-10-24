@@ -2,7 +2,7 @@
 
 ## What updates automatically
 - A public read-only `/api/trends` gateway checks BLS table 1.2, the OpenDOSM monthly labour CSV, O*NET release metadata and arXiv cs.AI. It runs without RunPod, API keys or personal data.
-- Opening Analysis, Evidence, Study Plan or saved Learning Progress starts a check; the manual button uses the same service. Shared responses cache for one hour. Refresh does not fabricate new observations.
+- Pages read the published evidence snapshot. Opening a page does not request source updates, and there is no user-facing update button.
 - A daily GitHub Actions workflow, plus manual workflow dispatch, refreshes the dated public snapshot for outages/static previews. Scheduled Actions can be delayed/disabled by repository settings; last-check times remain visible. The snapshot job needs the workflow's declared contents-write permission.
 - Each source is independently validated. A partial outage preserves its previous validated values. Broken/empty tables do not become zero vacancies.
 
@@ -35,7 +35,7 @@ asks for a review instead of claiming synchronized evidence history.
   plan review. It is not fully autonomous AI-driven curriculum rewriting.
 
 ## Demo
-1. Open Analysis. Point to last check, source links, periods and coverage.
+1. Open Analysis. Point to the published snapshot date, source links, periods and coverage.
 2. Expand a career's opportunity explanation and trace BLS base/future figures into the score.
 3. Switch moderate/rapid AI. Scenario readiness and opportunity score can change;
    measured BLS values stay unchanged. Some roles are insensitive to the scenario.

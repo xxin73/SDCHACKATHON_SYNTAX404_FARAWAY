@@ -1,17 +1,14 @@
-import {useEffect} from 'react';
 import {Link} from 'wouter';
 import {Card,CardTitle} from './bits';
-import {checkTrendUpdates,useTrendEvidence,marketOutlook,planNeedsReview,markPlanEvidence} from '@/lib/live-trends';
+import {useTrendEvidence,marketOutlook,planNeedsReview,markPlanEvidence} from '@/lib/live-trends';
 import {useStore,setState} from '@/lib/store';
 import {useRecommendations} from '@/lib/recommendations';
 import {careerById,type Career} from '@/data/careers';
 export function TrendUpdates(){
- const {evidence:e,busy,error,change}=useTrendEvidence();
- useEffect(()=>{void checkTrendUpdates();},[]);
- return <Card><CardTitle eyebrow="Evidence refresh · no GPU required" title="Check the evidence behind your next step"/>
- <p className="text-sm text-muted-foreground">Checks run when this panel opens and when you request them. Shared source responses are cached for one hour. New publications can change outlook rankings; an unchanged source correctly leaves the figures unchanged.</p>
- <div className="mt-4 flex flex-wrap items-center gap-3"><button className="btn-ghost" disabled={busy} onClick={()=>void checkTrendUpdates()}>{busy?'Checking sources…':'Check for data updates'}</button><span className="text-xs">Last source check: {e?new Date(e.checkedAt).toLocaleString():'not yet completed'}</span></div>
- {change&&<p role="status" className="mt-3 text-sm">{change}</p>}{error&&<p role="status" className="mt-2 text-sm text-amber-800">{error}</p>}
+ const {evidence:e}=useTrendEvidence();
+ return <Card><CardTitle eyebrow="Sources & dates" title="Evidence behind your next step"/>
+ <p className="text-sm text-muted-foreground">Charts and opportunity rankings use the published evidence snapshot. Sources are refreshed by the scheduled daily workflow.</p>
+ <p className="mt-3 text-xs">Snapshot checked: {e?new Date(e.checkedAt).toLocaleString():'dated bundled baseline'}</p>
  <div className="mt-4 grid gap-3 text-xs sm:grid-cols-2">
  <p><a className="underline" href="https://www.bls.gov/emp/tables/occupational-projections-and-characteristics.htm" target="_blank" rel="noreferrer">BLS employment outlook</a>: {e?.bls.data?`${e.bls.data.baseYear}–${e.bls.data.futureYear}, ${Object.keys(e.bls.data.occupations).length} occupations`:'dated 2025–2035 bundled snapshot'}. {e?.bls.lastCheckFailed?`Cached source retrieval: ${new Date(e.bls.lastSuccessAt??e.checkedAt).toLocaleString()}. `:''}United States; occupational analogues, not Malaysian vacancies.</p>
  <p><a className="underline" href="https://open.dosm.gov.my/data-catalogue/lfs_month" target="_blank" rel="noreferrer">DOSM labour-force context</a>: {e?.dosm.data?`${e.dosm.data.period.slice(0,7)} · unemployment ${e.dosm.data.unemployment}%`:'unavailable from update service'}. National context does not change individual-role scores. The separate DOSM job-offering group chart remains a reviewed quarterly snapshot.</p>
