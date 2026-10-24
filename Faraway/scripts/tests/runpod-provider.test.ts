@@ -19,6 +19,7 @@ test('RunPod request uses OpenAI JSON schema, a single completion and bounded ou
  assert.equal(request.n,1);
  assert.equal(request.stream,false);
  assert.equal(request.max_tokens,2048);
+ assert.match(request.messages[0].content,/\/no_think/);
  assert.deepEqual(request.response_format.json_schema.schema,{type:'object',properties:{items:{type:'array',items:{type:'object',properties:{title:{type:'string'}},required:['title']}}},required:['items']});
 });
 
