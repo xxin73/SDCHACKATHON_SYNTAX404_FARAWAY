@@ -110,7 +110,7 @@ export function Shell({ children }: { children: ReactNode }) {
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild><Link href="/profile">Profile & settings</Link></DropdownMenuItem>
                 <DropdownMenuItem asChild><Link href="/organization" data-testid="menu-organization"><Building2 className="mr-2 h-4 w-4" />Organization view</Link></DropdownMenuItem>
-                <DropdownMenuItem onClick={() => resetJourney()} data-testid="menu-reset"><RotateCcw className="mr-2 h-4 w-4" />Restart journey</DropdownMenuItem>
+                <DropdownMenuItem onClick={async () => { resetJourney(); try { await auth.flush(); } catch { /* The sync status displays the save error and retry action. */ } }} data-testid="menu-reset"><RotateCcw className="mr-2 h-4 w-4" />Restart journey</DropdownMenuItem>
                 <DropdownMenuItem onClick={() => void auth.signOut()} data-testid="menu-signout"><LogOut className="mr-2 h-4 w-4" />Sign out</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu></div>
