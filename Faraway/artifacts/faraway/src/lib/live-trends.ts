@@ -36,11 +36,21 @@ export async function checkTrendUpdates(){
   let fromSnapshot=false;let next:TrendEvidence;
   try{const r=await fetch('/api/trends',{signal:AbortSignal.timeout(15000)});if(!r.ok)throw Error();next=await r.json();if(!valid(next))throw Error();}
   catch{const r=await fetch('/trend-evidence.json',{cache:'no-cache',signal:AbortSignal.timeout(5000)});if(!r.ok)throw Error();next=await r.json();if(!valid(next))throw Error();fromSnapshot=true;}
+  // Some primary sites block cloud datacentres. Fill individual failed sources
+  // from the scheduled, dated shared snapshot even on a visitor's first visit.
+  if(['bls','dosm','onet','research'].some(k=>(next as any)[k].status==='unavailable')){
+   try{const r=await fetch('/trend-evidence.json',{cache:'no-cache',signal:AbortSignal.timeout(5000)});const snapshot=await r.json();if(r.ok&&valid(snapshot)){
+    if(next.bls.status==='unavailable'&&snapshot.bls.status==='live')next.bls={...snapshot.bls,lastSuccessAt:snapshot.bls.lastSuccessAt??snapshot.checkedAt,lastCheckFailed:true};
+    if(next.dosm.status==='unavailable'&&snapshot.dosm.status==='live')next.dosm={...snapshot.dosm,lastSuccessAt:snapshot.dosm.lastSuccessAt??snapshot.checkedAt,lastCheckFailed:true};
+    if(next.onet.status==='unavailable'&&snapshot.onet.status==='live')next.onet={...snapshot.onet,lastSuccessAt:snapshot.onet.lastSuccessAt??snapshot.checkedAt,lastCheckFailed:true};
+    if(next.research.status==='unavailable'&&snapshot.research.status==='live')next.research={...snapshot.research,lastSuccessAt:snapshot.research.lastSuccessAt??snapshot.checkedAt,lastCheckFailed:true};
+   }}catch{ /* Existing browser evidence remains the next fallback. */ }
+  }
   const before=evidenceFingerprint(state.evidence);
   // Keep the last validated source values during partial outages. The status message still reports failure.
   const failed=(['bls','dosm','onet','research'] as const).filter(k=>next[k].status==='unavailable'||next[k].lastCheckFailed);
   if(state.evidence?.bls.status==='live'&&next.bls.status==='unavailable')next.bls=state.evidence.bls;
-  if(state.evidence?.bls.data&&next.bls.data&&next.bls.data.baseYear<state.evidence.bls.data.baseYear){next.bls=state.evidence.bls;if(!failed.includes('bls'))failed.push('bls');}
+  if(state.evidence?.bls.data&&next.bls.data&&(next.bls.data.baseYear<state.evidence.bls.data.baseYear||(next.bls.lastCheckFailed&&Date.parse(next.bls.lastSuccessAt??next.checkedAt)<Date.parse(state.evidence.bls.lastSuccessAt??state.evidence.checkedAt)))){next.bls=state.evidence.bls;if(!failed.includes('bls'))failed.push('bls');}
   if(state.evidence?.dosm.data&&next.dosm.data&&next.dosm.data.period<state.evidence.dosm.data.period){next.dosm=state.evidence.dosm;if(!failed.includes('dosm'))failed.push('dosm');}
   if(next.dosm.status==='unavailable'&&state.evidence?.dosm.status==='live')next.dosm=state.evidence.dosm;
   if(next.onet.status==='unavailable'&&state.evidence?.onet.status==='live')next.onet=state.evidence.onet;
