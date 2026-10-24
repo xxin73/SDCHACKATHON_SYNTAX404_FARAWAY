@@ -14,7 +14,9 @@ export function industryRoles(org:OrganizationData,department='all'):Career[]{
   const members=org.members.filter(m=>m.department===name);
   const skills=new Set([...(unit?.skills??[]),...members.flatMap(m=>Object.keys(m.skills))].map(key));
   const specific=[...skills].filter(s=>!common.has(s));
-  const streams=sectors.filter(([re])=>re.test(name)).flatMap(([,s])=>s);
+  const softwareUnit=/software|computer|computing|information technolog|information system|cyber|data science|\\bit\\b/i.test(name);
+  const chemicalUnit=/chemical|chemistry|petrochemical|biochemical/i.test(name);
+  const streams=softwareUnit?['cs']:chemicalUnit?['engineering']:sectors.filter(([re])=>re.test(name)).flatMap(([,s])=>s);
   const words=key(name).split(' ').filter(w=>w.length>=4&&!['department','programme','program','management','general','services','service'].includes(w));
   for(const role of CAREERS){
    const required=Object.keys(role.required).map(key);
@@ -27,7 +29,14 @@ export function industryRoles(org:OrganizationData,department='all'):Career[]{
    const hasSpecific=specific.length>0;
    const educationRole=/teacher|instructor|professor|postsecondary/i.test(role.title);
    const educationUnit=/educat|teach|training/i.test(name);
-   const eligible=explicit||((!educationRole||educationUnit)&&(hasSpecific?(overlap>=2&&(titleMatch||streamMatch||!streams.length)):(titleMatch||streamMatch)));
+   const domainMatch=softwareUnit
+    ? /software|computer|computing|programmer|web develop|web design|database|data scien|data analy|information secur|cyber|network|cloud|machine learning|artificial intelligence|systems analy|systems architect|devops/i.test(role.title)
+    : chemicalUnit
+    ? /chemical|chemist|chemistry|biochemical|petroleum|petrochemical|process engineer|materials engineer|environmental engineer|industrial engineer|production engineer|biofuel/i.test(role.title)
+    : titleMatch||streamMatch||!streams.length;
+   // Explicit benchmarks may be retained, but a shared generic engineering skill
+   // must not turn software programmes into mechanical/construction programmes.
+   const eligible=explicit||((!educationRole||educationUnit)&&domainMatch&&(hasSpecific?overlap>=Math.min(2,specific.length):(titleMatch||streamMatch)));
    if(eligible)scored.set(role.id,Math.max(scored.get(role.id)??0,(titleMatch?8:0)+(streamMatch?4:0)+(explicit?6:0)+overlap*3));
   }
  }
