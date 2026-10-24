@@ -1,11 +1,12 @@
 import { AccountAvatar } from './account-avatar';
-import { useEffect, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { Link, useLocation, useSearch } from 'wouter';
 import { motion } from 'framer-motion';
 import { Atom, BarChart3, Briefcase, Brain, LogOut, RotateCcw, Building2, LayoutGrid } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { resetJourney, useStore } from '@/lib/store';
 import { useAuth } from '@/lib/auth-context';
+import { useRecommendations } from '@/lib/recommendations';
 import { rankCareers } from '@/lib/match';
 import { cn } from '@/lib/utils';
 import { Aurora, LOGO, Magnetic, SpectrumIcon } from './spectrum';
@@ -21,6 +22,8 @@ export function initials(name: string) {
 export function Shell({ children }: { children: ReactNode }) {
   const [loc] = useLocation();
   const auth = useAuth();
+  const recommendations = useRecommendations();
+  const [resetError, setResetError] = useState('');
   const search = useSearch();
   useEffect(() => { window.scrollTo(0, 0); }, [loc, search]);
   const orgView = new URLSearchParams(search).get("view") || "overview";
@@ -110,7 +113,7 @@ export function Shell({ children }: { children: ReactNode }) {
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild><Link href="/profile">Profile & settings</Link></DropdownMenuItem>
                 <DropdownMenuItem asChild><Link href="/organization" data-testid="menu-organization"><Building2 className="mr-2 h-4 w-4" />Organization view</Link></DropdownMenuItem>
-                <DropdownMenuItem onClick={async () => { resetJourney(); try { await auth.flush(); } catch { /* The sync status displays the save error and retry action. */ } }} data-testid="menu-reset"><RotateCcw className="mr-2 h-4 w-4" />Restart journey</DropdownMenuItem>
+                <DropdownMenuItem onClick={async () => { setResetError(""); resetJourney(); try { await auth.flush(); await recommendations.clearJourneyHistory(); } catch (e) { setResetError(e instanceof Error ? e.message : String(e)); } }} data-testid="menu-reset"><RotateCcw className="mr-2 h-4 w-4" />Restart journey</DropdownMenuItem>
                 <DropdownMenuItem onClick={() => void auth.signOut()} data-testid="menu-signout"><LogOut className="mr-2 h-4 w-4" />Sign out</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu></div>
@@ -121,6 +124,7 @@ export function Shell({ children }: { children: ReactNode }) {
           className="app-main mx-auto max-w-[1280px] px-4 pb-28 pt-6 sm:px-8 md:px-12 md:pb-20">
           {auth.user && <div className="mb-4 text-sm" role="status" aria-live="polite">{auth.syncStatus.phase === 'saving' ? 'Saving your personal profile…' : auth.syncStatus.phase === 'save-error' ? <><span role="alert">{auth.syncStatus.error} Keep this tab open.</span> <button className="underline" onClick={() => void auth.retry()}>Retry save</button></> : 'Personal profile and skills saved to your account.'}</div>}
           {auth.error && <p className="mb-4 text-sm" role="alert">{auth.error}</p>}
+          {resetError && <p className="mb-4 rounded-xl bg-red-50 p-3 text-sm text-red-800" role="alert">{resetError}</p>}
           {children}
           <footer className="mt-12 border-t pt-5 text-xs text-muted-foreground">Faraway · Personal profiles and learning progress sync to your account. Organisation records are stored in this browser. Scenario figures and catalogue course estimates are illustrative; source links and learning resources are identified separately. <Link href="/evidence" className="underline">Review or update evidence</Link></footer>
         </motion.main>
