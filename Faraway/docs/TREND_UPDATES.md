@@ -7,8 +7,7 @@
 - Each source is independently validated. A partial outage preserves its previous validated values. Broken/empty tables do not become zero vacancies.
 
 ## Ranking and uncertainty
-Personal fit stays 70% current skill fit + 20% interest + 10% experience.
-Career ordering within related interests uses a separate opportunity score:
+Each career displays one match score, also used for ranking within related interests:
 60% scenario skill readiness + 20% interest + 10% experience + 10% BLS outlook.
 Market index = clamp(50 + 2 × BLS baseline employment percentage change, 0, 100).
 These weights and normalization are transparent product assumptions, not validated prediction coefficients.
@@ -37,7 +36,7 @@ asks for a review instead of claiming synchronized evidence history.
 ## Demo
 1. Open Analysis. Point to the published snapshot date, source links, periods and coverage.
 2. Expand a career's opportunity explanation and trace BLS base/future figures into the score.
-3. Switch moderate/rapid AI. Scenario readiness and opportunity score can change;
+3. Switch moderate/rapid AI. Scenario readiness and match score can change;
    measured BLS values stay unchanged. Some roles are insensitive to the scenario.
 4. Open Study Plan, choose the matching scenario, review changed gaps and generate only
    when ready. The GPU is used for generation, not evidence checks.

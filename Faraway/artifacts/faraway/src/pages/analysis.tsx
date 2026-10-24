@@ -1,5 +1,5 @@
 import {useTrendEvidence} from '@/lib/live-trends';
-import {OpportunityDetails} from '@/components/trend-updates';
+import {MatchScoreDetails} from '@/components/trend-updates';
 import { TrendPanels } from '@/components/trend-panels';
 import { useState } from 'react';
 import { Link, useLocation } from 'wouter';
@@ -36,14 +36,14 @@ export default function Analysis() {
   return (
     <div className="space-y-8">
       <PageTitle eyebrow="Skill analysis" title={<>Explore technical skills.<br /><span className="text-muted-foreground">Compare possible futures.</span></>} >
-        Explore careers linked to your interest, compare their required skills and review dated job observations when available. Careers are ordered by opportunity: scenario readiness, interest, experience and the available US employment outlook. Personal fit remains a separate score. AI scenarios are planning assumptions; unverified imported counts do not affect ranking.
+        Explore careers linked to your interest, compare their required skills and review dated job observations when available. Each career has one match score combining scenario skill readiness, interest, experience and the available US employment outlook. AI scenarios are planning assumptions; unverified imported counts do not affect ranking.
 
       </PageTitle>
 
       <TrendPanels careerId={target}/>
 
       <section>
-        <Reveal><div className="mb-6 flex flex-wrap items-end justify-between gap-3"><div><p className="eyebrow mb-2">Suggested for you</p><h2 className="font-display text-4xl">Careers that fit</h2></div><p className="text-xs text-muted-foreground">Related interests first · opportunity = 60% scenario readiness + 20% interest + 10% experience + 10% market outlook</p></div></Reveal>
+        <Reveal><div className="mb-6 flex flex-wrap items-end justify-between gap-3"><div><p className="eyebrow mb-2">Suggested for you</p><h2 className="font-display text-4xl">Careers that fit</h2></div><p className="text-xs text-muted-foreground">Related interests first · match = 60% scenario readiness + 20% interest + 10% experience + 10% market outlook</p></div></Reveal>
         {!has ? <NeedProfile text="Rate your skills to see matches." /> : (
           <>
             <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
@@ -82,12 +82,12 @@ function JobCard({ m, i, isTarget }: { m: MatchResult; i: number; isTarget: bool
             <motion.div animate={hot ? { scale: 1.12, rotate: -4 } : { scale: 1, rotate: 0 }} transition={{ type: 'spring', stiffness: 200, damping: 14 }}>
               <SpectrumIcon icon={Icon} size={56} still={!hot} />
             </motion.div>
-            <span className="absolute bottom-2 right-3 font-mono max-w-full px-2 text-[10px] text-muted-foreground">{m.career.marketStatus==='unavailable'?'Market observations not available':`Illustrative scenario index: ${m.career.demand.moderate}/100`}</span>
+            <span className="absolute bottom-2 right-3 font-mono max-w-full px-2 text-[10px] text-muted-foreground">Selected AI scenario</span>
           </Link>
           <p className="text-sm text-muted-foreground">{m.career.blurb}</p>
-          <div className="mt-4 flex items-center justify-between text-sm"><span>Personal fit</span><span className="font-mono font-medium" data-testid={`text-score-${m.career.id}`}>{m.score.toFixed(1)}</span></div>
+          <div className="mt-4 flex items-center justify-between text-sm"><span>Match score</span><span className="font-mono font-medium" data-testid={`text-score-${m.career.id}`}>{m.score.toFixed(1)}</span></div>
           <div className="mt-2 h-2 overflow-hidden rounded-full bg-[hsl(232_40%_95%)]"><motion.div className="spectrum-bar h-full rounded-full" initial={{ width: 0 }} whileInView={{ width: `${m.score}%` }} viewport={{ once: true }} transition={{ duration: 1.1, ease: [0.2, 0.8, 0.2, 1] }} /></div>
-          <div className="mt-4 flex items-center justify-between text-sm"><span>Opportunity ranking score</span><span className="font-mono">{m.opportunityScore.toFixed(1)}</span></div><OpportunityDetails career={m.career} score={m.opportunityScore} readiness={m.scenarioReadiness}/><div className="mt-4 flex flex-wrap gap-1.5">{m.career.sdgs.map((n) => <SdgPill key={n} n={n} small />)}</div>
+          <MatchScoreDetails career={m.career} readiness={m.skillFit}/><div className="mt-4 flex flex-wrap gap-1.5">{m.career.sdgs.map((n) => <SdgPill key={n} n={n} small />)}</div>
           <div className="flex-1" />
           <button onClick={set} className="btn-ink mt-6 w-full" data-testid={`button-set-target-${m.career.id}`}>Set career target<ArrowRight className="h-4 w-4" /></button>
         </div>

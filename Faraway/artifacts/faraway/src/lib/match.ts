@@ -1,18 +1,14 @@
 import {opportunity} from './live-trends';
 import {skillRating} from '../../../../supabase/functions/faraway-recommendations/skill-policy';
 import {relevantRole} from '../../../../supabase/functions/faraway-recommendations/pathways';
-import { courseMatches, preferences } from '../../../../supabase/functions/faraway-recommendations/core';
+import { courseMatches, preferences, scenarioRequirements } from '../../../../supabase/functions/faraway-recommendations/core';
 import { CAREERS, careerById, careerInScenario, type Career, type Scenario } from '@/data/careers';
 import { COURSES, type Course } from '@/data/courses';
 import type { Plan, Profile } from './store';
-import { demandFromEvidence } from './evidence';
-import { hasDatabaseCatalogue } from './catalogue-status';
 
 export interface MatchResult {
   career: Career;
   score: number;
-  opportunityScore: number;
-  scenarioReadiness: number;
   skillFit: number;
   interestFit: number;
   experienceFit: number;
@@ -21,24 +17,23 @@ export interface MatchResult {
 }
 
 export function computeMatch(c: Career, p: Profile, scenario: Scenario, skillsOverride?: Record<string, number>): MatchResult {
-  c = careerInScenario(c, hasDatabaseCatalogue() ? 'moderate' : scenario)!;
+  c = careerInScenario(c, scenario)!;
   const skills = skillsOverride ?? p.skills;
-  const entries = Object.entries(c.required);
+  const entries = Object.entries(scenarioRequirements(c.required,scenario,c.futureSkills));
   const skillFit = entries.reduce((a, [k, need]) => a + Math.min((skillRating(skills,k) ?? 0) / need, 1), 0) / entries.length;
   const interestFit = p.careers.includes(c.id) ? 1 : relevantRole(c,p) ? 0.8 : 0.1;
   const experienceFit = Math.min((p.years + 0.5) / (c.minYears + 0.5), 1);
-  const marketFit = (hasDatabaseCatalogue() ? c.demand.moderate : demandFromEvidence(c.id, c.demand[scenario])) / 100;
-  const score = 100 * (0.7 * skillFit + 0.2 * interestFit + 0.1 * experienceFit);
+
   const gaps = entries
     .map(([skill, need]) => ({ skill, have: skillRating(skills,skill) ?? 0, need }))
     .filter((g) => g.have < g.need)
     .sort((a, b) => b.need - b.have - (a.need - a.have));
   const outlook=opportunity(c,skills,interestFit,experienceFit,scenario);
-  return { opportunityScore:outlook.score,scenarioReadiness:outlook.readiness,career: c, score: Math.round(score * 10) / 10, skillFit, interestFit, experienceFit, marketFit, gaps };
+  return { career:c,score:outlook.score,skillFit:outlook.readiness,interestFit,experienceFit,marketFit:(outlook.market?.index??0)/100,gaps };
 }
 
 export function rankCareers(p: Profile, scenario: Scenario) {
-  return CAREERS.map((c) => computeMatch(c, p, scenario)).sort((a, b) => Number(relevantRole(b.career,p))-Number(relevantRole(a.career,p)) || b.opportunityScore - a.opportunityScore || b.score - a.score || a.career.id.localeCompare(b.career.id));
+  return CAREERS.map((c) => computeMatch(c, p, scenario)).sort((a, b) => Number(relevantRole(b.career,p))-Number(relevantRole(a.career,p)) || b.score - a.score || a.career.id.localeCompare(b.career.id));
 }
 
 export function suggested(p: Profile, scenario: Scenario, more: boolean) {

@@ -1,5 +1,5 @@
 import {useTrendEvidence} from '@/lib/live-trends';
-import {OpportunityDetails} from '@/components/trend-updates';
+import {MatchScoreDetails} from '@/components/trend-updates';
 import {jobRadarAxes} from '@/lib/radar-model';
 import {skillRating,skillKey} from '../../../../supabase/functions/faraway-recommendations/skill-policy';
 import {PathwayEvidence} from '@/components/pathway-evidence';
@@ -90,7 +90,7 @@ export default function JobDetail() {
         </div>
       </Reveal>
 
-      <p className="text-sm">Personal fit: {preview.score.toFixed(1)}/100 · Opportunity score under the {scenario==='fast'?'rapid':'moderate'} AI scenario: {preview.opportunityScore.toFixed(1)}/100</p><OpportunityDetails career={career} score={preview.opportunityScore} readiness={preview.scenarioReadiness}/>
+      <p className="text-sm">Match score uses the {scenario==='fast'?'rapid':'moderate'} AI development scenario.</p><MatchScoreDetails career={career} readiness={preview.skillFit}/>
       {/* three column: job SDG | radar | skill SDG */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[260px_1fr_260px]">
         <Reveal><Card className="h-full" testId="panel-job-sdg">
