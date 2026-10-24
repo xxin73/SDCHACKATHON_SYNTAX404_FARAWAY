@@ -15,7 +15,7 @@ Faraway brings individual learners, HR teams, and universities/TVET institutions
 | --- | --- |
 | **Team Name** | Syntax 404 |
 | **Team Domain** | **Domain 1: The Aiversecurity Future-ready Workforce Domain** |
-| **SDG Track (1–17)** | **TO CONFIRM — official registered SDG track**. Project contributions include SDG 4 (Quality Education), SDG 8 (Decent Work and Economic Growth), and SDG 9 (Industry, Innovation and Infrastructure). |
+| **SDG Track (1–17)** | SDG 8 – Decent Work and Economic Growth  |
 | **Team Leader** | Low Xin Hui |
 | **University** | Xiamen University Malaysia (XMUM) |
 | **Number of Members** | 4 |
@@ -25,13 +25,11 @@ Faraway brings individual learners, HR teams, and universities/TVET institutions
 | Resource | Link |
 | --- | --- |
 | **GitHub Repository** | [xxin73/faraway-practice](https://github.com/xxin73/faraway-practice) |
-| **Replit Project** | **TO COMPLETE — shareable Replit project URL** |
 | **Live Demo** | [Open Faraway](https://faraway-practice-faraway.vercel.app) |
 | **RunPod Endpoint** | **TO COMPLETE — verified endpoint URL, without an API key** |
 | **Slide Deck** | **TO COMPLETE — viewable pitching slide deck URL** |
 | **Pitching / Demo Video** | **TO COMPLETE — viewable pitching video URL** |
 
-**Before submission:** replace every **TO COMPLETE / TO CONFIRM** entry and check that judges can access the repository, project, slides, and video using the required sharing permissions. Do not include API keys, passwords, or access tokens. The RunPod endpoint requires authorised server-side access; use the live demo to test the integrated AI flow.
 
 ## Overview
 
