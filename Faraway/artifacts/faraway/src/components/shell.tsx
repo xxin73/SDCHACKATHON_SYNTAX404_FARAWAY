@@ -74,14 +74,14 @@ export function Shell({ children }: { children: ReactNode }) {
       <Aurora />
       {/* Left icon rail */}
       <nav aria-label={translateUi("Primary")} className="fixed inset-y-0 left-0 z-40 hidden w-[76px] flex-col items-center border-r bg-white/80 pt-5 backdrop-blur-xl md:flex">
-        <Link href={isOrg ? "/organization" : "/"} className="hidden md:mb-[8vh] md:block" data-testid="link-home-logo" aria-label={translateUi("Faraway home")}>
+        <Link href={isOrg ? "/organization" : "/"} className="hidden md:mb-8 md:block" data-testid="link-home-logo" aria-label={translateUi("Faraway home")}>
           <motion.img src={LOGO} alt="Faraway" className="h-11 w-11 object-contain drop-shadow-[0_2px_6px_rgba(200,150,0,.25)]" whileHover={{ rotate: 25 }} transition={{ type: 'spring', stiffness: 200 }} />
         </Link>
         <Link href={isOrg ? "/organization" : "/"} className="md:hidden" data-testid="link-home-mobile" aria-label={translateUi("Dashboard")}><div className={cn('grid h-11 w-11 place-items-center rounded-2xl', loc === '/' && 'bg-white shadow-md')}><SpectrumIcon icon={LayoutGrid} size={20} still={loc !== '/'} /></div></Link>
         {items.map((it, i) => {
           const active = it.match(loc);
           return (
-            <Magnetic key={it.label} strength={0.35} className={cn(i === 2 && 'md:mt-[10vh]', i === 1 && 'md:mt-[8vh]', i === 3 && 'md:mt-[6vh]')}>
+            <Magnetic key={it.label} strength={0.35} className="mb-5 shrink-0">
               <Link href={it.href} data-testid={`nav-${it.label.toLowerCase().replace(/\W+/g, '-')}`} aria-label={translateUi(it.label)} className="group relative block">
                 <div className={cn('relative grid h-12 w-12 place-items-center rounded-2xl transition-all duration-300', active ? 'bg-white shadow-[0_10px_30px_-12px_hsl(250_60%_40%/.45)]' : 'hover:bg-white hover:shadow-md')}>
                   {active && <motion.span layoutId="rail-active" className="spectrum-border absolute inset-0 rounded-2xl" />}
