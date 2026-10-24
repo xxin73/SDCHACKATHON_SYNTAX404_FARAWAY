@@ -1,6 +1,5 @@
 import {t as localeLabel,ui as localeText} from '@/lib/i18n';
 import {t as translateUi,useLanguage} from '@/lib/i18n';
-import {TrendUpdates} from './trend-updates';
 import {useTrendEvidence} from '@/lib/live-trends';
 import {useStore as useGlobalStore,setState} from '@/lib/store';
 import {useState} from 'react';
@@ -56,7 +55,6 @@ export function TrendPanels({careerId,departmentSkills,rolesOverride,organizatio
  const maxSkillFuture=5;
  const SkillBars=({data,max,labels}:{data:Pair[];max:number;labels:[string,string]})=><div className="space-y-3">{data.map(d=><div key={d.label} className="grid gap-2 sm:grid-cols-[130px_1fr]"><span className="text-xs">{localeText(d.label)}</span><div className="space-y-1">{[d.first,d.second].map((n,i)=><div key={i} className="flex items-center gap-2 text-[10px]"><span className="w-20 shrink-0 text-muted-foreground">{localeText(labels[i])}</span><div className="h-2 flex-1 rounded bg-slate-100"><div className={'h-full rounded '+(i?'bg-amber-400':'bg-teal-500')} style={{width:`${Math.max(0,Math.min(100,(n??0)/max*100))}%`}}/></div><span className="w-8 text-right">{localeText(n===null?'N/A':n.toFixed(1))}</span></div>)}</div></div>)}</div>;
  return <div className="min-w-0 space-y-6">
-  <TrendUpdates/>
   <Card><CardTitle title={translateUi("Skill trends")} right={<><label className="sr-only" htmlFor="skill-trend-career">{translateUi("Career")}</label><select id="skill-trend-career" className="field max-w-[220px]" value={role.id} onChange={e=>setSkillRole(e.target.value)}>{related.map(r=><option key={r.id} value={r.id}>{localeText(r.title)}</option>)}</select><Scenario value={scenario} onChange={setScenario}/></>}/>
    <div className="grid gap-6 lg:grid-cols-2">
     <section><h3 className="mb-3 text-sm font-medium">{translateUi("O*NET skill importance · previous vs current")}</h3>{skillHistory.length?<SkillBars data={skillHistory} max={maxSkillHistory} labels={['Previous','Current']}/>:<p className="text-sm text-muted-foreground">{translateUi("No mapped O*NET skill history for this career.")}</p>}<p className="mt-3 text-[11px] text-muted-foreground">{translateUi("Importance ratings describe occupational requirements, not hiring demand.")}</p><OnetSource previous/></section>
