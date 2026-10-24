@@ -24,7 +24,7 @@ Faraway brings individual learners, HR teams, and universities/TVET institutions
 
 | Resource | Link |
 | --- | --- |
-| **GitHub Repository** | [xxin73/SDCHACKATHON_SYNTAX404_FARAWAY]([https://github.com/xxin73/SDCHACKATHON_SYNTAX404_FARWAY.git]) |
+| **GitHub Repository** | [xxin73/SDCHACKATHON_SYNTAX404_FARAWAY](https://github.com/xxin73/SDCHACKATHON_SYNTAX404_FARWAY.git) |
 | **Live Demo** | [Open Faraway](https://faraway-practice-faraway.vercel.app) |
 | **RunPod Endpoint** | **TO COMPLETE — verified endpoint URL, without an API key** |
 | **Slide Deck** | **TO COMPLETE — viewable pitching slide deck URL** |
