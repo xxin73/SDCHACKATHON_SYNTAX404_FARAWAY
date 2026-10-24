@@ -90,7 +90,7 @@ export default function JobDetail() {
         </div>
       </Reveal>
 
-      <p className="text-sm">Match score uses the {scenario==='fast'?'rapid':'moderate'} AI development scenario.</p><MatchScoreDetails career={career} readiness={preview.skillFit}/>
+      <div className="flex flex-wrap items-center gap-3" data-testid="job-match-scenario-control"><span className="text-sm font-medium">Match score scenario</span><ScenarioToggle id="job-match-scenario" compact/><p className="text-xs text-muted-foreground">Changes your match score and skill gaps immediately.</p></div><MatchScoreDetails career={career} readiness={preview.skillFit}/>
       {/* three column: job SDG | radar | skill SDG */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[260px_1fr_260px]">
         <Reveal><Card className="h-full" testId="panel-job-sdg">
