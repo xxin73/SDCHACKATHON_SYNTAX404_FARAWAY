@@ -6,8 +6,11 @@ import { motion } from 'framer-motion';
 import { ArrowRight, Mail, User, Building2, Sparkles, Compass } from 'lucide-react';
 import { useAuth } from '@/lib/auth-context';
 import { useStore } from '@/lib/store';
-import { Aurora, LOGO, Magnetic, ParticleField, SpectrumIcon, Tilt } from '@/components/spectrum';
+import { Aurora, LOGO, Magnetic, SpectrumIcon, Tilt } from '@/components/spectrum';
 import { cn } from '@/lib/utils';
+import { FloatingLoginVisual } from '@/components/floating-login-visual';
+import { SdcMission } from '@/components/sdc-mission';
+import { LandingSections } from '@/components/landing-sections';
 
 
 export function Login() {
@@ -39,7 +42,7 @@ export function Login() {
 
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1, duration: 0.9 }} className="mt-[8vh]">
             <p className="eyebrow mb-4">{translateUi("Career & education compass · Malaysia")}</p>
-            <h1 className="font-display text-5xl leading-[0.98] sm:text-6xl xl:text-7xl">{translateUi("Where")}{localeText(' ')}<em className="spectrum-text">{translateUi("Possibilities")}</em><br />{translateUi("Take You.")}</h1>
+            <h1 className="font-display text-5xl leading-[0.98] sm:text-6xl xl:text-7xl">{translateUi("Where")}{localeText(' ')}<em className="spectrum-text">{translateUi("possibilities")}</em><br />{translateUi("take you.")}</h1>
             <p className="mt-6 max-w-md text-muted-foreground">{translateUi("Explore your skills, compare possible AI futures, and turn a career goal into a practical learning plan.")}</p>
           </motion.div>
 
@@ -59,22 +62,12 @@ export function Login() {
           </motion.div>
         </div>
 
-        <motion.div initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.15, duration: 1 }} className="hidden lg:block">
-          <Tilt className="h-full" max={4}>
-            <div className="glass spectrum-border relative h-full min-h-[560px] overflow-hidden rounded-[2.5rem]">
-              <div className="absolute inset-0 opacity-70"><ParticleField height={900} converge /></div>
-              <div className="absolute inset-0 grid place-items-center">
-                <motion.img src={LOGO} alt="" className="w-[42%] max-w-[260px] object-contain drop-shadow-[0_20px_40px_rgba(200,150,0,.25)]" animate={{ y: [0, -8, 0] }} transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }} />
-              </div>
-              <div className="absolute inset-x-6 bottom-6 grid grid-cols-3 gap-3">
-                {[['12', 'career paths modelled'], ['2', 'AI adoption scenarios'], ['8', 'UN SDGs mapped']].map(([n, l]) => (
-                  <div key={l} className="glass rounded-2xl p-4"><p className="font-display text-3xl">{localeText(n)}</p><p className="text-xs text-muted-foreground">{translateUi(l)}</p></div>
-                ))}
-              </div>
-            </div>
-          </Tilt>
-        </motion.div>
+        <div className="hidden lg:block">
+          <FloatingLoginVisual />
+        </div>
       </div>
+      <LandingSections />
+      <SdcMission />
     </div>
   );
 }

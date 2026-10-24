@@ -1,3 +1,4 @@
+import {AiScenarioControl} from './ai-scenario-control';
 import {t as localeLabel,ui as localeText} from '@/lib/i18n';
 import {t as translateUi,useLanguage} from '@/lib/i18n';
 import {targetForContext} from '../../../../supabase/functions/faraway-recommendations/sdg-targets';
@@ -55,22 +56,9 @@ export function Counter({ to, decimals = 0, suffix = '' }: { to: number; decimal
   return <span ref={ref}>{localeText(v.toFixed(decimals))}{localeText(suffix)}</span>;
 }
 
-export function ScenarioToggle({ id = 'scn', compact }: { id?: string; compact?: boolean }) {
-  useLanguage();
-  const scenario = useStore((s) => s.scenario);
-  const set = (v: Scenario) => setState((s) => ({ ...s, scenario: v, plan: s.plan }));
-  return (
-    <div role="radiogroup" aria-label={translateUi("AI adoption scenario")} className="inline-flex rounded-full border bg-white/80 p-1 shadow-sm backdrop-blur">
-      {(['moderate', 'fast'] as Scenario[]).map((v) => (
-        <button key={v} role="radio" aria-checked={scenario === v} onClick={() => set(v)} data-testid={`toggle-scenario-${v}`}
-          className={cn('relative rounded-full font-medium transition-colors', compact ? 'px-3 py-1 text-xs' : 'px-4 py-1.5 text-sm', scenario === v ? 'text-white' : 'text-muted-foreground hover:text-foreground')}>
-          {scenario === v && <motion.span layoutId={id} className="absolute inset-0 rounded-full bg-ink" transition={{ type: 'spring', stiffness: 400, damping: 32 }} />}
-          {scenario === v && <motion.span layoutId={id + '-line'} className="spectrum-bar absolute inset-x-3 -bottom-px h-[2px] rounded-full" />}
-          <span className="relative">{localeText(v === 'fast' ? translateUi("Fast AI development") : translateUi("Moderate AI development"))}</span>
-        </button>
-      ))}
-    </div>
-  );
+export function ScenarioToggle({ compact }: { id?: string; compact?: boolean }) {
+ const scenario=useStore(s=>s.scenario);
+ return <AiScenarioControl value={scenario} compact={compact} onChange={scenario=>setState(s=>({...s,scenario}))}/>;
 }
 
 export function SdgPill({ n, small, onHover, active }: { n: number; small?: boolean; onHover?: (n: number | null) => void; active?: boolean }) {

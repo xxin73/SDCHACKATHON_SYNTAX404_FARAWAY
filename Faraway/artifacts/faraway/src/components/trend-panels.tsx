@@ -1,3 +1,4 @@
+import {AiScenarioControl} from './ai-scenario-control';
 import {t as localeLabel,ui as localeText} from '@/lib/i18n';
 import {t as translateUi,useLanguage} from '@/lib/i18n';
 import {useTrendEvidence} from '@/lib/live-trends';
@@ -22,15 +23,14 @@ export function percentageChange(first:number|null,second:number|null):number|nu
 }
 function TrendChange({first,second,labels,levels=false}:{first:number|null;second:number|null;labels:[string,string];levels?:boolean}){
  useLanguage();const change=percentageChange(first,second);const rounded=change===null?null:Math.round(change*10)/10;
- const text=rounded===null?'N/A':(rounded>0?'+':'')+rounded.toFixed(1).replace(/\\.0$/,'')+'%';
+ const text=rounded===null?'N/A':(rounded>0?'+':'')+rounded.toFixed(1).replace(/\.0$/,'')+'%';
  const difference=first!==null&&second!==null?Math.round((second-first)*10)/10:null;
  return <span className={'inline-flex flex-wrap items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-semibold '+(rounded===null||rounded===0?'border-slate-200 bg-slate-50 text-slate-600':rounded>0?'border-teal-200 bg-teal-50 text-teal-800':'border-amber-200 bg-amber-50 text-amber-800')} title={localeLabel(labels[0])+' → '+localeLabel(labels[1])} aria-label={localeLabel(labels[0])+' → '+localeLabel(labels[1])+': '+text}>
  {rounded!==null&&rounded!==0&&<span aria-hidden="true">{rounded>0?'↗':'↘'}</span>}{text}{levels&&difference!==null&&<span className="font-normal">({difference>0?'+':''}{difference}/5)</span>}
  </span>;
 }
 
-function Scenario({value,onChange}:{value:Scenario;onChange:(s:Scenario)=>void}){
-  useLanguage();return <div className="flex gap-1 rounded-full border p-1 text-xs">{(['moderate','fast'] as const).map(s=><button key={s} aria-pressed={s===value} className={'rounded-full px-3 py-1 '+(s===value?'bg-ink text-white':'')} onClick={()=>onChange(s)}>{localeText(s==='fast'?translateUi("Rapid AI"):translateUi("Moderate AI"))}</button>)}</div>;}
+function Scenario({value,onChange}:{value:Scenario;onChange:(s:Scenario)=>void}){return <AiScenarioControl value={value} onChange={onChange}/>;}
 const DOSM_CAREER_GROUPS:Record<string,string>={
  'hotel-manager':'Managers','construction-manager':'Managers','community-service-manager':'Managers','business-owner':'Managers','public-service-manager':'Managers','product-manager':'Managers',
  'agricultural-scientist':'Professionals','lawyer':'Professionals','legal-researcher':'Professionals','policy-analyst':'Professionals','nurse':'Professionals','health-educator':'Professionals','industrial-engineer':'Professionals','mechanical-engineer':'Professionals','teacher':'Professionals','instructional-designer':'Professionals','biologist':'Professionals','research-scientist':'Professionals','environmental-scientist':'Professionals','food-scientist':'Professionals','logistician':'Professionals','civil-engineer':'Professionals','social-worker':'Professionals','journalist':'Professionals','public-relations-specialist':'Professionals','data-analyst':'Professionals','software-engineer':'Professionals','ml-engineer':'Professionals','cloud-engineer':'Professionals','cyber-analyst':'Professionals','risk-analyst':'Professionals','accountant':'Professionals','business-analyst':'Professionals','digital-marketer':'Professionals','hr-specialist':'Professionals','ux-designer':'Professionals'
@@ -87,4 +87,5 @@ export function TrendPanels({careerId,departmentSkills,rolesOverride,organizatio
   </div>
  </div>;
 }
+
 

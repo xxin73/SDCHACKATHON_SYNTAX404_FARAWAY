@@ -2210,5 +2210,17 @@
   "New cohort / class": {
     "zh": "新年级 / 班级",
     "ms": "Kohort / kelas baharu"
+  },
+  "Faster AI adoption: future skills rise by up to 2 levels.": {
+    "zh": "AI 普及更快：未来技能目标最多提高 2 级。",
+    "ms": "Penerapan AI lebih pantas: sasaran kemahiran masa depan meningkat sehingga 2 tahap."
+  },
+  "Gradual AI adoption: future skills rise by up to 1 level.": {
+    "zh": "AI 逐步普及：未来技能目标最多提高 1 级。",
+    "ms": "Penerapan AI beransur-ansur: sasaran kemahiran masa depan meningkat sehingga 1 tahap."
+  },
+  "Planning assumptions, not forecasts.": {
+    "zh": "仅为规划假设，并非预测。",
+    "ms": "Andaian perancangan, bukan ramalan."
   }
 }

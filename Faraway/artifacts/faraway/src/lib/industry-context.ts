@@ -14,7 +14,7 @@ export function industryRoles(org:OrganizationData,department='all'):Career[]{
   const members=org.members.filter(m=>m.department===name);
   const skills=new Set([...(unit?.skills??[]),...members.flatMap(m=>Object.keys(m.skills))].map(key));
   const specific=[...skills].filter(s=>!common.has(s));
-  const softwareUnit=/software|computer|computing|information technolog|information system|cyber|data science|\\bit\\b/i.test(name);
+  const softwareUnit=/software|computer|computing|information technolog|information system|cyber|data science|\bit\b/i.test(name);
   const chemicalUnit=/chemical|chemistry|petrochemical|biochemical/i.test(name);
   const streams=softwareUnit?['cs']:chemicalUnit?['engineering']:sectors.filter(([re])=>re.test(name)).flatMap(([,s])=>s);
   const words=key(name).split(' ').filter(w=>w.length>=4&&!['department','programme','program','management','general','services','service'].includes(w));
@@ -48,3 +48,4 @@ export function industryRoles(org:OrganizationData,department='all'):Career[]{
  return CAREERS.filter(c=>scored.has(c.id)).sort((a,b)=>(scored.get(b.id)??0)-(scored.get(a.id)??0));
 }
 export function departmentSuggestions(name:string,org:OrganizationData){const roles=industryRoles({...org,departmentSetup:[{name,teams:[],skills:[]} ]},name);return [...new Set(roles.slice(0,3).flatMap(c=>Object.keys(c.required)))].slice(0,8);}
+
