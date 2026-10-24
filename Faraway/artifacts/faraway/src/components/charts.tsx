@@ -1,3 +1,4 @@
+import {t as localeLabel,ui as localeText,useLanguage as useUiLanguage} from '@/lib/i18n';
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { RotateCw } from 'lucide-react';
@@ -9,6 +10,7 @@ export const hueAt = (i: number) => HUES[i % HUES.length];
 
 /** Horizontal diverging bars for skill trends. */
 export function HBars({ data, field, testId }: { data: SkillTrend[]; field: 'now' | Scenario; testId?: string }) {
+ useUiLanguage();
   const max = Math.max(...data.map((d) => Math.abs(d[field])), 1);
   return (
     <div className="space-y-2.5" data-testid={testId}>
@@ -16,14 +18,14 @@ export function HBars({ data, field, testId }: { data: SkillTrend[]; field: 'now
         const v = d[field]; const w = (Math.abs(v) / max) * 50;
         return (
           <div key={d.skill} className="grid grid-cols-[120px_1fr_44px] items-center gap-3 text-sm sm:grid-cols-[150px_1fr_52px]">
-            <span className="truncate text-foreground/80">{d.skill}</span>
+            <span className="truncate text-foreground/80">{localeText(d.skill)}</span>
             <div className="relative h-2.5 rounded-full bg-[hsl(232_40%_96%)]">
               <span className="absolute left-1/2 top-[-3px] h-[16px] w-px bg-[hsl(232_30%_85%)]" />
               <motion.div className="absolute top-0 h-full rounded-full" initial={{ width: 0 }} whileInView={{ width: `${w}%` }} viewport={{ once: true }} animate={{ width: `${w}%` }}
                 transition={{ duration: 0.9, delay: i * 0.04, ease: [0.2, 0.8, 0.2, 1] }}
                 style={v >= 0 ? { left: '50%', background: `linear-gradient(90deg, ${hueAt(i)}, #b48cff)` } : { right: '50%', background: 'linear-gradient(270deg, #ffb3a1, #ff7f9f)' }} />
             </div>
-            <span className={cn('text-right font-mono text-xs', v >= 0 ? 'text-[hsl(250_50%_50%)]' : 'text-[hsl(350_60%_52%)]')}>{v > 0 ? '+' : ''}{v}%</span>
+            <span className={cn('text-right font-mono text-xs', v >= 0 ? 'text-[hsl(250_50%_50%)]' : 'text-[hsl(350_60%_52%)]')}>{localeText(v > 0 ? '+' : '')}{localeText(v)}%</span>
           </div>
         );
       })}
@@ -35,6 +37,7 @@ export function HBars({ data, field, testId }: { data: SkillTrend[]; field: 'now
 export function VBars({ data, value, reflect, height = 180, highlight, testId, max: maxIn }: {
   data: JobTrend[]; value: (d: JobTrend) => number; reflect?: boolean; height?: number; highlight?: string; testId?: string; max?: number;
 }) {
+ useUiLanguage();
   const [hover, setHover] = useState<number | null>(null);
   const max = maxIn ?? Math.max(...data.map(value), 1);
   return (
@@ -44,7 +47,7 @@ export function VBars({ data, value, reflect, height = 180, highlight, testId, m
           const v = value(d); const h = (v / max) * 100; const hot = hover === i || highlight === d.role;
           return (
             <div key={d.role} className="relative flex h-full flex-1 flex-col justify-end" onMouseEnter={() => setHover(i)} onMouseLeave={() => setHover(null)}>
-              <motion.span className="mb-1 text-center font-mono text-[10.5px] text-muted-foreground" animate={{ opacity: hot ? 1 : 0.7 }}>{v}</motion.span>
+              <motion.span className="mb-1 text-center font-mono text-[10.5px] text-muted-foreground" animate={{ opacity: hot ? 1 : 0.7 }}>{localeText(v)}</motion.span>
               <motion.div className="relative w-full origin-bottom rounded-t-xl" initial={{ scaleY: 0 }} whileInView={{ scaleY: 1 }} viewport={{ once: true }}
                 animate={{ height: `${h}%` }} transition={{ duration: 0.9, delay: i * 0.05, ease: [0.2, 0.8, 0.2, 1] }}
                 style={{ background: `linear-gradient(180deg, ${hueAt(i)}, ${hueAt(i)}55)`, boxShadow: hot ? `0 12px 30px -10px ${hueAt(i)}` : undefined }}>
@@ -63,7 +66,7 @@ export function VBars({ data, value, reflect, height = 180, highlight, testId, m
         </div>
       )}
       <div className="mt-2 flex gap-2 sm:gap-4">
-        {data.map((d) => <span key={d.role} className="flex-1 text-center text-[10.5px] leading-tight text-muted-foreground">{d.role}</span>)}
+        {data.map((d) => <span key={d.role} className="flex-1 text-center text-[10.5px] leading-tight text-muted-foreground">{localeText(d.role)}</span>)}
       </div>
     </div>
   );
@@ -71,6 +74,7 @@ export function VBars({ data, value, reflect, height = 180, highlight, testId, m
 
 /** A card that flips in 3D on click. axis 'y' = left/right, 'x' = up/down. */
 export function FlipCard({ front, back, axis = 'y', className, testId, hint }: { front: React.ReactNode; back: React.ReactNode; axis?: 'x' | 'y'; className?: string; testId?: string; hint?: [string, string] }) {
+ useUiLanguage();
   const [flipped, setFlipped] = useState(false);
   const rot = axis === 'y' ? { rotateY: flipped ? 180 : 0 } : { rotateX: flipped ? 180 : 0 };
   return (
@@ -79,11 +83,11 @@ export function FlipCard({ front, back, axis = 'y', className, testId, hint }: {
         onClick={() => setFlipped((f) => !f)} role="button" tabIndex={0} aria-pressed={flipped} data-testid={testId}
         onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setFlipped((f) => !f); } }}>
         <div className="glass backface-hidden col-start-1 row-start-1 rounded-[1.75rem] p-6">
-          {front}
+          {localeText(front)}
           <FlipHint label={hint?.[0] ?? 'Click to flip to future scenarios'} />
         </div>
         <div className="spectrum-border glass backface-hidden col-start-1 row-start-1 rounded-[1.75rem] p-6" style={{ transform: axis === 'y' ? 'rotateY(180deg)' : 'rotateX(180deg)' }}>
-          {back}
+          {localeText(back)}
           <FlipHint label={hint?.[1] ?? 'Click to flip back to today'} />
         </div>
       </motion.div>
@@ -92,5 +96,6 @@ export function FlipCard({ front, back, axis = 'y', className, testId, hint }: {
 }
 
 function FlipHint({ label }: { label: string }) {
-  return <p className="mt-5 flex items-center justify-end gap-1.5 text-[11px] text-muted-foreground"><RotateCw className="h-3 w-3" />{label}</p>;
+ useUiLanguage();
+  return <p className="mt-5 flex items-center justify-end gap-1.5 text-[11px] text-muted-foreground"><RotateCw className="h-3 w-3" />{localeText(label)}</p>;
 }

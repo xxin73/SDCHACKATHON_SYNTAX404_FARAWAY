@@ -12,7 +12,7 @@ export type Match = { careerId: string; score: number; gaps: { skill: string; ha
 export type Module = { courseId: string; courseVersion: string; title: string; provider: string; skills: string[]; hours: number; cost: number; weeks: number; why: string; activities: { id: string; title: string; hours: number }[] };
 export type PlanResult = { resourceQuotes?:Record<string,ResourceQuote>;resourceCost?:number; overview: string; modules: Module[]; missing: string[]; totalHours: number; totalCost: number; totalWeeks: number };
 export type Explanation = { careerId: string; fitSummary: string; actions: string[]; trendSummary?:string; sourceIds?:string[]; projection?:{moderate:number;fast:number} };
-export type Generated = { kind: 'explain' | 'plan'; rankings: Match[]; explanations?: Explanation[]; plan?: PlanResult; careerId?: string; meta: { catalogueVersion: string; cataloguePublishedAt: string; evidenceObservedAt: string | null; evidenceStatus: string; profileHash: string; preferencesHash: string; generatedAt: string; model: string; promptVersion: string; calculationVersion: string; pathwayVersion?:string; scenario?:'moderate'|'fast'; chartEvidenceHash?:string; trendContext?:unknown } };
+export type Generated = { kind: 'explain' | 'plan'; rankings: Match[]; explanations?: Explanation[]; plan?: PlanResult; careerId?: string; meta: { language?:'en'|'zh'|'ms'; catalogueVersion: string; cataloguePublishedAt: string; evidenceObservedAt: string | null; evidenceStatus: string; profileHash: string; preferencesHash: string; generatedAt: string; model: string; promptVersion: string; calculationVersion: string; pathwayVersion?:string; scenario?:'moderate'|'fast'; chartEvidenceHash?:string; trendContext?:unknown } };
 export const PROMPT_VERSION = 'hard-skills-impact-v7';
 export const CALCULATION_VERSION = 'hard-skills-fit-v3';
 
@@ -137,3 +137,4 @@ export function progressFor(plan: PlanResult, completed: Set<string>) {
   const doneHours = Math.round(plan.modules.reduce((n,m)=>n+m.activities.filter(a=>completed.has(completionKey(m.courseId,m.courseVersion,a.id))).reduce((h,a)=>h+a.hours,0),0)*100)/100;
   return {doneHours,totalHours:plan.totalHours,percent:plan.totalHours?Math.min(100,Math.round(doneHours/plan.totalHours*100)):0};
 }
+

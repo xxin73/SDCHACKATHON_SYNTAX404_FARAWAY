@@ -1,3 +1,4 @@
+import {useLanguage} from './i18n';
 import {loadObservations} from './market-data';
 import {observationsForRole} from '../../../../supabase/functions/faraway-recommendations/trends';
 import {PATHWAY_VERSION} from '../../../../supabase/functions/faraway-recommendations/pathways';
@@ -21,17 +22,18 @@ function studyPlan(run:Run):SavedStudyPlan|undefined {
   return {runId:run.id,meta:run.result.meta,overview:plan.overview,totalWeeks:plan.totalWeeks,modules:plan.modules.map(m=>({skill:m.skills.join(', '),weeks:m.weeks,why:m.why,resource:m.title+' · '+m.provider+(m.provider==='Faraway self-study'?' · authored practice; estimated hours':' · illustrative catalogue'),steps:m.activities.map(a=>({title:a.title,hours:a.hours}))}))};
 }
 function useRemote(kind:'explain'|'plan',careerId?:string) {
+  const language=useLanguage();
   const context=useRecommendations(); const scenario=useStore(s=>s.scenario); const profile=useStore(s=>s.profile),plan=useStore(s=>s.plan),session=useStore(s=>s.session);
   const [run,setRun]=useState<Run>(),[error,setError]=useState<Error|null>(null),[pending,setPending]=useState(false);
   useEffect(()=>{
     let current=true;setRun(undefined);setError(null);
     if(!session?.id||!profile.complete)return;
     void Promise.resolve().then(()=>Promise.all([digest(profileInput(profile)),digest(preferences(plan)),digest(careerId&&careerById(careerId)?observationsForRole(careerById(careerId)!,loadObservations()).slice(0,40):[])])).then(([p,q,e])=>{
-      const found=context.runs.find(r=>r.kind===kind&&r.result.meta.pathwayVersion===PATHWAY_VERSION&&r.result.meta.calculationVersion===CALCULATION_VERSION&&(kind!=='explain'||r.result.meta.scenario===scenario&&r.result.meta.chartEvidenceHash===e)&&r.result.meta.profileHash===p&&r.result.meta.catalogueVersion===context.catalogue?.version&&(kind!=='plan'||r.result.meta.preferencesHash===q)&&(kind!=='explain'||r.result.explanations?.some(e=>e.careerId===careerId)));
+      const found=context.runs.find(r=>r.kind===kind&&(r.result.meta.language??'en')===language&&r.result.meta.pathwayVersion===PATHWAY_VERSION&&r.result.meta.calculationVersion===CALCULATION_VERSION&&(kind!=='explain'||r.result.meta.scenario===scenario&&r.result.meta.chartEvidenceHash===e)&&r.result.meta.profileHash===p&&r.result.meta.catalogueVersion===context.catalogue?.version&&(kind!=='plan'||r.result.meta.preferencesHash===q)&&(kind!=='explain'||r.result.explanations?.some(e=>e.careerId===careerId)));
       if(current)setRun(found);
     }).catch(()=>{});
     return()=>{current=false;};
-  },[profile,plan,session?.id,context.runs,context.catalogue?.version,kind,careerId,scenario]);
+  },[profile,plan,session?.id,context.runs,context.catalogue?.version,kind,careerId,scenario,language]);
   const mutate=async(_input:unknown,options?:{onSuccess?:(value:any)=>void})=>{
     setError(null);setPending(true);
     try{

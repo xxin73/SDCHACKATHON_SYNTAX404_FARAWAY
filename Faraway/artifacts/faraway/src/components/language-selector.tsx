@@ -1,10 +1,12 @@
-import {Globe} from 'lucide-react';
-import {t,useLanguage,setLanguage,type Language} from '@/lib/i18n';
+import {useState} from 'react';
+import {Globe,Check,ChevronDown,Loader2} from 'lucide-react';
+import {t,useLanguage,useLanguageStatus,setLanguage,type Language} from '@/lib/i18n';
+const choices:{id:Language;name:string;caption:string}[]=[{id:'en',name:'English',caption:'Explore what comes next.'},{id:'zh',name:'简体中文',caption:'让每一份热爱，都有前行的方向。'},{id:'ms',name:'Bahasa Melayu',caption:'Langkah baharu, masa depan bermakna.'}];
 export function LanguageSelector(){
- const language=useLanguage();
- return <div className="fixed bottom-[calc(env(safe-area-inset-bottom)+5.5rem)] right-3 z-50 flex max-w-[calc(100vw-1.5rem)] items-center gap-2 rounded-full border bg-white/95 px-3 py-2 shadow-lg backdrop-blur md:bottom-5 md:right-5" title={t('Saved AI explanations and external source titles remain in their original language.')}>
- <Globe className="h-4 w-4 shrink-0" aria-hidden="true"/><label className="sr-only" htmlFor="faraway-language">{t('Interface language')}</label>
- <select id="faraway-language" data-testid="language-selector" aria-label={t('Interface language')} value={language} onChange={event=>setLanguage(event.target.value as Language)} className="max-w-[145px] rounded-lg bg-transparent py-1 text-sm outline-offset-2">
- <option value="en" lang="en">English</option><option value="zh" lang="zh-Hans">中文</option><option value="ms" lang="ms">Bahasa Melayu</option>
- </select></div>;
+ const language=useLanguage(),status=useLanguageStatus();const [open,setOpen]=useState(false);
+ return <div className="language-control fixed bottom-[calc(env(safe-area-inset-bottom)+5.5rem)] right-3 z-50 max-w-[calc(100vw-1.5rem)] md:bottom-5 md:right-5">
+ {open&&<><button className="fixed inset-0 -z-10 cursor-default" aria-label={t('Close')} onClick={()=>setOpen(false)}/><div className="mb-3 w-[290px] rounded-3xl border border-white/90 bg-white/95 p-3 shadow-[0_20px_70px_-18px_rgba(80,60,120,.35)] backdrop-blur-xl"><p className="px-3 pb-2 pt-1 text-xs text-muted-foreground">{t('Choose the language that feels like home.')}</p>{choices.map(option=><button key={option.id} data-testid={'language-'+option.id} disabled={status.busy} aria-pressed={language===option.id} onClick={async()=>{await setLanguage(option.id);setOpen(false);}} className={'mb-1 flex w-full items-center justify-between gap-3 rounded-2xl px-3 py-3 text-left transition-colors '+(language===option.id?'bg-violet-50 text-violet-900':'hover:bg-slate-50')}><span><span className="block text-sm font-semibold" lang={option.id==='zh'?'zh-Hans':option.id}>{option.name}</span><span className="mt-1 block text-[11px] opacity-75" lang={option.id==='zh'?'zh-Hans':option.id}>{option.caption}</span></span>{language===option.id&&<Check size={16}/>}</button>)}</div></>}
+ <button type="button" data-testid="language-selector" aria-label={t('Interface language')} aria-expanded={open} onClick={()=>setOpen(!open)} className="ml-auto flex items-center gap-2 rounded-full border border-white/90 bg-white/95 px-4 py-3 text-sm font-medium shadow-lg backdrop-blur transition-transform hover:-translate-y-0.5">{status.busy?<Loader2 className="h-4 w-4 animate-spin"/>:<Globe size={16}/>}<span>{choices.find(c=>c.id===language)?.name}</span><ChevronDown size={14} className={open?'rotate-180':''}/></button>
+ {status.error&&<p role="alert" className="mt-2 max-w-[290px] rounded-xl bg-white p-3 text-xs text-red-700">{status.error}</p>}
+ </div>;
 }

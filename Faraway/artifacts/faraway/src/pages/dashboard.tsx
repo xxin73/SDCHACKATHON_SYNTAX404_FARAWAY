@@ -1,3 +1,4 @@
+import {t as localeLabel,ui as localeText} from '@/lib/i18n';
 import {t as translateUi,useLanguage} from '@/lib/i18n';
 import {VerticalPairs} from '@/components/trend-panels';
 import {roleIndex} from '@/lib/trend-index';
@@ -31,7 +32,7 @@ export function JourneyStepper({ done, active, labels = STEPS }: { done: boolean
           <li key={s} className="flex flex-col items-center gap-2 text-center">
             <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.1 * i, type: 'spring' }}
               className={cn('grid h-[23px] w-[23px] place-items-center rounded-full border-2 bg-white text-[10px]', done[i] ? 'border-transparent bg-ink text-white' : i === active ? 'border-[hsl(260_70%_70%)] shadow-[0_0_0_5px_hsl(260_80%_70%/.12)]' : 'border-[hsl(232_30%_86%)]')}>
-              {done[i] ? <Check className="h-3 w-3" /> : <span className="font-mono text-muted-foreground">{i + 1}</span>}
+              {done[i] ? <Check className="h-3 w-3" /> : <span className="font-mono text-muted-foreground">{localeText(i + 1)}</span>}
             </motion.span>
             <span className={cn('text-[11px] sm:text-xs', i === active ? 'font-medium' : 'text-muted-foreground')}>{translateUi(s)}</span>
           </li>
@@ -78,14 +79,14 @@ export default function Dashboard() {
             </div>
             <div className="relative max-w-xl">
               <p className="eyebrow">{translateUi("Workspace · Personal")}</p>
-              <h1 className="mt-4 font-display text-5xl leading-[0.98] sm:text-6xl">Good to see you, {first}.<br /><span className="text-muted-foreground">{has ? 'Your bearing is set.' : 'Let us find your bearing.'}</span></h1>
-              <p className="mt-5 text-muted-foreground">{has && target ? <>Faraway is tracking <strong className="font-medium text-foreground">{target.title}</strong> under <strong className="font-medium text-foreground">{scenario}</strong> AI adoption. {match?.gaps.length ? `${match.gaps.length} skill gaps stand between you and it.` : 'You already meet every required level.'}</> : 'Tell Faraway what interests you, drop in your CV, and it will compute how your skills and the jobs around them move as AI spreads.'}</p>
+              <h1 className="mt-4 font-display text-5xl leading-[0.98] sm:text-6xl">{localeText("Good to see you,")}{localeText(' ')}{first}.<br /><span className="text-muted-foreground">{localeText(has ? 'Your bearing is set.' : 'Let us find your bearing.')}</span></h1>
+              <p className="mt-5 text-muted-foreground">{has && target ? <>{localeLabel("Faraway is tracking")}{' '}<strong className="font-medium text-foreground">{localeText(target.title)}</strong>{' '}{localeLabel("under")}{' '}<strong className="font-medium text-foreground">{localeText(scenario)}</strong>{' '}{localeLabel("AI adoption.")}{' '}{localeText(match?.gaps.length ? `${match.gaps.length} skill gaps stand between you and it.` : 'You already meet every required level.')}</> : localeLabel('Tell Faraway what interests you, drop in your CV, and it will compute how your skills and the jobs around them move as AI spreads.')}</p>
               <div className="mt-8 flex flex-wrap items-center gap-3">
-                <Magnetic><Link href="/pathway" className="btn-ink px-6 py-3" data-testid="button-explore-pathway">{translateUi("Explore my pathway")}{' '}<ArrowRight className="h-4 w-4" /></Link></Magnetic>
+                <Magnetic><Link href="/pathway" className="btn-ink px-6 py-3" data-testid="button-explore-pathway">{translateUi("Explore my pathway")}{localeText(' ')}<ArrowRight className="h-4 w-4" /></Link></Magnetic>
                 {has && <Link href="/analysis" className="btn-ghost" data-testid="link-hero-analysis">{translateUi("See skill analysis")}</Link>}
               </div>
             </div>
-            <a href="#summary" className="absolute bottom-6 right-8 hidden items-center gap-1.5 text-xs text-muted-foreground sm:flex" data-testid="link-scroll-down">Scroll down <motion.span animate={{ y: [0, 4, 0] }} transition={{ duration: 1.8, repeat: Infinity }}><ChevronDown className="h-3.5 w-3.5" /></motion.span></a>
+            <a href="#summary" className="absolute bottom-6 right-8 hidden items-center gap-1.5 text-xs text-muted-foreground sm:flex" data-testid="link-scroll-down">{localeText("Scroll down")}{localeText(' ')}<motion.span animate={{ y: [0, 4, 0] }} transition={{ duration: 1.8, repeat: Infinity }}><ChevronDown className="h-3.5 w-3.5" /></motion.span></a>
           </div>
         </Tilt>
       </Reveal>
@@ -95,9 +96,9 @@ export default function Dashboard() {
         <div id="summary" className="glass grid grid-cols-2 gap-px overflow-hidden rounded-[1.75rem] bg-[hsl(232_30%_93%)] md:grid-cols-4" data-testid="band-summary">
           {[
             { icon: GraduationCap, label: 'Highest education', v: profile.highest || null },
-            { icon: Briefcase, label: 'Experience', v: profile.name ? `${profile.years} yrs` : null },
+            { icon: Briefcase, label: 'Experience', v: profile.name ? localeLabel(`${profile.years} yrs`) : null },
             { icon: Layers, label: 'Skills rated', v: has ? String(Object.keys(profile.skills).length) : null },
-            { icon: Target, label: 'Best match', v: ranked[0] ? `${ranked[0].score.toFixed(1)}` : null },
+            { icon: Target, label: 'Best match', v: ranked[0] ? localeLabel(`${ranked[0].score.toFixed(1)}`) : null },
           ].map((s) => (
             <div key={s.label} className="bg-white/90 p-6">
               <div className="flex items-center gap-2 text-xs text-muted-foreground"><SpectrumIcon icon={s.icon} size={16} still />{translateUi(s.label)}</div>
@@ -111,16 +112,16 @@ export default function Dashboard() {
       <div className="grid gap-6 lg:grid-cols-[0.85fr_1.15fr]">
         <Reveal>
           <Card className="h-full" testId="card-mini-radar">
-            <CardTitle eyebrow={translateUi("Skills snapshot")} title={target ? `You vs ${target.title}` : 'Your hexagon'} />
+            <CardTitle eyebrow={translateUi("Skills snapshot")} title={localeLabel(target ? `You vs ${target.title}` : 'Your hexagon')} />
             {has && axes.length ? <div className="mx-auto max-w-[320px]"><SkillRadar axes={axes} size={320} compact /></div> : (
-              <div className="grid h-[260px] place-items-center rounded-2xl border border-dashed text-center text-sm text-muted-foreground"><div><p className="font-display text-4xl text-foreground/30">— — —</p><p className="mt-2">Upload a CV or rate skills to draw it.</p></div></div>
+              <div className="grid h-[260px] place-items-center rounded-2xl border border-dashed text-center text-sm text-muted-foreground"><div><p className="font-display text-4xl text-foreground/30">— — —</p><p className="mt-2">{localeLabel("Upload a CV or rate skills to draw it.")}</p></div></div>
             )}
           </Card>
         </Reveal>
         <Reveal delay={0.08}>
           <Card className="h-full" testId="card-skill-trend">
-            <CardTitle eyebrow="Career-specific technical skills" title={translateUi("Skill priorities")} right={<ScenarioToggle id="dash-scn" compact />} />
-            {has&&target?<div className="space-y-4">{Object.entries(target.required).map(([skill,need])=><div key={skill}><p className="text-xs mb-1">{skill} · {need}/5 practice target</p><div className="h-2 rounded bg-violet-100"><div className="h-full rounded bg-violet-500" style={{width:need/5*100+'%'}}/></div></div>)}</div>:<p className="py-12 text-sm text-muted-foreground">{translateUi("Complete your profile to see related skill analysis.")}</p>}
+            <CardTitle eyebrow={localeLabel("Career-specific technical skills")} title={translateUi("Skill priorities")} right={<ScenarioToggle id="dash-scn" compact />} />
+            {has&&target?<div className="space-y-4">{Object.entries(target.required).map(([skill,need])=><div key={skill}><p className="text-xs mb-1">{localeText(skill)} · {localeText(need)}{localeLabel("/5 practice target")}</p><div className="h-2 rounded bg-violet-100"><div className="h-full rounded bg-violet-500" style={{width:need/5*100+'%'}}/></div></div>)}</div>:<p className="py-12 text-sm text-muted-foreground">{translateUi("Complete your profile to see related skill analysis.")}</p>}
           </Card>
         </Reveal>
       </div>
@@ -129,21 +130,21 @@ export default function Dashboard() {
       <div className="grid gap-6 lg:grid-cols-[0.7fr_1.3fr]">
         <Reveal>
           <Card className="h-full" testId="card-match">
-            <CardTitle eyebrow={translateUi("Career target")} title={target?.title ?? 'Not set'} />
+            <CardTitle eyebrow={translateUi("Career target")} title={localeLabel(target?.title ?? 'Not set')} />
             <div className="flex items-center gap-5">
               <ScoreRing score={match?.score ?? null} size={104} />
               <div className="text-sm text-muted-foreground">
                 <p>{translateUi("Match score")}</p>
-                <p className="mt-1 text-xs">100 × (0.70 skill + 0.20 interest + 0.10 experience)</p>
+                <p className="mt-1 text-xs">{localeText("100 × (0.70 skill + 0.20 interest + 0.10 experience)")}</p>
               </div>
             </div>
             {target && <div className="mt-5 flex flex-wrap gap-1.5">{target.sdgs.map((n) => <SdgPill key={n} n={n} small />)}</div>}
-            {target && <Link href={`/jobs/${target.id}`} className="btn-ghost mt-6 w-full" data-testid="link-target-detail">{translateUi("Open job detail")}{' '}<ArrowRight className="h-4 w-4" /></Link>}
+            {target && <Link href={`/jobs/${target.id}`} className="btn-ghost mt-6 w-full" data-testid="link-target-detail">{translateUi("Open job detail")}{localeText(' ')}<ArrowRight className="h-4 w-4" /></Link>}
           </Card>
         </Reveal>
         <Reveal delay={0.08}>
           <Card className="h-full" testId="card-target-chart">
-            <CardTitle eyebrow="Occupation requirement index / 100" title={target?.title??'Choose a career'} right={<ScenarioToggle id="dash-scn2" compact />} />
+            <CardTitle eyebrow={localeLabel("Occupation requirement index / 100")} title={localeLabel(target?.title??'Choose a career')} right={<ScenarioToggle id="dash-scn2" compact />} />
             {has&&target?<><VerticalPairs data={[{label:target.title,first:roleIndex(target,scenario).current,second:roleIndex(target,scenario).future}]} labels={['Current O*NET reference','AI planning scenario']}/><p className="text-xs mt-3 text-muted-foreground">{translateUi("Technical importance reference and formula-based scenario; not vacancy demand.")}</p></>:<p className="py-12 text-sm text-muted-foreground">{translateUi("Choose a career to see its analysis.")}</p>}
           </Card>
         </Reveal>
@@ -154,7 +155,7 @@ export default function Dashboard() {
         <Card className="p-0" testId="card-plan-overview">
           <div className="grid lg:grid-cols-[1fr_320px]">
             <div className="p-6 sm:p-8">
-              <CardTitle eyebrow="Study plan overview" title={<>{translateUi("Study plan")}{' '}<span className="text-muted-foreground">|</span> {(profile.complete?careerById(recommendations.active?.result.careerId??'')?.title:undefined) ?? target?.title ?? 'Not started'}</>} right={<Link href={plan.saved ? '/progress' : '/plan'} className="btn-ghost" data-testid="link-plan">{plan.saved ? 'Continue learning' : 'Build plan'}</Link>} />
+              <CardTitle eyebrow={localeLabel("Study plan overview")} title={<>{translateUi("Study plan")}{localeText(' ')}<span className="text-muted-foreground">|</span> {localeText((profile.complete?careerById(recommendations.active?.result.careerId??'')?.title:undefined) ?? target?.title ?? 'Not started')}</>} right={<Link href={plan.saved ? '/progress' : '/plan'} className="btn-ghost" data-testid="link-plan">{localeText(plan.saved ? 'Continue learning' : 'Build plan')}</Link>} />
               {planSkills.length ? (
                 <ul className="space-y-3">
                   {planSkills.map((s, i) => {
@@ -165,7 +166,7 @@ export default function Dashboard() {
                         className={cn('flex items-center gap-4 rounded-2xl border border-transparent p-3 transition-all', hoverSkill === s && 'border-border bg-white shadow-md')}>
                         <div className="grid h-11 w-11 shrink-0 place-items-center rounded-xl border bg-white"><SpectrumIcon icon={ICONS[i % ICONS.length]} size={20} still={hoverSkill !== s} /></div>
                         <div className="min-w-0 flex-1">
-                          <div className="flex justify-between text-sm"><span className="font-medium">{translateUi(s)}</span><span className="font-mono text-xs text-muted-foreground">{Math.round(p * 100)}% · {hrs}{translateUi("h")}</span></div>
+                          <div className="flex justify-between text-sm"><span className="font-medium">{translateUi(s)}</span><span className="font-mono text-xs text-muted-foreground">{localeText(Math.round(p * 100))}% · {localeText(hrs)}{translateUi("h")}</span></div>
                           <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-[hsl(232_40%_95%)]"><motion.div className="spectrum-bar h-full rounded-full" initial={{ width: 0 }} whileInView={{ width: `${Math.max(p * 100, 2)}%` }} viewport={{ once: true }} transition={{ duration: 1 }} /></div>
                         </div>
                       </li>
@@ -176,12 +177,12 @@ export default function Dashboard() {
             </div>
             <div className="border-t bg-[hsl(232_50%_98.5%)]/80 p-6 lg:rounded-r-[1.75rem] lg:border-l lg:border-t-0">
               <p className="eyebrow mb-4">{translateUi("SDG explanation")}</p>
-              <SdgExplain n={hoverSkill ? skillSdg(hoverSkill) : null} skill={hoverSkill} placeholder="Hover a skill to see which UN Sustainable Development Goal it advances, and how." />
+              <SdgExplain n={hoverSkill ? skillSdg(hoverSkill) : null} skill={hoverSkill} placeholder={localeLabel("Hover a skill to see which UN Sustainable Development Goal it advances, and how.")} />
             </div>
           </div>
         </Card>
       </Reveal>
-      {has && <p className="text-center text-xs text-muted-foreground">Computed live from your profile · <Counter to={ranked.length} />{' '}{translateUi("careers ranked")}</p>}
+      {has && <p className="text-center text-xs text-muted-foreground">{localeLabel("Computed live from your profile ·")}{' '}<Counter to={ranked.length} />{localeText(' ')}{translateUi("careers ranked")}</p>}
     </div>
   );
 }

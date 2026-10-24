@@ -241,15 +241,15 @@
   },
   "Where": {
     "zh": "让",
-    "ms": "Ke mana"
+    "ms": "Dari"
   },
   "Possibilities": {
-    "zh": "可能",
-    "ms": "Peluang"
+    "zh": "每一种可能",
+    "ms": "Impian"
   },
   "Take You.": {
-    "zh": "带你前行。",
-    "ms": "Membawa Anda."
+    "zh": "照亮你的前路。",
+    "ms": "ke Masa Depan."
   },
   "Explore your skills, compare possible AI futures, and turn a career goal into a practical learning plan.": {
     "zh": "探索你的技能，比较不同 AI 发展情景，将职业目标转化为可行的学习计划。",
@@ -864,12 +864,12 @@
     "ms": "Bina pelan pembelajaran saya"
   },
   "Your route,": {
-    "zh": "你的路径，",
-    "ms": "Laluan anda,"
+    "zh": "奔赴热爱，",
+    "ms": "Laluan pilihan anda,"
   },
   "your pace.": {
-    "zh": "由你掌握节奏。",
-    "ms": "mengikut rentak anda."
+    "zh": "自有节奏。",
+    "ms": "rentak milik anda."
   },
   "Preferences": {
     "zh": "偏好设置",
@@ -1044,12 +1044,12 @@
     "ms": "Sahkan profil dan kemahiran sebelum menjana pelan."
   },
   "Small steps.": {
-    "zh": "积少成多。",
+    "zh": "每一步积累，",
     "ms": "Langkah kecil."
   },
   "Real momentum.": {
-    "zh": "稳步向前。",
-    "ms": "Kemajuan sebenar."
+    "zh": "都在靠近理想。",
+    "ms": "Kemajuan bermakna."
   },
   "Your route": {
     "zh": "你的学习路径",
@@ -2046,5 +2046,169 @@
   "location": {
     "zh": "所在地",
     "ms": "lokasi"
+  },
+  "Choose the language that feels like home.": {
+    "zh": "用熟悉的语言，看见更远的未来。",
+    "ms": "Teroka masa depan dalam bahasa pilihan anda."
+  },
+  "Deploy the updated AI function to generate explanations and study plans in your selected language.": {
+    "zh": "请先部署已更新的 AI 函数，即可用所选语言生成说明和学习计划。",
+    "ms": "Sila gunakan fungsi AI yang dikemas kini untuk menjana penjelasan dan pelan pembelajaran dalam bahasa pilihan anda."
+  },
+  "Imagine putting {expertise} to work where it matters. Choose one challenge in your community, create a practical solution and listen to the people whose lives it could improve.": {
+    "zh": "让{expertise}成为改变的起点。从社区里一个真实的难题出发，尝试可行的方案，倾听每一位可能因此受益的人。",
+    "ms": "Jadikan {expertise} titik mula perubahan yang bermakna. Pilih satu cabaran sebenar dalam komuniti, usahakan penyelesaian praktikal dan dengar suara mereka yang bakal menerima manfaat."
+  },
+  "Strengthen {skills} with guided practice and the linked learning resource. Complete the activities, apply what you learn, then reassess your progress.": {
+    "zh": "结合引导练习与所附学习资源，逐步提升{skills}。完成活动后，把所学用于实践，再重新评估自己的进步。",
+    "ms": "Tingkatkan {skills} melalui latihan berpandu dan sumber pembelajaran yang dipautkan. Lengkapkan aktiviti, gunakan apa yang dipelajari dan nilai semula kemajuan anda."
+  },
+  "Loading your language…": {
+    "zh": "正在铺展你的语言旅程…",
+    "ms": "Menyediakan pengalaman dalam bahasa anda…"
+  },
+  "Core concepts": {
+    "zh": "核心概念",
+    "ms": "Konsep teras"
+  },
+  "Guided practice exercises": {
+    "zh": "引导练习",
+    "ms": "Latihan berpandu"
+  },
+  "Mini project applying the skill": {
+    "zh": "技能应用小项目",
+    "ms": "Projek mini menggunakan kemahiran"
+  },
+  "Self-assessment and reflection": {
+    "zh": "自我评估与反思",
+    "ms": "Penilaian kendiri dan refleksi"
+  },
+  "Your language changed while AI was working. Generate again in the selected language.": {
+    "zh": "AI 生成期间，你切换了语言。请按当前所选语言重新生成。",
+    "ms": "Bahasa telah ditukar semasa AI sedang menjana. Sila jana semula dalam bahasa yang dipilih."
+  },
+  "Skill preparation does not confer a professional licence or qualification. Check local entry requirements.": {
+    "zh": "技能学习并不等同于取得专业执照或资格，请另行确认当地的入行要求。",
+    "ms": "Pembelajaran kemahiran tidak memberikan lesen atau kelayakan profesional. Sila semak syarat kemasukan tempatan."
+  },
+  "Related interests first · match = 60% scenario readiness + 20% interest + 10% experience + 10% market outlook": {
+    "zh": "优先推荐相关兴趣领域 · 匹配分数 = 60% 情景技能准备程度 + 20% 职业兴趣 + 10% 工作经验 + 10% 就业前景",
+    "ms": "Utamakan bidang minat berkaitan · skor padanan = 60% kesediaan kemahiran senario + 20% minat + 10% pengalaman + 10% prospek pasaran"
+  },
+  "60% scenario skill readiness (": {
+    "zh": "60% 情景技能准备程度（",
+    "ms": "60% kesediaan kemahiran senario ("
+  },
+  "%) + 20% interest + 10% experience + 10% employment outlook. Product weights are planning choices, not validated predictions.": {
+    "zh": "%）+ 20% 职业兴趣 + 10% 工作经验 + 10% 就业前景。这些权重属于规划规则，并非经过验证的预测系数。",
+    "ms": "%) + 20% minat + 10% pengalaman + 10% prospek pekerjaan. Wajaran ini ialah pilihan perancangan, bukan pekali ramalan yang telah disahkan."
+  },
+  "N/A means unassessed or an unused axis, not zero. Only assessed points are drawn.": {
+    "zh": "N/A 表示尚未评估或该维度未使用，不代表零分。图中只绘制已评估的技能。",
+    "ms": "N/A bermaksud belum dinilai atau paksi tidak digunakan, bukan sifar. Hanya kemahiran yang telah dinilai dipaparkan."
+  },
+  "Choose current requirements, or a what-if AI development scenario. This changes the target skill gaps used for this plan.": {
+    "zh": "选择当前职业要求，或一种假设性的 AI 发展情景。不同选择会调整这份计划所针对的技能差距。",
+    "ms": "Pilih keperluan semasa atau senario andaian perkembangan AI. Pilihan ini mengubah jurang kemahiran sasaran bagi pelan ini."
+  },
+  "New publications can change outlook rankings; an unchanged source correctly leaves the figures unchanged.": {
+    "zh": "新发布的资料可能改变职业前景排名；若来源没有更新，图表数值也应保持一致。",
+    "ms": "Penerbitan baharu boleh mengubah kedudukan prospek; jika sumber tidak berubah, angka juga kekal sama."
+  },
+  "Develop quantitative techniques to inform securities investing, equities investing, pricing, or valuation of financial instruments. Develop mathematical or statistical models for risk management, asset optimization, pricing, or relative value analysis.": {
+    "zh": "开发量化方法，为证券与股票投资、定价及金融工具估值提供依据。建立数学或统计模型，用于风险管理、资产优化、定价或相对价值分析。",
+    "ms": "Membangunkan kaedah kuantitatif untuk menyokong pelaburan sekuriti dan ekuiti, penetapan harga atau penilaian instrumen kewangan. Membina model matematik atau statistik bagi pengurusan risiko, pengoptimuman aset, penetapan harga atau analisis nilai relatif."
+  },
+  "Coordinate or design programs and conduct outreach to promote the religious education or activities of a denominational group. May provide counseling, guidance, and leadership relative to marital, health, financial, and religious problems.": {
+    "zh": "协调或设计项目，并开展推广工作，促进宗教团体的教育与活动。也可能就婚姻、健康、财务及宗教相关问题提供辅导、指引与组织支持。",
+    "ms": "Menyelaras atau mereka bentuk program serta menjalankan aktiviti jangkauan untuk menyokong pendidikan atau kegiatan sesebuah kumpulan agama. Turut boleh memberikan kaunseling, bimbingan dan kepimpinan berkaitan masalah perkahwinan, kesihatan, kewangan dan agama."
+  },
+  "Helpers--Carpenters": {
+    "zh": "木工助手",
+    "ms": "Pembantu tukang kayu"
+  },
+  "Helpers--Electricians": {
+    "zh": "电工助手",
+    "ms": "Pembantu juruelektrik"
+  },
+  "Helpers--Roofers": {
+    "zh": "屋面工助手",
+    "ms": "Pembantu pekerja bumbung"
+  },
+  "/5 practice target": {
+    "zh": "/5 练习目标",
+    "ms": "/5 sasaran latihan"
+  },
+  "/5. Practise on a work sample, then reassess.": {
+    "zh": "/5。先完成一个实际工作练习，再重新评估。",
+    "ms": "/5. Berlatih menggunakan contoh tugasan kerja, kemudian nilai semula."
+  },
+  "/5; target": {
+    "zh": "/5；目标",
+    "ms": "/5; sasaran"
+  },
+  "Orientation:": {
+    "zh": "规划方向：",
+    "ms": "Hala tuju:"
+  },
+  "Welcome,": {
+    "zh": "欢迎，",
+    "ms": "Selamat datang,"
+  },
+  "at": {
+    "zh": "按",
+    "ms": "pada"
+  },
+  "for": {
+    "zh": "适用于",
+    "ms": "untuk"
+  },
+  "fundamentals": {
+    "zh": "基础",
+    "ms": "asas"
+  },
+  "hours/week": {
+    "zh": "小时/周",
+    "ms": "jam/minggu"
+  },
+  "level": {
+    "zh": "等级",
+    "ms": "tahap"
+  },
+  "occupations": {
+    "zh": "个职业",
+    "ms": "pekerjaan"
+  },
+  "participants": {
+    "zh": "位参与者",
+    "ms": "peserta"
+  },
+  "roles": {
+    "zh": "个职业",
+    "ms": "peranan"
+  },
+  "to": {
+    "zh": "至",
+    "ms": "hingga"
+  },
+  "yrs": {
+    "zh": "年",
+    "ms": "tahun"
+  },
+  "New department": {
+    "zh": "新部门",
+    "ms": "Jabatan baharu"
+  },
+  "New academic programme": {
+    "zh": "新学术专业",
+    "ms": "Program akademik baharu"
+  },
+  "New team": {
+    "zh": "新团队",
+    "ms": "Pasukan baharu"
+  },
+  "New cohort / class": {
+    "zh": "新年级 / 班级",
+    "ms": "Kohort / kelas baharu"
   }
 }

@@ -1,3 +1,4 @@
+import {t as localeLabel,ui as localeText} from '@/lib/i18n';
 import {t as translateUi,useLanguage} from '@/lib/i18n';
 import { experienceError, withRoleYears, withTotalYears } from '@/lib/experience';
 import {isHardSkill} from '../../../../supabase/functions/faraway-recommendations/skill-policy';
@@ -88,15 +89,15 @@ export default function Pathway() {
           role="button" tabIndex={0} data-testid="dropzone-cv" onKeyDown={(e) => e.key === 'Enter' && fileRef.current?.click()}
           className={cn('glass group relative flex min-h-[260px] cursor-pointer flex-col items-center justify-center rounded-3xl border-2 border-dashed p-6 text-center transition-all', drag ? 'spectrum-border scale-[1.01] border-transparent' : 'hover:border-[hsl(250_50%_82%)]')}>
           <motion.div animate={drag ? { scale: 1.15, rotate: -6 } : { scale: 1, rotate: 0 }} className="grid h-16 w-16 place-items-center rounded-2xl border bg-white shadow-md"><SpectrumIcon icon={drag ? ScanLine : FileUp} size={30} /></motion.div>
-          <p className="mt-4 font-display text-2xl">{preview?'CV uploaded':'Upload CV'}</p>{preview&&<p className="text-xs">{preview.name} · click to replace</p>}
-          <p className="mt-1 max-w-[240px] text-sm text-muted-foreground">PDF, TXT, PNG or JPG / JPEG · up to 8 MB. Text extraction runs in your browser. Review the results and rate your skills; a CV does not prove proficiency.</p>
+          <p className="mt-4 font-display text-2xl">{localeText(preview?'CV uploaded':'Upload CV')}</p>{preview&&<p className="text-xs">{localeText(preview.name)}{' '}{localeLabel("· click to replace")}</p>}
+          <p className="mt-1 max-w-[240px] text-sm text-muted-foreground">{localeText("PDF, TXT, PNG or JPG / JPEG · up to 8 MB. Text extraction runs in your browser. Review the results and rate your skills; a CV does not prove proficiency.")}</p>
           <input ref={fileRef} type="file" accept=".pdf,.txt,.png,.jpg,.jpeg,application/pdf,text/plain,image/png,image/jpeg" className="hidden" onChange={(e) => { onFile(e.target.files?.[0]); e.target.value = ''; }} data-testid="input-cv-file" />
         </div>
       </AiStage>
-      {preview&&<div className="rounded-2xl border p-3"><p className="mb-2 text-sm font-medium">{preview.name}</p>{preview.type.startsWith('image/')?<img src={preview.url} alt="Your uploaded CV" className="w-full"/>:<iframe src={preview.url} title={translateUi("Your uploaded CV")} className="h-[480px] w-full"/>}</div>}
-      {cvReview&&<div className="space-y-3 rounded-2xl border bg-white p-4"><h3 className="font-medium">{translateUi("Review extracted details")}</h3><p className="text-xs">Only the uploaded file is used. Empty fields keep your saved details. Check every suggestion before applying.</p>{(['name','email','location'] as const).map(k=><label key={k} className="block text-sm">{translateUi(k)}<input className="field" value={cvReview[k]} onChange={e=>setCvReview({...cvReview,[k]:e.target.value})}/></label>)}<p className="text-sm">Education detected: {cvReview.highest||'Needs manual review'}</p>{cvReview.educationText&&<pre className="whitespace-pre-wrap text-xs">{cvReview.educationText}</pre>}{cvReview.experienceText&&<><p className="text-sm">Experience text — use this to enter your roles; dates and durations are not guessed.</p><pre className="whitespace-pre-wrap text-xs">{cvReview.experienceText}</pre></>}<p className="text-xs">{translateUi("Suggested skills (rate these yourself):")}{' '}{cvReview.skills.map(s=>s.name).join(', ')||'None detected'}</p><button className="btn-ink" onClick={()=>{apply(cvReview);setCvReview(null);}}>{translateUi("Apply reviewed details")}</button><button className="btn-ghost" onClick={()=>setCvReview(null)}>{translateUi("Discard")}</button></div>}
-      <p className="text-xs text-muted-foreground">No CV? Enter your information manually. Image/scanned PDF reading currently uses English OCR and downloads recognition files on first use.</p>
-      {missing.length > 0 && <p className="rounded-2xl bg-[hsl(30_100%_97%)] p-3 text-xs text-[hsl(25_60%_38%)]" data-testid="text-missing">Could not confidently extract: {missing.join(', ')}. Review or enter these details manually; they may still be present in your CV.</p>}
+      {preview&&<div className="rounded-2xl border p-3"><p className="mb-2 text-sm font-medium">{localeText(preview.name)}</p>{preview.type.startsWith('image/')?<img src={preview.url} alt="Your uploaded CV" className="w-full"/>:<iframe src={preview.url} title={translateUi("Your uploaded CV")} className="h-[480px] w-full"/>}</div>}
+      {cvReview&&<div className="space-y-3 rounded-2xl border bg-white p-4"><h3 className="font-medium">{translateUi("Review extracted details")}</h3><p className="text-xs">{localeLabel("Only the uploaded file is used. Empty fields keep your saved details. Check every suggestion before applying.")}</p>{(['name','email','location'] as const).map(k=><label key={k} className="block text-sm">{translateUi(k)}<input className="field" value={cvReview[k]} onChange={e=>setCvReview({...cvReview,[k]:e.target.value})}/></label>)}<p className="text-sm">{localeLabel("Education detected:")}{' '}{localeText(cvReview.highest||'Needs manual review')}</p>{cvReview.educationText&&<pre className="whitespace-pre-wrap text-xs">{localeText(cvReview.educationText)}</pre>}{cvReview.experienceText&&<><p className="text-sm">{localeLabel("Experience text — use this to enter your roles; dates and durations are not guessed.")}</p><pre className="whitespace-pre-wrap text-xs">{localeText(cvReview.experienceText)}</pre></>}<p className="text-xs">{translateUi("Suggested skills (rate these yourself):")}{localeText(' ')}{localeText(cvReview.skills.map(s=>s.name).join(', ')||'None detected')}</p><button className="btn-ink" onClick={()=>{apply(cvReview);setCvReview(null);}}>{translateUi("Apply reviewed details")}</button><button className="btn-ghost" onClick={()=>setCvReview(null)}>{translateUi("Discard")}</button></div>}
+      <p className="text-xs text-muted-foreground">{localeText("No CV? Enter your information manually. Image/scanned PDF reading currently uses English OCR and downloads recognition files on first use.")}</p>
+      {missing.length > 0 && <p className="rounded-2xl bg-[hsl(30_100%_97%)] p-3 text-xs text-[hsl(25_60%_38%)]" data-testid="text-missing">{localeLabel("Could not confidently extract:")}{' '}{localeText(missing.join(', '))}{localeLabel(". Review or enter these details manually; they may still be present in your CV.")}</p>}
     </div>
   );
 
@@ -112,7 +113,7 @@ export default function Pathway() {
               <div className="grid gap-8 lg:grid-cols-[1fr_340px]">
                 <section>
                   <h2 className="font-display text-3xl">{translateUi("Interest")}</h2>
-                  <p className="mt-1 text-sm text-muted-foreground">Choose an interest area, then select careers you want to explore. Careers and assessment skills below follow the occupation links for your chosen interest.</p>
+                  <p className="mt-1 text-sm text-muted-foreground">{localeLabel("Choose an interest area, then select careers you want to explore. Careers and assessment skills below follow the occupation links for your chosen interest.")}</p>
                   <div className="mt-6 grid gap-3 sm:grid-cols-2">
                     {STREAMS.map((s) => (
                       <motion.button whileTap={{ scale: 0.98 }} key={s.id} onClick={() => {upd((p) => ({ stream: s.id, careers: p.stream === s.id ? p.careers.filter(id=>s.id==='other'||s.careers.includes(id)) : [] }));if(s.id!=='other'&&!s.careers.includes(target))setState(state=>({...state,plan:{...state.plan,target:s.careers[0]??'',skills:[],saved:false}}));}} data-testid={`button-stream-${s.id}`}
@@ -122,20 +123,20 @@ export default function Pathway() {
                       </motion.button>
                     ))}
                   </div>
-                  {profile.stream==='other'&&<Field label="Your interest"><input className="field mt-4" maxLength={100} value={profile.otherInterest??''} onChange={e=>upd(()=>({otherInterest:e.target.value}))} placeholder="For example: marine conservation"/></Field>}
+                  {profile.stream==='other'&&<Field label="Your interest"><input className="field mt-4" maxLength={100} value={profile.otherInterest??''} onChange={e=>upd(()=>({otherInterest:e.target.value}))} placeholder={localeLabel("For example: marine conservation")}/></Field>}
                   {stream && (
                     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mt-8">
-                      <p className="text-sm font-medium">Career interests ({CAREERS.length} supported careers) <span className="font-normal text-muted-foreground">{translateUi("(select any)")}</span></p>
+                      <p className="text-sm font-medium">{localeLabel("Career interests (")}{localeText(CAREERS.length)}{' '}{localeLabel("supported careers)")}{' '}<span className="font-normal text-muted-foreground">{translateUi("(select any)")}</span></p>
                       <input className="field mt-3" aria-label={translateUi("Search careers")} placeholder={translateUi("Search careers, e.g. chemical engineer")} value={careerSearch} onChange={e=>setCareerSearch(e.target.value)}/><div className="mt-3 flex max-h-72 flex-wrap gap-2 overflow-auto">
-                        {(stream.id==='other'?CAREERS.map(c=>c.id):stream.careers).filter(id=>!careerSearch||careerById(id)?.title.toLowerCase().includes(careerSearch.toLowerCase())).slice(0,80).map((id) => { const c = careerById(id); if(!c)return null; const on = profile.careers.includes(id); return (
+                        {(stream.id==='other'?CAREERS.map(c=>c.id):stream.careers).filter(id=>!careerSearch||careerById(id)?.title.toLowerCase().includes(careerSearch.toLowerCase())||localeLabel(careerById(id)?.title??'').toLowerCase().includes(careerSearch.toLowerCase())).slice(0,80).map((id) => { const c = careerById(id); if(!c)return null; const on = profile.careers.includes(id); return (
                           <button key={id} onClick={() => upd((p) => ({ careers: on ? p.careers.filter((x) => x !== id) : [...p.careers, id] }))} data-testid={`chip-career-${id}`}
-                            className={cn('rounded-full border px-4 py-2 text-sm transition-all', on ? 'border-ink bg-ink text-white' : 'bg-white hover:border-[hsl(250_50%_80%)]')}>{c.title}</button>
+                            className={cn('rounded-full border px-4 py-2 text-sm transition-all', on ? 'border-ink bg-ink text-white' : 'bg-white hover:border-[hsl(250_50%_80%)]')}>{localeText(c.title)}</button>
                         ); })}
-                      </div><Field label="Other career interest (optional)"><input className="field mt-4" maxLength={100} value={profile.otherCareer??''} onChange={e=>upd(()=>({otherCareer:e.target.value}))} onKeyDown={e=>{if(e.key==='Enter'){e.preventDefault();saveOtherCareer();}}} placeholder="For example: Chemical Engineer"/><button type="button" className="btn-ghost mt-2" disabled={!profile.otherCareer?.trim()} onClick={saveOtherCareer}>{translateUi("Save interest")}</button></Field><p className="mt-2 text-xs text-muted-foreground">Type a career here and press Save interest. It will appear in your profile summary. If it matches a catalogue career, we also select that career and suggest its technical skills. Otherwise it stays as a saved interest until we have a verified skill profile.</p>
+                      </div><Field label="Other career interest (optional)"><input className="field mt-4" maxLength={100} value={profile.otherCareer??''} onChange={e=>upd(()=>({otherCareer:e.target.value}))} onKeyDown={e=>{if(e.key==='Enter'){e.preventDefault();saveOtherCareer();}}} placeholder={localeLabel("For example: Chemical Engineer")}/><button type="button" className="btn-ghost mt-2" disabled={!profile.otherCareer?.trim()} onClick={saveOtherCareer}>{translateUi("Save interest")}</button></Field><p className="mt-2 text-xs text-muted-foreground">{localeLabel("Type a career here and press Save interest. It will appear in your profile summary. If it matches a catalogue career, we also select that career and suggest its technical skills. Otherwise it stays as a saved interest until we have a verified skill profile.")}</p>
                     </motion.div>
                   )}
                 </section>
-                {cvPanel}
+                {localeText(cvPanel)}
               </div>
             )}
 
@@ -147,7 +148,7 @@ export default function Pathway() {
                     <div className="mt-5 grid gap-4 sm:grid-cols-2">
                       <Field label="Full name"><input className={cn('field', miss('name', profile.name))} value={profile.name} onChange={(e) => upd(() => ({ name: e.target.value }))} data-testid="input-name" /></Field>
                       <Field label="Email"><input className={cn('field', miss('email', profile.email))} value={profile.email} onChange={(e) => upd(() => ({ email: e.target.value }))} data-testid="input-email" /></Field>
-                      <Field label="Location"><input className={cn('field', miss('location', profile.location))} value={profile.location} onChange={(e) => upd(() => ({ location: e.target.value }))} placeholder="Shah Alam, Selangor" data-testid="input-location" /></Field>
+                      <Field label="Location"><input className={cn('field', miss('location', profile.location))} value={profile.location} onChange={(e) => upd(() => ({ location: e.target.value }))} placeholder={localeLabel("Shah Alam, Selangor")} data-testid="input-location" /></Field>
                       <Field label="Status">
                         <select className="field" value={profile.status} onChange={(e) => upd(() => ({ status: e.target.value as Profile['status'] }))} data-testid="select-status">
                           <option value="graduate">{translateUi("Fresh graduate")}</option><option value="jobseeker">{translateUi("Job seeker")}</option><option value="switcher">{translateUi("Worker switching career")}</option>
@@ -157,11 +158,11 @@ export default function Pathway() {
                   </div>
                   <div>
                     <h2 className="font-display text-3xl">{translateUi("Experience")}</h2>
-                    <p className="mt-3 text-sm text-muted-foreground">Add each role and its duration in years (maximum 99 years per role and in total). For one role, total and role duration stay in sync. For multiple roles, their durations must add up to the total before you continue.</p>
+                    <p className="mt-3 text-sm text-muted-foreground">{localeLabel("Add each role and its duration in years (maximum 99 years per role and in total). For one role, total and role duration stay in sync. For multiple roles, their durations must add up to the total before you continue.")}</p>
                     <Field label="Total experience in years"><input type="number" min={0} max={99} step={0.25} className="field mt-3 max-w-xs" placeholder="0" value={profile.years||''} onChange={e=>upd(p=>withTotalYears(p,e.target.value))} data-testid="input-years"/></Field>
                     <div className="mt-4 space-y-3">
                       {profile.roles.map((r,i)=><div key={i} className="rounded-2xl border bg-white/70 p-4"><div className="grid gap-3 sm:grid-cols-3">
-                        <Field label="Job title"><input className="field" placeholder="For example: pharmacy assistant" value={r.title} onChange={e=>upd(p=>({roles:p.roles.map((x,j)=>j===i?{...x,title:e.target.value}:x)}))} data-testid={`input-role-title-${i}`}/></Field>
+                        <Field label="Job title"><input className="field" placeholder={localeLabel("For example: pharmacy assistant")} value={r.title} onChange={e=>upd(p=>({roles:p.roles.map((x,j)=>j===i?{...x,title:e.target.value}:x)}))} data-testid={`input-role-title-${i}`}/></Field>
                         <Field label="Company / organisation"><input className="field" value={r.company} onChange={e=>upd(p=>({roles:p.roles.map((x,j)=>j===i?{...x,company:e.target.value}:x)}))} data-testid={`input-role-company-${i}`}/></Field>
                         <Field label="Duration in years (0.5 = 6 months)"><input className="field" type="number" min={0} max={99} step={0.25} placeholder="0" value={r.years||''} onChange={e=>upd(p=>withRoleYears(p,i,e.target.value))} data-testid={`input-role-years-${i}`}/></Field>
                       </div><Field label="Responsibilities and achievements"><textarea className="field mt-3" value={r.responsibilities??''} placeholder={translateUi("What did you do? Which tools did you use? What did you achieve?")} onChange={e=>upd(p=>({roles:p.roles.map((x,j)=>j===i?{...x,responsibilities:e.target.value.slice(0,3000)}:x)}))}/></Field><button className="btn-ghost mt-2 text-xs" onClick={()=>{const found=detectSkills(r.responsibilities??'',ALL_SKILLS);upd(p=>({skills:{...Object.fromEntries(found.map(sk=>[sk,0])),...p.skills}}));toast({title:found.length?'Skills added for your review':'No catalogue keywords found',description:found.length?found.join(', '):'Add skills manually in the Skills step.'});}}>{translateUi("Find skills in responsibilities")}</button><button className="btn-ghost mt-2 text-xs" onClick={()=>upd(p=>{const roles=p.roles.filter((_,j)=>j!==i);return {roles,years:Math.min(99,roles.reduce((n,x)=>n+x.years,0))};})} data-testid={`button-remove-role-${i}`}><Trash2 size={14}/>{translateUi("Remove this role")}</button></div>)}
@@ -169,7 +170,7 @@ export default function Pathway() {
                     </div>
                   </div>
                 </section>
-                {cvPanel}
+                {localeText(cvPanel)}
               </div>
             )}
 
@@ -179,15 +180,15 @@ export default function Pathway() {
                   <h2 className="font-display text-3xl">{translateUi("Education")}</h2>
                   <p className="mt-1 text-sm text-muted-foreground">{translateUi("Highest level completed, then the qualification and field that apply.")}</p>
                   <div className="mt-5 flex flex-wrap gap-2">
-                    {HIGHEST.map((h) => <button key={h} onClick={() => upd(() => ({ highest: h }))} data-testid={`button-highest-${h}`} className={cn('rounded-full border px-4 py-2 text-sm transition-all', profile.highest === h ? 'border-ink bg-ink text-white' : 'bg-white')}>{h}</button>)}
+                    {HIGHEST.map((h) => <button key={h} onClick={() => upd(() => ({ highest: h }))} data-testid={`button-highest-${h}`} className={cn('rounded-full border px-4 py-2 text-sm transition-all', profile.highest === h ? 'border-ink bg-ink text-white' : 'bg-white')}>{localeText(h)}</button>)}
                   </div>
-                  {profile.highest==='Pre-U'&&<div className="mt-6 space-y-4"><Field label="Pre-university qualification"><select className="field" value={profile.preUQualification??''} onChange={e=>upd(()=>({preUQualification:e.target.value}))}><option value="">{translateUi("Select qualification")}</option>{['A-Level','STPM','Foundation','Matriculation','International Baccalaureate (IB)','UEC','Other pre-university qualification'].map(q=><option key={q}>{q}</option>)}</select></Field><EducationFields entry={profile.preU??{field:'',institution:'',year:''}} showField={false} onChange={entry=>upd(()=>({preU:entry}))} testId="preu"/></div>}
-                  {profile.highest==='Secondary'&&<Field label="Secondary qualification"><select className="field mt-4" value={profile.secondaryQualification??''} onChange={e=>upd(()=>({secondaryQualification:e.target.value}))}><option value="">{translateUi("Select qualification")}</option>{['SPM','PT3','IGCSE / O-Level','Other secondary qualification'].map(q=><option key={q}>{q}</option>)}</select></Field>}
+                  {profile.highest==='Pre-U'&&<div className="mt-6 space-y-4"><Field label="Pre-university qualification"><select className="field" value={profile.preUQualification??''} onChange={e=>upd(()=>({preUQualification:e.target.value}))}><option value="">{translateUi("Select qualification")}</option>{['A-Level','STPM','Foundation','Matriculation','International Baccalaureate (IB)','UEC','Other pre-university qualification'].map(q=><option key={q}>{localeText(q)}</option>)}</select></Field><EducationFields entry={profile.preU??{field:'',institution:'',year:''}} showField={false} onChange={entry=>upd(()=>({preU:entry}))} testId="preu"/></div>}
+                  {profile.highest==='Secondary'&&<Field label="Secondary qualification"><select className="field mt-4" value={profile.secondaryQualification??''} onChange={e=>upd(()=>({secondaryQualification:e.target.value}))}><option value="">{translateUi("Select qualification")}</option>{['SPM','PT3','IGCSE / O-Level','Other secondary qualification'].map(q=><option key={q}>{localeText(q)}</option>)}</select></Field>}
                   {profile.highest==='Diploma'&&<div className="mt-6"><p className="eyebrow mb-3">{translateUi("Diploma")}</p><EducationFields entry={profile.diploma??{field:'',institution:'',year:''}} onChange={entry=>upd(()=>({diploma:entry}))} testId="diploma"/></div>}
-                  {(['ug','pg','phd'] as const).filter((k)=>(k==='ug'&&['Degree','Masters','PhD'].includes(profile.highest))||(k==='pg'&&['Masters','PhD'].includes(profile.highest))||(k==='phd'&&profile.highest==='PhD')).map(k=><div key={k} className="mt-6"><p className="eyebrow mb-3">{k==='ug'?translateUi("Degree"):k==='pg'?translateUi("Masters"):translateUi("PhD")}</p><EducationFields entry={profile[k]} onChange={entry=>upd(()=>({[k]:entry}))} testId={k}/></div>)}
+                  {(['ug','pg','phd'] as const).filter((k)=>(k==='ug'&&['Degree','Masters','PhD'].includes(profile.highest))||(k==='pg'&&['Masters','PhD'].includes(profile.highest))||(k==='phd'&&profile.highest==='PhD')).map(k=><div key={k} className="mt-6"><p className="eyebrow mb-3">{localeText(k==='ug'?translateUi("Degree"):k==='pg'?translateUi("Masters"):translateUi("PhD"))}</p><EducationFields entry={profile[k]} onChange={entry=>upd(()=>({[k]:entry}))} testId={k}/></div>)}
 
                 </section>
-                {cvPanel}
+                {localeText(cvPanel)}
               </div>
             )}
 
@@ -199,8 +200,8 @@ export default function Pathway() {
                   <ul className="mt-6 space-y-4">
                     {skillList.map((sk) => { const v = profile.skills[sk] ?? 0; return (
                       <li key={sk} onMouseEnter={() => setHoverSkill(sk)} onMouseLeave={() => setHoverSkill(null)}>
-                        <div className="mb-1.5 flex items-center justify-between text-sm"><span className="flex items-center gap-2">{sk}<SdgPill n={skillSdg(sk)} small /></span><span className="flex items-center gap-3"><span className="font-mono text-xs text-muted-foreground">{translateUi(LEVELS[v])} · {v}/5</span><button type="button" className="text-xs underline" aria-label={'Remove '+sk} onClick={()=>upd(p=>{const skills={...p.skills};delete skills[sk];return {skills,excludedSkills:[...new Set([...(p.excludedSkills??[]),sk])]};})}>{translateUi("Remove")}</button></span></div>
-                        <input type="range" min={0} max={5} value={v} className="range" aria-label={`${sk} level`} data-testid={`range-skill-${sk.replace(/\W/g, '')}`}
+                        <div className="mb-1.5 flex items-center justify-between text-sm"><span className="flex items-center gap-2">{localeText(sk)}<SdgPill n={skillSdg(sk)} small /></span><span className="flex items-center gap-3"><span className="font-mono text-xs text-muted-foreground">{translateUi(LEVELS[v])} · {localeText(v)}/5</span><button type="button" className="text-xs underline" aria-label={localeLabel('Remove '+sk)} onClick={()=>upd(p=>{const skills={...p.skills};delete skills[sk];return {skills,excludedSkills:[...new Set([...(p.excludedSkills??[]),sk])]};})}>{translateUi("Remove")}</button></span></div>
+                        <input type="range" min={0} max={5} value={v} className="range" aria-label={localeLabel(`${sk} level`)} data-testid={`range-skill-${sk.replace(/\W/g, '')}`}
                           onChange={(e) => { const n = Number(e.target.value); upd((p) => { const s = { ...p.skills }; s[sk] = n; return { skills: s }; }); }}
                           style={{ background: `linear-gradient(90deg, #8fb0ff, #c08bff ${v * 20}%, hsl(232 40% 94%) ${v * 20}%)` }} />
                       </li>
@@ -208,8 +209,8 @@ export default function Pathway() {
                   </ul>
                   <div className="mt-6 flex gap-2">
                     <input list="all-skills" className="field" placeholder={translateUi("Others — add a skill")} value={other} onChange={(e) => setOther(e.target.value)} data-testid="input-other-skill" />
-                    <datalist id="all-skills">{ALL_SKILLS.map((s) => <option key={s} value={s} />)}</datalist>
-                    <button className="btn-ghost shrink-0" disabled={!other.trim()} onClick={() => { const error=skillError(other);if(error){toast({title:'Invalid skill',description:error});return;}const name=cleanSkill(other);upd((p) => ({ skills: { ...p.skills, [name]: p.skills[name] ?? 0 }, excludedSkills:(p.excludedSkills??[]).filter(s=>s!==name) })); setOther(''); }} data-testid="button-add-skill"><Plus className="h-4 w-4" />{translateUi("Add")}</button>
+                    <datalist id="all-skills">{ALL_SKILLS.map((s) => <option key={s} value={localeLabel(s)} />)}</datalist>
+                    <button className="btn-ghost shrink-0" disabled={!other.trim()} onClick={() => { const typed=cleanSkill(other);const name=ALL_SKILLS.find(skill=>localeLabel(skill).toLowerCase()===typed.toLowerCase())??typed;const error=skillError(name);if(error){toast({title:'Invalid skill',description:error});return;}upd((p) => ({ skills: { ...p.skills, [name]: p.skills[name] ?? 0 }, excludedSkills:(p.excludedSkills??[]).filter(s=>s!==name) })); setOther(''); }} data-testid="button-add-skill"><Plus className="h-4 w-4" />{translateUi("Add")}</button>
                   </div>
                 </section>
 
@@ -223,19 +224,19 @@ export default function Pathway() {
 
                   <dl className="grid gap-px overflow-hidden rounded-2xl border bg-border sm:grid-cols-2">
                     {[['Name', profile.name || '—'], ['Location', profile.location || '—'], ['Interest area', profile.otherInterest || stream?.name || '—'], ['Careers to explore', [...profile.careers.map((c) => careerById(c)?.title),profile.otherCareer].filter(Boolean).join(', ') || '—'], ['Highest education', [profile.highest,profile.highest==='Pre-U'?profile.preUQualification:'',profile.highest==='Secondary'?profile.secondaryQualification:'',profile.highest==='Diploma'?profile.diploma?.field:profile.highest==='Pre-U'?'':profile.ug.field].filter(Boolean).join(' · ')], ['Experience', `${profile.years} yrs · ${profile.roles.length} roles`]].map(([k, v]) => (
-                      <div key={k} className="bg-white p-4"><dt className="eyebrow">{translateUi(k)}</dt><dd className="mt-1 text-sm">{v}</dd></div>
+                      <div key={k} className="bg-white p-4"><dt className="eyebrow">{translateUi(k)}</dt><dd className="mt-1 text-sm">{localeText(v)}</dd></div>
                     ))}
                   </dl>
                 </section>
                 <section className="glass rounded-3xl p-6">
-                  <p className="eyebrow mb-3">{Object.keys(profile.skills).length}{' '}{translateUi("skills rated")}</p>
+                  <p className="eyebrow mb-3">{localeText(Object.keys(profile.skills).length)}{localeText(' ')}{translateUi("skills rated")}</p>
                   <div className="flex flex-wrap gap-2">
                     {Object.entries(profile.skills).map(([s, v]) => (
-                      <span key={s} className="inline-flex items-center gap-2 rounded-full border bg-white px-3 py-1 text-sm">{translateUi(s)}<span className="font-mono text-xs text-muted-foreground">{v}/5</span>
+                      <span key={s} className="inline-flex items-center gap-2 rounded-full border bg-white px-3 py-1 text-sm">{translateUi(s)}<span className="font-mono text-xs text-muted-foreground">{localeText(v)}/5</span>
 </span>
                     ))}
                   </div>
-                  <p className="mt-4 text-xs text-muted-foreground">{translateUi("Use Back to edit your skill ratings; this summary is read-only.")}</p><p className="mt-6 text-xs text-muted-foreground">Of {CAREERS.length} careers modelled, Faraway will rank the ones that fit you best on the next screen.</p>
+                  <p className="mt-4 text-xs text-muted-foreground">{translateUi("Use Back to edit your skill ratings; this summary is read-only.")}</p><p className="mt-6 text-xs text-muted-foreground">{localeLabel("Of")}{' '}{localeText(CAREERS.length)}{' '}{localeLabel("careers modelled, Faraway will rank the ones that fit you best on the next screen.")}</p>
                 </section>
               </div>
             )}
@@ -244,8 +245,8 @@ export default function Pathway() {
 
         <div className="mt-10 flex items-center justify-between border-t pt-6">
           <button onClick={() => setStep((s) => Math.max(0, s - 1))} disabled={step === 0} className="btn-ghost" data-testid="button-back"><ArrowLeft className="h-4 w-4" />{translateUi("Back")}</button>
-          <span className="font-mono text-xs text-muted-foreground">{step + 1} / {STEPS.length}</span>
-          {step===1&&experienceIssue&&<p role="alert" className="text-sm text-red-700">{experienceIssue}</p>}
+          <span className="font-mono text-xs text-muted-foreground">{localeText(step + 1)} / {localeText(STEPS.length)}</span>
+          {step===1&&experienceIssue&&<p role="alert" className="text-sm text-red-700">{localeText(experienceIssue)}</p>}
           {step < 4 ? <button onClick={() => setStep((s) => s + 1)} disabled={!canNext} className="btn-ink" data-testid="button-next">{translateUi("Next")}<ArrowRight className="h-4 w-4" /></button>
             : <button onClick={finish} className="btn-ink" data-testid="button-finish">{translateUi("See skill analysis")}<ArrowRight className="h-4 w-4" /></button>}
         </div>
@@ -256,8 +257,8 @@ export default function Pathway() {
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   useLanguage();
-  return <label className="block"><span className="mb-1.5 block text-xs font-medium text-muted-foreground">{translateUi(label)}</span>{children}</label>;
+  return <label className="block"><span className="mb-1.5 block text-xs font-medium text-muted-foreground">{translateUi(label)}</span>{localeText(children)}</label>;
 }
 
 function EducationFields({entry,onChange,testId,showField=true}:{entry:Profile['ug'];onChange:(entry:Profile['ug'])=>void;testId:string;showField?:boolean}){
-  useLanguage();return <div className="grid gap-4 sm:grid-cols-2">{showField&&<Field label="Field of study"><input className="field" value={entry.field} onChange={e=>onChange({...entry,field:e.target.value})} placeholder="e.g. Software Engineering" data-testid={`input-${testId}-field`}/></Field>}<Field label="School / institution"><input className="field" value={entry.institution} onChange={e=>onChange({...entry,institution:e.target.value})} data-testid={`input-${testId}-institution`}/></Field><Field label="Graduation / completion year"><input className="field" type="text" inputMode="numeric" maxLength={4} pattern="[0-9]{4}" placeholder="e.g. 2025" value={entry.year} onChange={e=>onChange({...entry,year:e.target.value.replace(/\D/g,'').slice(0,4)})} data-testid={`input-${testId}-year`}/></Field></div>;}
+  useLanguage();return <div className="grid gap-4 sm:grid-cols-2">{showField&&<Field label="Field of study"><input className="field" value={entry.field} onChange={e=>onChange({...entry,field:e.target.value})} placeholder={localeLabel("e.g. Software Engineering")} data-testid={`input-${testId}-field`}/></Field>}<Field label="School / institution"><input className="field" value={entry.institution} onChange={e=>onChange({...entry,institution:e.target.value})} data-testid={`input-${testId}-institution`}/></Field><Field label="Graduation / completion year"><input className="field" type="text" inputMode="numeric" maxLength={4} pattern="[0-9]{4}" placeholder={localeLabel("e.g. 2025")} value={entry.year} onChange={e=>onChange({...entry,year:e.target.value.replace(/\D/g,'').slice(0,4)})} data-testid={`input-${testId}-year`}/></Field></div>;}

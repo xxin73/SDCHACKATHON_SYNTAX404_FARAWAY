@@ -1,3 +1,4 @@
+import {t as localeLabel,ui as localeText,useLanguage as useUiLanguage} from '@/lib/i18n';
 import { useEffect, useRef, useState, type ReactNode, type ComponentType } from 'react';
 import { motion, useMotionValue, useSpring, useTransform, useReducedMotion } from 'framer-motion';
 import { AlertTriangle, RotateCw } from 'lucide-react';
@@ -7,6 +8,7 @@ export const LOGO = import.meta.env.BASE_URL + 'faraway-logo-trimmed.png';
 
 /** Global SVG defs — the flowing spectrum gradient every icon strokes with. */
 export function SpectrumDefs() {
+ useUiLanguage();
   return (
     <svg width="0" height="0" className="absolute" aria-hidden>
       <defs>
@@ -27,6 +29,7 @@ type IconT = ComponentType<{ size?: number; strokeWidth?: number; color?: string
 
 /** Icon with a continuous rainbow stroke that flows along its contours. */
 export function SpectrumIcon({ icon: Icon, size = 22, className, still }: { icon: IconT; size?: number; className?: string; still?: boolean }) {
+ useUiLanguage();
   return (
     <span className={cn('relative inline-grid shrink-0 place-items-center', className)} style={{ width: size, height: size }}>
       <Icon size={size} strokeWidth={1.6} className="absolute text-[hsl(232_30%_20%/.14)]" />
@@ -37,6 +40,7 @@ export function SpectrumIcon({ icon: Icon, size = 22, className, still }: { icon
 
 /** Pointer-reactive 3D tilt. */
 export function Tilt({ children, className, max = 6 }: { children: ReactNode; className?: string; max?: number }) {
+ useUiLanguage();
   const reduce = useReducedMotion();
   const x = useMotionValue(0.5); const y = useMotionValue(0.5);
   const rx = useSpring(useTransform(y, [0, 1], [max, -max]), { stiffness: 160, damping: 18 });
@@ -49,13 +53,14 @@ export function Tilt({ children, className, max = 6 }: { children: ReactNode; cl
       onPointerMove={(e) => { const r = e.currentTarget.getBoundingClientRect(); x.set((e.clientX - r.left) / r.width); y.set((e.clientY - r.top) / r.height); }}
       onPointerLeave={() => { x.set(0.5); y.set(0.5); }}
     >
-      {children}
+      {localeText(children)}
     </motion.div>
   );
 }
 
 /** Slight magnetic attraction toward the cursor. */
 export function Magnetic({ children, className, strength = 0.28 }: { children: ReactNode; className?: string; strength?: number }) {
+ useUiLanguage();
   const reduce = useReducedMotion();
   const x = useSpring(0, { stiffness: 220, damping: 15 }); const y = useSpring(0, { stiffness: 220, damping: 15 });
   return (
@@ -65,13 +70,14 @@ export function Magnetic({ children, className, strength = 0.28 }: { children: R
       onPointerMove={(e) => { const r = e.currentTarget.getBoundingClientRect(); x.set((e.clientX - r.left - r.width / 2) * strength); y.set((e.clientY - r.top - r.height / 2) * strength); }}
       onPointerLeave={() => { x.set(0); y.set(0); }}
     >
-      {children}
+      {localeText(children)}
     </motion.div>
   );
 }
 
 /** Faint pastel aurora light leaks drifting across white. Follows the mouse slightly. */
 export function Aurora() {
+ useUiLanguage();
   const reduce = useReducedMotion();
   const mx = useSpring(0, { stiffness: 30, damping: 20 }); const my = useSpring(0, { stiffness: 30, damping: 20 });
   useEffect(() => {
@@ -100,6 +106,7 @@ export function Aurora() {
  */
 const CELL = 11;
 function MosaicField() {
+ useUiLanguage();
   const ref = useRef<HTMLCanvasElement>(null);
   const reduce = useReducedMotion();
   useEffect(() => {
@@ -181,6 +188,7 @@ function MosaicField() {
 
 /** Canvas particle aggregation: spectrum particles converge into a compass ring while a scan line sweeps. */
 export function ParticleField({ height = 220, converge = true }: { height?: number; converge?: boolean }) {
+ useUiLanguage();
   const ref = useRef<HTMLCanvasElement>(null);
   const reduce = useReducedMotion();
   useEffect(() => {
@@ -229,6 +237,7 @@ export function ParticleField({ height = 220, converge = true }: { height?: numb
 export function AiStage({ pending, error, onRetry, phases, children, testId }: {
   pending: boolean; error?: unknown; onRetry?: () => void; phases: string[]; children?: ReactNode; testId?: string;
 }) {
+ useUiLanguage();
   const [i, setI] = useState(0);
   useEffect(() => {
     if (!pending) { setI(0); return; }
@@ -240,7 +249,7 @@ export function AiStage({ pending, error, onRetry, phases, children, testId }: {
       <motion.div data-testid={testId ? `${testId}-loading` : 'ai-loading'} initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} className="spectrum-border glass relative overflow-hidden rounded-3xl">
         <ParticleField height={200} />
         <div className="absolute inset-x-0 bottom-0 p-4 text-center">
-          <motion.p key={i} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} className="font-mono text-xs tracking-wide text-muted-foreground">{phases[i]}</motion.p>
+          <motion.p key={i} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} className="font-mono text-xs tracking-wide text-muted-foreground">{localeText(phases[i])}</motion.p>
         </div>
       </motion.div>
     );
@@ -249,11 +258,11 @@ export function AiStage({ pending, error, onRetry, phases, children, testId }: {
     const msg = (error as { data?: { error?: string }; message?: string })?.data?.error ?? (error as Error)?.message ?? 'Something went wrong.';
     return (
       <div className="rounded-3xl border border-[hsl(352_70%_88%)] bg-[hsl(352_100%_98.5%)] p-5" role="alert" data-testid={testId ? `${testId}-error` : 'ai-error'}>
-        <p className="flex items-center gap-2 text-sm font-medium text-[hsl(352_60%_42%)]"><AlertTriangle className="h-4 w-4" />The engine could not finish that run.</p>
-        <p className="mt-1 text-sm text-muted-foreground">{msg}</p>
-        {onRetry && <button onClick={onRetry} className="btn-ghost mt-3" data-testid="button-retry"><RotateCw className="h-4 w-4" />Try again</button>}
+        <p className="flex items-center gap-2 text-sm font-medium text-[hsl(352_60%_42%)]"><AlertTriangle className="h-4 w-4" />{localeText("The engine could not finish that run.")}</p>
+        <p className="mt-1 text-sm text-muted-foreground">{localeText(msg)}</p>
+        {onRetry && <button onClick={onRetry} className="btn-ghost mt-3" data-testid="button-retry"><RotateCw className="h-4 w-4" />{localeLabel("Try again")}</button>}
       </div>
     );
   }
-  return <>{children}</>;
+  return <>{localeText(children)}</>;
 }

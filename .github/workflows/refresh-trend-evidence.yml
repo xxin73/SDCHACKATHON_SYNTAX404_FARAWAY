@@ -11,21 +11,35 @@ concurrency:
 jobs:
   refresh:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 8
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/cache@v4
+        with:
+          path: ${{ runner.temp }}/faraway-nllb
+          key: faraway-nllb-600m-int8-v1
       - name: Fetch and validate public sources
         working-directory: Faraway
         run: node scripts/update-trend-evidence.cjs
-      - name: Publish dated shared snapshot
+      - name: Prepare translated public evidence titles on CPU
+        working-directory: Faraway
+        env:
+          FARAWAY_TRANSLATION_MODEL: ${{ runner.temp }}/faraway-nllb
+        run: |
+          python -m pip install ctranslate2 sentencepiece --quiet
+          python scripts/localize-trend-evidence.py
+      - name: Publish dated shared snapshot and matching translations
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add Faraway/artifacts/faraway/public/trend-evidence.json
+          git add Faraway/artifacts/faraway/public/trend-evidence.json Faraway/artifacts/faraway/src/lib/locales/zh.json Faraway/artifacts/faraway/src/lib/locales/ms.json
           if ! git diff --cached --quiet; then
-            git commit -m "Refresh dated public trend evidence"
+            git commit -m "Refresh dated public evidence and language dictionaries"
             git push
           fi

@@ -1,3 +1,5 @@
+import {getLanguage,t} from './i18n';
+import {t as localeLabel,ui as localeText,useLanguage as useUiLanguage} from '@/lib/i18n';
 import {markPlanEvidence} from './live-trends';
 import expanded from '@/data/expanded-catalogue.json';
 import {loadObservations} from './market-data';
@@ -24,6 +26,7 @@ function replaceCatalogue(catalogue:Catalogue|null) {
   setDatabaseCatalogue(Boolean(catalogue));
 }
 export function RecommendationProvider({children}:{children:ReactNode}) {
+ useUiLanguage();
   const auth=useAuth(); const userId=auth.user?.id;
   const generation=useRef(0);
   const [ready,setReady]=useState(false),[error,setError]=useState('');
@@ -61,18 +64,21 @@ export function RecommendationProvider({children}:{children:ReactNode}) {
     const current=generation.current;
     await auth.flush();
     const state=getState();
+    const requestedLanguage=getLanguage();
     if(state.session?.id!==userId)throw new Error('Your account changed. Sign in again.');
     const p=profileInput(state.profile),pref=preferences(state.plan);
     const profileHash=await digest(p),preferencesHash=await digest(pref);
     const role=CAREERS.find(r=>r.id===careerId);
     const marketObservations=(careerIds?loadObservations().filter(r=>CAREERS.filter(c=>careerIds.includes(c.id)).some(c=>observationsForRole(c,[r]).length>0)):role?observationsForRole(role,loadObservations()):[]).slice(0,40);
-    const {data,error}=await requireSupabase().functions.invoke('faraway-recommendations',{body:{kind,careerId,profileHash,preferencesHash,pathwayVersion:PATHWAY_VERSION,scenario:state.scenario,marketObservations,...(careerIds?{careerIds}:{})}});
-    if(error){let detail='';try{detail=(await error.context?.json())?.error??'';}catch{}throw new Error(detail==='Invalid recommendation request.'?'The AI server needs the latest occupation-pathway update. Deploy the updated faraway-recommendations function, then retry.':detail||'AI function unavailable. Deploy faraway-recommendations and check the server secrets.');}
+    const {data,error}=await requireSupabase().functions.invoke('faraway-recommendations',{body:{kind,careerId,profileHash,preferencesHash,pathwayVersion:PATHWAY_VERSION,scenario:state.scenario,...(requestedLanguage!=='en'?{language:requestedLanguage}:{}),marketObservations,...(careerIds?{careerIds}:{})}});
+    if(error){let detail='';try{detail=(await error.context?.json())?.error??'';}catch{}throw new Error(detail==='Invalid recommendation request.'&&getLanguage()!=='en'?t('Deploy the updated AI function to generate explanations and study plans in your selected language.'):detail==='Invalid recommendation request.'?'The AI server needs the latest occupation-pathway update. Deploy the updated faraway-recommendations function, then retry.':detail||'AI function unavailable. Deploy faraway-recommendations and check the server secrets.');}
     if(data?.error)throw new Error(data.error);
     if(current!==generation.current||getState().session?.id!==userId)throw new Error('Your account changed during generation.');
     if(await digest(profileInput(getState().profile))!==profileHash || (kind==='plan'&&await digest(preferences(getState().plan))!==preferencesHash))throw new Error('Your inputs changed. Confirm them and generate again.');
     if(kind==='explain'&&getState().scenario!==state.scenario)throw new Error('Your chart scenario changed. Generate its explanation again.');
     const run=data.run as Run;
+    if(getLanguage()!==requestedLanguage)throw new Error(t('Your language changed while AI was working. Generate again in the selected language.'));
+    if((run?.result?.meta.language??'en')!==requestedLanguage)throw new Error(t('Deploy the updated AI function to generate explanations and study plans in your selected language.'));
     if(run?.result?.meta.calculationVersion!==CALCULATION_VERSION||run?.result?.meta.pathwayVersion!==PATHWAY_VERSION)throw new Error('The AI server needs the latest occupation-pathway update. Deploy the updated faraway-recommendations function, then retry. Your saved plan is unchanged.');
     if(!run?.id||run.result?.meta.profileHash!==profileHash||run.result?.meta.catalogueVersion!==catalogue?.version)throw new Error('AI returned a different data version. Reload before continuing.');
     if(kind==='plan')markPlanEvidence(userId,run.id,CAREERS.find(c=>c.id===careerId));
@@ -112,7 +118,8 @@ export function RecommendationProvider({children}:{children:ReactNode}) {
     if(error)throw new Error('Completion was not saved. Please retry.');
     if(current===generation.current)setCompleted(before=>{const copy=new Set(before);if(next)copy.add(key);else copy.delete(key);return copy;});
   };
-  return <Context.Provider value={{ready,error,catalogue,runs,active,completed,reload,clearJourneyHistory,generate,activate,tick}}>{children}</Context.Provider>;
+  return <Context.Provider value={{ready,error,catalogue,runs,active,completed,reload,clearJourneyHistory,generate,activate,tick}}>{localeText(children)}</Context.Provider>;
 }
 export function useRecommendations(){const value=useContext(Context);if(!value)throw new Error('RecommendationProvider is required');return value;}
+
 

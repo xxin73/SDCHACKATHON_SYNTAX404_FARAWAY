@@ -1,0 +1,14 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&family=Noto+Serif+SC:wght@500;600;700&display=swap');
+html[lang="zh-Hans"] body {font-family:"Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif;}
+html[lang="zh-Hans"] .font-display {font-family:"Noto Serif SC","Songti SC",serif;font-weight:600;line-height:1.22;letter-spacing:.015em;}
+html[lang="zh-Hans"] .eyebrow {letter-spacing:.13em;line-height:1.7;}
+html[lang="zh-Hans"] p,html[lang="zh-Hans"] li {line-height:1.8;}
+html[lang="ms"] .font-display {line-height:1.14;letter-spacing:-.025em;}
+html[lang="ms"] .eyebrow {letter-spacing:.1em;line-height:1.5;}
+.language-enter #root main,.language-enter #root .page-heading {animation:languageReveal .32s ease both;}
+@keyframes languageReveal {from{opacity:.35;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+@media(prefers-reduced-motion:reduce){.language-enter #root main,.language-enter #root .page-heading{animation:none}}
+
+.language-boot{min-height:100dvh;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:1.2rem;padding:2rem;text-align:center;background:linear-gradient(145deg,#faf8ff,#fff,#fffaf4)}
+.language-boot span{font-size:.75rem;letter-spacing:.35em;color:#898299}
+.language-boot p{max-width:36rem;font-size:clamp(1.4rem,4vw,2.5rem);font-family:"Noto Serif SC",serif;color:#30283f;line-height:1.6}

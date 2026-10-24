@@ -1,3 +1,4 @@
+import {t as localeLabel,ui as localeText} from '@/lib/i18n';
 import {t as translateUi,useLanguage} from '@/lib/i18n';
 import { AccountAvatar } from './account-avatar';
 import { useEffect, useState, type ReactNode } from 'react';
@@ -111,7 +112,7 @@ export function Shell({ children }: { children: ReactNode }) {
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56 rounded-2xl">
-                <DropdownMenuLabel><p className="font-medium">{name}</p><p className="text-xs font-normal text-muted-foreground">{session?.email}</p></DropdownMenuLabel>
+                <DropdownMenuLabel><p className="font-medium">{name}</p><p className="text-xs font-normal text-muted-foreground">{localeText(session?.email)}</p></DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild><Link href="/profile">{translateUi("Profile & settings")}</Link></DropdownMenuItem>
                 <DropdownMenuItem asChild><Link href="/organization" data-testid="menu-organization"><Building2 className="mr-2 h-4 w-4" />{translateUi("Organization view")}</Link></DropdownMenuItem>
@@ -124,11 +125,11 @@ export function Shell({ children }: { children: ReactNode }) {
         </header>
         <motion.main key={loc} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease: [0.2, 0.8, 0.2, 1] }}
           className="app-main mx-auto max-w-[1280px] px-4 pb-28 pt-6 sm:px-8 md:px-12 md:pb-20">
-          {auth.user && <div className="mb-4 text-sm" role="status" aria-live="polite">{auth.syncStatus.phase === 'saving' ? translateUi("Saving your personal profile…") : auth.syncStatus.phase === 'save-error' ? <><span role="alert">{auth.syncStatus.error} Keep this tab open.</span> <button className="underline" onClick={() => void auth.retry()}>{translateUi("Retry save")}</button></> : translateUi("Personal profile and skills saved to your account.")}</div>}
-          {auth.error && <p className="mb-4 text-sm" role="alert">{auth.error}</p>}
-          {resetError && <p className="mb-4 rounded-xl bg-red-50 p-3 text-sm text-red-800" role="alert">{resetError}</p>}
-          {children}
-          <footer className="mt-12 border-t pt-5 text-xs text-muted-foreground">Faraway · Personal profiles and learning progress sync to your account. Organisation records are stored in this browser. Scenario figures and catalogue course estimates are illustrative; source links and learning resources are identified separately. <Link href="/evidence" className="underline">{translateUi("Review or update evidence")}</Link></footer>
+          {auth.user && <div className="mb-4 text-sm" role="status" aria-live="polite">{auth.syncStatus.phase === 'saving' ? translateUi("Saving your personal profile…") : auth.syncStatus.phase === 'save-error' ? <><span role="alert">{localeText(auth.syncStatus.error)}{' '}{localeLabel("Keep this tab open.")}</span> <button className="underline" onClick={() => void auth.retry()}>{translateUi("Retry save")}</button></> : translateUi("Personal profile and skills saved to your account.")}</div>}
+          {auth.error && <p className="mb-4 text-sm" role="alert">{localeText(auth.error)}</p>}
+          {resetError && <p className="mb-4 rounded-xl bg-red-50 p-3 text-sm text-red-800" role="alert">{localeText(resetError)}</p>}
+          {localeText(children)}
+          <footer className="mt-12 border-t pt-5 text-xs text-muted-foreground">{localeText("Faraway · Personal profiles and learning progress sync to your account. Organisation records are stored in this browser. Scenario figures and catalogue course estimates are illustrative; source links and learning resources are identified separately.")}{localeText(' ')}<Link href="/evidence" className="underline">{translateUi("Review or update evidence")}</Link></footer>
         </motion.main>
       </div>
     </div>
