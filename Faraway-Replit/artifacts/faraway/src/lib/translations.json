@@ -1,0 +1,2214 @@
+{
+  "Language": {
+    "zh": "语言",
+    "ms": "Bahasa"
+  },
+  "Interface language": {
+    "zh": "界面语言",
+    "ms": "Bahasa antara muka"
+  },
+  "English": {
+    "zh": "英语",
+    "ms": "Bahasa Inggeris"
+  },
+  "Mandarin": {
+    "zh": "中文",
+    "ms": "Bahasa Cina"
+  },
+  "Malay": {
+    "zh": "马来语",
+    "ms": "Bahasa Melayu"
+  },
+  "Saved AI explanations and external source titles remain in their original language.": {
+    "zh": "已保存的 AI 说明和外部资料标题保留原文。",
+    "ms": "Penjelasan AI yang disimpan dan tajuk sumber luar kekal dalam bahasa asal."
+  },
+  "Home": {
+    "zh": "首页",
+    "ms": "Utama"
+  },
+  "Dashboard": {
+    "zh": "概览",
+    "ms": "Papan pemuka"
+  },
+  "Personal": {
+    "zh": "个人",
+    "ms": "Peribadi"
+  },
+  "Organization": {
+    "zh": "组织",
+    "ms": "Organisasi"
+  },
+  "Organisation": {
+    "zh": "组织",
+    "ms": "Organisasi"
+  },
+  "Workspace": {
+    "zh": "工作区",
+    "ms": "Ruang kerja"
+  },
+  "Workspace · Personal": {
+    "zh": "工作区 · 个人",
+    "ms": "Ruang kerja · Peribadi"
+  },
+  "Switch": {
+    "zh": "切换",
+    "ms": "Tukar"
+  },
+  "Switch workspace": {
+    "zh": "切换工作区",
+    "ms": "Tukar ruang kerja"
+  },
+  "Explore": {
+    "zh": "探索",
+    "ms": "Teroka"
+  },
+  "Explore pathway": {
+    "zh": "探索职业路径",
+    "ms": "Teroka laluan kerjaya"
+  },
+  "Skill analysis": {
+    "zh": "技能分析",
+    "ms": "Analisis kemahiran"
+  },
+  "Career target": {
+    "zh": "职业目标",
+    "ms": "Sasaran kerjaya"
+  },
+  "Study plan": {
+    "zh": "学习计划",
+    "ms": "Pelan pembelajaran"
+  },
+  "Learning progress": {
+    "zh": "学习进度",
+    "ms": "Kemajuan pembelajaran"
+  },
+  "Profile & settings": {
+    "zh": "个人资料与设置",
+    "ms": "Profil dan tetapan"
+  },
+  "Evidence & assumptions": {
+    "zh": "证据与假设",
+    "ms": "Bukti dan andaian"
+  },
+  "Evidence & sources": {
+    "zh": "证据与来源",
+    "ms": "Bukti dan sumber"
+  },
+  "Evidence behind your next step": {
+    "zh": "支持下一步的资料",
+    "ms": "Bukti untuk langkah seterusnya"
+  },
+  "Sources & dates": {
+    "zh": "来源与日期",
+    "ms": "Sumber dan tarikh"
+  },
+  "Review or update evidence": {
+    "zh": "查看资料",
+    "ms": "Semak bukti"
+  },
+  "Departments & teams": {
+    "zh": "部门与团队",
+    "ms": "Jabatan dan pasukan"
+  },
+  "People directory": {
+    "zh": "人员名录",
+    "ms": "Direktori ahli"
+  },
+  "Workforce intelligence": {
+    "zh": "人才与技能分析",
+    "ms": "Analisis tenaga kerja"
+  },
+  "Learning plans": {
+    "zh": "学习计划",
+    "ms": "Pelan pembelajaran"
+  },
+  "Team progress": {
+    "zh": "团队进度",
+    "ms": "Kemajuan pasukan"
+  },
+  "Programmes": {
+    "zh": "课程专业",
+    "ms": "Program"
+  },
+  "Departments": {
+    "zh": "部门",
+    "ms": "Jabatan"
+  },
+  "People": {
+    "zh": "人员",
+    "ms": "Ahli"
+  },
+  "Insights": {
+    "zh": "分析",
+    "ms": "Analisis"
+  },
+  "Plans": {
+    "zh": "计划",
+    "ms": "Pelan"
+  },
+  "Progress": {
+    "zh": "进度",
+    "ms": "Kemajuan"
+  },
+  "Career": {
+    "zh": "职业",
+    "ms": "Kerjaya"
+  },
+  "Plan": {
+    "zh": "计划",
+    "ms": "Pelan"
+  },
+  "Organization view": {
+    "zh": "组织视图",
+    "ms": "Paparan organisasi"
+  },
+  "Restart journey": {
+    "zh": "重新开始",
+    "ms": "Mulakan semula"
+  },
+  "Sign out": {
+    "zh": "退出登录",
+    "ms": "Log keluar"
+  },
+  "Sign in": {
+    "zh": "登录",
+    "ms": "Log masuk"
+  },
+  "Log in": {
+    "zh": "登录",
+    "ms": "Log masuk"
+  },
+  "Sign up": {
+    "zh": "注册",
+    "ms": "Daftar"
+  },
+  "Create account": {
+    "zh": "创建账户",
+    "ms": "Cipta akaun"
+  },
+  "Continue with email": {
+    "zh": "使用邮箱继续",
+    "ms": "Teruskan dengan e-mel"
+  },
+  "Signing in…": {
+    "zh": "正在登录…",
+    "ms": "Sedang log masuk…"
+  },
+  "Creating account…": {
+    "zh": "正在创建账户…",
+    "ms": "Sedang mencipta akaun…"
+  },
+  "Email": {
+    "zh": "邮箱",
+    "ms": "E-mel"
+  },
+  "Password": {
+    "zh": "密码",
+    "ms": "Kata laluan"
+  },
+  "Full name": {
+    "zh": "姓名",
+    "ms": "Nama penuh"
+  },
+  "New to Faraway?": {
+    "zh": "首次使用 Faraway？",
+    "ms": "Baharu di Faraway?"
+  },
+  "Already have one?": {
+    "zh": "已有账户？",
+    "ms": "Sudah mempunyai akaun?"
+  },
+  "Your profile and progress save securely to your account": {
+    "zh": "个人资料和进度安全保存至账户",
+    "ms": "Profil dan kemajuan disimpan dengan selamat dalam akaun anda"
+  },
+  "Start charting.": {
+    "zh": "开启你的旅程。",
+    "ms": "Mulakan perjalanan anda."
+  },
+  "Create an account to save your personal profile and skill assessments.": {
+    "zh": "创建账户，保存个人资料和技能评估。",
+    "ms": "Cipta akaun untuk menyimpan profil dan penilaian kemahiran anda."
+  },
+  "At least 8 characters": {
+    "zh": "至少 8 个字符",
+    "ms": "Sekurang-kurangnya 8 aksara"
+  },
+  "Career & education compass · Malaysia": {
+    "zh": "职业与教育指南 · 马来西亚",
+    "ms": "Panduan kerjaya dan pendidikan · Malaysia"
+  },
+  "Where": {
+    "zh": "让",
+    "ms": "Dari"
+  },
+  "Possibilities": {
+    "zh": "每一种可能",
+    "ms": "Impian"
+  },
+  "Take You.": {
+    "zh": "照亮你的前路。",
+    "ms": "ke Masa Depan."
+  },
+  "Explore your skills, compare possible AI futures, and turn a career goal into a practical learning plan.": {
+    "zh": "探索你的技能，比较不同 AI 发展情景，将职业目标转化为可行的学习计划。",
+    "ms": "Teroka kemahiran anda, bandingkan senario masa depan AI dan jadikan matlamat kerjaya suatu pelan pembelajaran praktikal."
+  },
+  "Welcome": {
+    "zh": "欢迎",
+    "ms": "Selamat datang"
+  },
+  "Who are you exploring for?": {
+    "zh": "你希望为谁规划未来？",
+    "ms": "Untuk siapakah anda merancang?"
+  },
+  "Which organisation are you supporting?": {
+    "zh": "你为哪类组织提供支持？",
+    "ms": "Organisasi manakah yang anda sokong?"
+  },
+  "Fresh graduate, job seeker, or a worker whose role is shifting under AI.": {
+    "zh": "适合毕业生、求职者，以及工作正受 AI 影响的人士。",
+    "ms": "Untuk graduan baharu, pencari kerja atau pekerja yang peranannya berubah akibat AI."
+  },
+  "HR manager, TVET centre or university career office planning for a team.": {
+    "zh": "适合为团队规划的人力资源经理、TVET 中心或大学就业指导部门。",
+    "ms": "Untuk pengurus sumber manusia, pusat TVET atau pusat kerjaya universiti yang merancang bagi pasukan."
+  },
+  "HR manager / employer": {
+    "zh": "人力资源经理 / 雇主",
+    "ms": "Pengurus sumber manusia / majikan"
+  },
+  "University / TVET career centre": {
+    "zh": "大学 / TVET 职业中心",
+    "ms": "Pusat kerjaya universiti / TVET"
+  },
+  "Reskill employees and track workforce learning.": {
+    "zh": "提升员工技能，追踪团队学习进度。",
+    "ms": "Tingkatkan kemahiran pekerja dan pantau pembelajaran tenaga kerja."
+  },
+  "Assess student readiness and plan learning pathways.": {
+    "zh": "评估学生的准备程度，规划学习路径。",
+    "ms": "Nilai kesediaan pelajar dan rancang laluan pembelajaran."
+  },
+  "Back to workspace choice": {
+    "zh": "返回工作区选择",
+    "ms": "Kembali ke pilihan ruang kerja"
+  },
+  "Continue": {
+    "zh": "继续",
+    "ms": "Teruskan"
+  },
+  "Next": {
+    "zh": "下一步",
+    "ms": "Seterusnya"
+  },
+  "Back": {
+    "zh": "返回",
+    "ms": "Kembali"
+  },
+  "← Back": {
+    "zh": "← 返回",
+    "ms": "← Kembali"
+  },
+  "Cancel": {
+    "zh": "取消",
+    "ms": "Batal"
+  },
+  "Close": {
+    "zh": "关闭",
+    "ms": "Tutup"
+  },
+  "Close ×": {
+    "zh": "关闭 ×",
+    "ms": "Tutup ×"
+  },
+  "Save": {
+    "zh": "保存",
+    "ms": "Simpan"
+  },
+  "Save changes": {
+    "zh": "保存更改",
+    "ms": "Simpan perubahan"
+  },
+  "Saving…": {
+    "zh": "正在保存…",
+    "ms": "Sedang menyimpan…"
+  },
+  "Saved": {
+    "zh": "已保存",
+    "ms": "Disimpan"
+  },
+  "Retry": {
+    "zh": "重试",
+    "ms": "Cuba semula"
+  },
+  "Retry save": {
+    "zh": "重新保存",
+    "ms": "Cuba simpan semula"
+  },
+  "Retry setup": {
+    "zh": "重新加载设置",
+    "ms": "Cuba tetapan semula"
+  },
+  "Apply": {
+    "zh": "应用",
+    "ms": "Gunakan"
+  },
+  "Add": {
+    "zh": "添加",
+    "ms": "Tambah"
+  },
+  "Remove": {
+    "zh": "移除",
+    "ms": "Buang"
+  },
+  "Edit": {
+    "zh": "编辑",
+    "ms": "Sunting"
+  },
+  "Clear": {
+    "zh": "清空",
+    "ms": "Kosongkan"
+  },
+  "Dismiss": {
+    "zh": "关闭提示",
+    "ms": "Tutup"
+  },
+  "Keep": {
+    "zh": "保留",
+    "ms": "Kekalkan"
+  },
+  "Discard": {
+    "zh": "放弃更改",
+    "ms": "Buang perubahan"
+  },
+  "Interest": {
+    "zh": "兴趣",
+    "ms": "Minat"
+  },
+  "Profile & CV": {
+    "zh": "个人资料与简历",
+    "ms": "Profil dan CV"
+  },
+  "Education": {
+    "zh": "教育背景",
+    "ms": "Pendidikan"
+  },
+  "Skills": {
+    "zh": "技能",
+    "ms": "Kemahiran"
+  },
+  "Summary": {
+    "zh": "总结",
+    "ms": "Ringkasan"
+  },
+  "Basic info": {
+    "zh": "基本信息",
+    "ms": "Maklumat asas"
+  },
+  "Personal details": {
+    "zh": "个人信息",
+    "ms": "Maklumat peribadi"
+  },
+  "Name": {
+    "zh": "姓名",
+    "ms": "Nama"
+  },
+  "Location": {
+    "zh": "所在地",
+    "ms": "Lokasi"
+  },
+  "Status": {
+    "zh": "当前状态",
+    "ms": "Status"
+  },
+  "Fresh graduate": {
+    "zh": "应届毕业生",
+    "ms": "Graduan baharu"
+  },
+  "Job seeker": {
+    "zh": "求职者",
+    "ms": "Pencari kerja"
+  },
+  "Worker switching career": {
+    "zh": "转行人士",
+    "ms": "Pekerja yang beralih kerjaya"
+  },
+  "Experience": {
+    "zh": "工作经验",
+    "ms": "Pengalaman"
+  },
+  "Career interests": {
+    "zh": "感兴趣的职业",
+    "ms": "Minat kerjaya"
+  },
+  "Save interest": {
+    "zh": "保存兴趣",
+    "ms": "Simpan minat"
+  },
+  "Search careers": {
+    "zh": "搜索职业",
+    "ms": "Cari kerjaya"
+  },
+  "Search careers, e.g. chemical engineer": {
+    "zh": "搜索职业，例如化学工程师",
+    "ms": "Cari kerjaya, contohnya jurutera kimia"
+  },
+  "Other": {
+    "zh": "其他",
+    "ms": "Lain-lain"
+  },
+  "Other career": {
+    "zh": "其他职业",
+    "ms": "Kerjaya lain"
+  },
+  "Other interest": {
+    "zh": "其他兴趣",
+    "ms": "Minat lain"
+  },
+  "Highest qualification": {
+    "zh": "最高学历",
+    "ms": "Kelayakan tertinggi"
+  },
+  "Secondary": {
+    "zh": "中学",
+    "ms": "Sekolah menengah"
+  },
+  "Pre-U": {
+    "zh": "大学预科",
+    "ms": "Prauniversiti"
+  },
+  "Diploma": {
+    "zh": "文凭",
+    "ms": "Diploma"
+  },
+  "Degree": {
+    "zh": "学士",
+    "ms": "Ijazah sarjana muda"
+  },
+  "Masters": {
+    "zh": "硕士",
+    "ms": "Sarjana"
+  },
+  "PhD": {
+    "zh": "博士",
+    "ms": "Doktor falsafah"
+  },
+  "Select qualification": {
+    "zh": "选择学历",
+    "ms": "Pilih kelayakan"
+  },
+  "Highest level completed, then the qualification and field that apply.": {
+    "zh": "选择已完成的最高学历，再填写相应资格和专业。",
+    "ms": "Pilih tahap tertinggi yang telah diselesaikan, kemudian kelayakan dan bidang berkaitan."
+  },
+  "Add role": {
+    "zh": "添加工作经历",
+    "ms": "Tambah pengalaman kerja"
+  },
+  "Remove this role": {
+    "zh": "移除此经历",
+    "ms": "Buang pengalaman ini"
+  },
+  "What did you do? Which tools did you use? What did you achieve?": {
+    "zh": "你的职责是什么？使用了哪些工具？取得了什么成果？",
+    "ms": "Apakah tugas anda? Apakah alat yang digunakan? Apakah pencapaian anda?"
+  },
+  "Find skills in responsibilities": {
+    "zh": "从职责中识别技能",
+    "ms": "Kenal pasti kemahiran daripada tugas"
+  },
+  "Your uploaded CV": {
+    "zh": "已上传的简历",
+    "ms": "CV yang dimuat naik"
+  },
+  "Review extracted details": {
+    "zh": "检查提取结果",
+    "ms": "Semak maklumat yang diekstrak"
+  },
+  "Apply reviewed details": {
+    "zh": "应用已确认的信息",
+    "ms": "Gunakan maklumat yang disemak"
+  },
+  "Skills snapshot": {
+    "zh": "技能概览",
+    "ms": "Gambaran kemahiran"
+  },
+  "Skill ratings": {
+    "zh": "技能等级",
+    "ms": "Tahap kemahiran"
+  },
+  "Skill": {
+    "zh": "技能",
+    "ms": "Kemahiran"
+  },
+  "Add skill": {
+    "zh": "添加技能",
+    "ms": "Tambah kemahiran"
+  },
+  "Select skill": {
+    "zh": "选择技能",
+    "ms": "Pilih kemahiran"
+  },
+  "Choose a skill": {
+    "zh": "选择一项技能",
+    "ms": "Pilih kemahiran"
+  },
+  "Other skill": {
+    "zh": "其他技能",
+    "ms": "Kemahiran lain"
+  },
+  "Others — add a skill": {
+    "zh": "其他 — 添加技能",
+    "ms": "Lain-lain — tambah kemahiran"
+  },
+  "Enter another skill, e.g. C++": {
+    "zh": "输入其他技能，例如 C++",
+    "ms": "Masukkan kemahiran lain, contohnya C++"
+  },
+  "Suggested skills (rate these yourself):": {
+    "zh": "建议技能（请自行评分）：",
+    "ms": "Kemahiran dicadangkan (nilai sendiri):"
+  },
+  "Self-rate each skill from 0 to 5. Add other relevant skills below.": {
+    "zh": "为每项技能自评 0–5 分，也可在下方添加其他相关技能。",
+    "ms": "Nilai setiap kemahiran dari 0 hingga 5. Tambah kemahiran berkaitan di bawah."
+  },
+  "Rate 0–5. A blank rating is unassessed; 0 means no proficiency demonstrated yet.": {
+    "zh": "评分为 0–5；留空代表未评估，0 代表尚未展现此技能。",
+    "ms": "Nilai 0–5. Ruang kosong bermaksud belum dinilai; 0 bermaksud kecekapan belum ditunjukkan."
+  },
+  "None": {
+    "zh": "尚无",
+    "ms": "Tiada"
+  },
+  "Aware": {
+    "zh": "了解",
+    "ms": "Kenal asas"
+  },
+  "Beginner": {
+    "zh": "入门",
+    "ms": "Pemula"
+  },
+  "Working": {
+    "zh": "能应用",
+    "ms": "Boleh menggunakan"
+  },
+  "Strong": {
+    "zh": "熟练",
+    "ms": "Mahir"
+  },
+  "Expert": {
+    "zh": "精通",
+    "ms": "Pakar"
+  },
+  "Unrated": {
+    "zh": "未评分",
+    "ms": "Belum dinilai"
+  },
+  "Unassessed": {
+    "zh": "未评估",
+    "ms": "Belum dinilai"
+  },
+  "Next: review skills →": {
+    "zh": "下一步：检查技能 →",
+    "ms": "Seterusnya: semak kemahiran →"
+  },
+  "Next: skill analysis →": {
+    "zh": "下一步：技能分析 →",
+    "ms": "Seterusnya: analisis kemahiran →"
+  },
+  "Explore my pathway": {
+    "zh": "探索我的路径",
+    "ms": "Teroka laluan saya"
+  },
+  "Explore technical skills.": {
+    "zh": "探索专业技能。",
+    "ms": "Teroka kemahiran teknikal."
+  },
+  "Compare possible futures.": {
+    "zh": "比较未来的不同可能。",
+    "ms": "Bandingkan kemungkinan masa depan."
+  },
+  "Suggested for you": {
+    "zh": "为你推荐",
+    "ms": "Dicadangkan untuk anda"
+  },
+  "Careers that fit": {
+    "zh": "适合你的职业",
+    "ms": "Kerjaya yang sesuai"
+  },
+  "Match score": {
+    "zh": "匹配分数",
+    "ms": "Skor padanan"
+  },
+  "Match score scenario": {
+    "zh": "匹配情景",
+    "ms": "Senario padanan"
+  },
+  "How this match score is calculated": {
+    "zh": "匹配分数如何计算",
+    "ms": "Cara skor padanan dikira"
+  },
+  "Moderate AI development": {
+    "zh": "AI 稳健发展",
+    "ms": "Perkembangan AI sederhana"
+  },
+  "Fast AI development": {
+    "zh": "AI 快速发展",
+    "ms": "Perkembangan AI pesat"
+  },
+  "Moderate AI": {
+    "zh": "AI 稳健发展",
+    "ms": "AI sederhana"
+  },
+  "Rapid AI": {
+    "zh": "AI 快速发展",
+    "ms": "AI pesat"
+  },
+  "Selected AI scenario": {
+    "zh": "已选 AI 情景",
+    "ms": "Senario AI dipilih"
+  },
+  "Switch scenarios to recalculate career match scores and skill gaps.": {
+    "zh": "切换情景，重新计算职业匹配分数和技能差距。",
+    "ms": "Tukar senario untuk mengira semula skor padanan kerjaya dan jurang kemahiran."
+  },
+  "Changes your match score and skill gaps immediately.": {
+    "zh": "立即更新匹配分数和技能差距。",
+    "ms": "Mengemas kini skor padanan dan jurang kemahiran serta-merta."
+  },
+  "Set career target": {
+    "zh": "设为职业目标",
+    "ms": "Tetapkan sasaran kerjaya"
+  },
+  "Your target": {
+    "zh": "你的目标",
+    "ms": "Sasaran anda"
+  },
+  "Target": {
+    "zh": "目标",
+    "ms": "Sasaran"
+  },
+  "Show related careers": {
+    "zh": "显示相关职业",
+    "ms": "Papar kerjaya berkaitan"
+  },
+  "Explore other careers": {
+    "zh": "探索其他职业",
+    "ms": "Teroka kerjaya lain"
+  },
+  "Rate your skills to see matches.": {
+    "zh": "完成技能评分以查看职业匹配。",
+    "ms": "Nilai kemahiran anda untuk melihat padanan."
+  },
+  "Skill hexagon": {
+    "zh": "技能六角图",
+    "ms": "Heksagon kemahiran"
+  },
+  "Show future target": {
+    "zh": "显示未来目标",
+    "ms": "Papar sasaran masa depan"
+  },
+  "Skill priorities for this role": {
+    "zh": "此职业的技能重点",
+    "ms": "Keutamaan kemahiran bagi peranan ini"
+  },
+  "Core for this role?": {
+    "zh": "是否为核心技能？",
+    "ms": "Kemahiran teras?"
+  },
+  "Future priority": {
+    "zh": "未来重点",
+    "ms": "Keutamaan masa depan"
+  },
+  "Current → future target": {
+    "zh": "当前 → 未来目标",
+    "ms": "Sasaran semasa → masa depan"
+  },
+  "Current target": {
+    "zh": "当前目标",
+    "ms": "Sasaran semasa"
+  },
+  "Future target": {
+    "zh": "未来目标",
+    "ms": "Sasaran masa depan"
+  },
+  "Current": {
+    "zh": "当前",
+    "ms": "Semasa"
+  },
+  "Previous": {
+    "zh": "过去",
+    "ms": "Terdahulu"
+  },
+  "Required": {
+    "zh": "要求",
+    "ms": "Diperlukan"
+  },
+  "CORE": {
+    "zh": "核心",
+    "ms": "TERAS"
+  },
+  "Core": {
+    "zh": "核心",
+    "ms": "Teras"
+  },
+  "Supporting": {
+    "zh": "辅助",
+    "ms": "Sokongan"
+  },
+  "Maintained": {
+    "zh": "维持",
+    "ms": "Dikekalkan"
+  },
+  "Reassess skills": {
+    "zh": "重新评估技能",
+    "ms": "Nilai semula kemahiran"
+  },
+  "Reassess my skills": {
+    "zh": "重新评估我的技能",
+    "ms": "Nilai semula kemahiran saya"
+  },
+  "Refresh hexagon & score": {
+    "zh": "更新六角图与分数",
+    "ms": "Kemas kini heksagon dan skor"
+  },
+  "Add or edit profile skills →": {
+    "zh": "添加或编辑个人技能 →",
+    "ms": "Tambah atau sunting kemahiran profil →"
+  },
+  "The role": {
+    "zh": "职业介绍",
+    "ms": "Peranan"
+  },
+  "Illustrative prospects": {
+    "zh": "示例职业前景",
+    "ms": "Contoh prospek"
+  },
+  "Illustrative salary range": {
+    "zh": "示例薪资范围",
+    "ms": "Contoh julat gaji"
+  },
+  "Illustrative growth scenario": {
+    "zh": "示例增长情景",
+    "ms": "Contoh senario pertumbuhan"
+  },
+  "Related SDGs": {
+    "zh": "相关可持续发展目标",
+    "ms": "SDG berkaitan"
+  },
+  "SDG explanation": {
+    "zh": "可持续发展目标说明",
+    "ms": "Penjelasan SDG"
+  },
+  "SDG impact": {
+    "zh": "可持续发展贡献",
+    "ms": "Sumbangan SDG"
+  },
+  "This job's SDGs": {
+    "zh": "此职业的可持续发展目标",
+    "ms": "SDG bagi pekerjaan ini"
+  },
+  "This career’s SDGs": {
+    "zh": "此职业的可持续发展目标",
+    "ms": "SDG bagi kerjaya ini"
+  },
+  "Each skill's SDG": {
+    "zh": "各技能的可持续发展目标",
+    "ms": "SDG bagi setiap kemahiran"
+  },
+  "Each skill’s SDG": {
+    "zh": "各技能的可持续发展目标",
+    "ms": "SDG bagi setiap kemahiran"
+  },
+  "UN target reference ↗": {
+    "zh": "联合国具体目标来源 ↗",
+    "ms": "Rujukan sasaran PBB ↗"
+  },
+  "Faraway’s suggested link · potential contribution, not measured achievement": {
+    "zh": "Faraway 建议关联 · 表示潜在贡献，而非已衡量的成果",
+    "ms": "Hubungan dicadangkan Faraway · potensi sumbangan, bukan pencapaian yang diukur"
+  },
+  "Tap or hover an SDG above to see how this role advances it.": {
+    "zh": "点击或悬停于上方目标，了解此职业如何作出贡献。",
+    "ms": "Tekan atau tuding pada SDG di atas untuk melihat sumbangan peranan ini."
+  },
+  "Hover a radar point or skill to see how it connects to an SDG.": {
+    "zh": "悬停于图中节点或技能，了解它与可持续发展目标的联系。",
+    "ms": "Tuding pada titik radar atau kemahiran untuk melihat kaitannya dengan SDG."
+  },
+  "AI explanation": {
+    "zh": "AI 说明",
+    "ms": "Penjelasan AI"
+  },
+  "Career fit explained": {
+    "zh": "职业匹配说明",
+    "ms": "Penjelasan padanan kerjaya"
+  },
+  "Generate insight": {
+    "zh": "生成分析",
+    "ms": "Jana analisis"
+  },
+  "Regenerate": {
+    "zh": "重新生成",
+    "ms": "Jana semula"
+  },
+  "Actions": {
+    "zh": "建议行动",
+    "ms": "Tindakan"
+  },
+  "Build my study plan": {
+    "zh": "制定我的学习计划",
+    "ms": "Bina pelan pembelajaran saya"
+  },
+  "Your route,": {
+    "zh": "奔赴热爱，",
+    "ms": "Laluan pilihan anda,"
+  },
+  "your pace.": {
+    "zh": "自有节奏。",
+    "ms": "rentak milik anda."
+  },
+  "Preferences": {
+    "zh": "偏好设置",
+    "ms": "Keutamaan"
+  },
+  "How you like to learn": {
+    "zh": "你的学习偏好",
+    "ms": "Keutamaan pembelajaran anda"
+  },
+  "Cost": {
+    "zh": "费用",
+    "ms": "Kos"
+  },
+  "Free": {
+    "zh": "免费",
+    "ms": "Percuma"
+  },
+  "Low cost (up to RM 200)": {
+    "zh": "低费用（不超过 RM 200）",
+    "ms": "Kos rendah (sehingga RM 200)"
+  },
+  "Moderate (up to RM 500)": {
+    "zh": "适中费用（不超过 RM 500）",
+    "ms": "Kos sederhana (sehingga RM 500)"
+  },
+  "No budget limit": {
+    "zh": "不限预算",
+    "ms": "Tiada had bajet"
+  },
+  "Study time per day": {
+    "zh": "每日学习时间",
+    "ms": "Masa belajar sehari"
+  },
+  "Which future are you preparing for?": {
+    "zh": "你希望为哪种未来做好准备？",
+    "ms": "Masa depan manakah yang ingin anda persiapkan?"
+  },
+  "Current catalogue requirements": {
+    "zh": "当前目录要求",
+    "ms": "Keperluan katalog semasa"
+  },
+  "Plan type": {
+    "zh": "计划类型",
+    "ms": "Jenis pelan"
+  },
+  "recommended": {
+    "zh": "推荐",
+    "ms": "disyorkan"
+  },
+  "custom": {
+    "zh": "自选",
+    "ms": "tersuai"
+  },
+  "Recommended": {
+    "zh": "推荐",
+    "ms": "Disyorkan"
+  },
+  "Custom": {
+    "zh": "自选",
+    "ms": "Tersuai"
+  },
+  "Skills to learn": {
+    "zh": "待学习技能",
+    "ms": "Kemahiran untuk dipelajari"
+  },
+  "What else would you like to learn?": {
+    "zh": "你还希望学习什么？",
+    "ms": "Apakah lagi yang ingin anda pelajari?"
+  },
+  "Type a skill, e.g. SQL": {
+    "zh": "输入技能，例如 SQL",
+    "ms": "Taip kemahiran, contohnya SQL"
+  },
+  "Course": {
+    "zh": "课程",
+    "ms": "Kursus"
+  },
+  "Hours": {
+    "zh": "时数",
+    "ms": "Jam"
+  },
+  "Estimate": {
+    "zh": "预计",
+    "ms": "Anggaran"
+  },
+  "Estimated duration": {
+    "zh": "预计时长",
+    "ms": "Anggaran tempoh"
+  },
+  "Generate plan": {
+    "zh": "生成计划",
+    "ms": "Jana pelan"
+  },
+  "Regenerate plan": {
+    "zh": "重新生成计划",
+    "ms": "Jana semula pelan"
+  },
+  "Generating…": {
+    "zh": "正在生成…",
+    "ms": "Sedang menjana…"
+  },
+  "Generating a plan for your current preferences…": {
+    "zh": "正在按当前偏好生成计划…",
+    "ms": "Menjana pelan mengikut keutamaan semasa anda…"
+  },
+  "Review & start plan": {
+    "zh": "查看并开始计划",
+    "ms": "Semak dan mulakan pelan"
+  },
+  "Your weekly learning outline": {
+    "zh": "每周学习安排",
+    "ms": "Rangka pembelajaran mingguan anda"
+  },
+  "AI organiser": {
+    "zh": "AI 学习规划",
+    "ms": "Perancang AI"
+  },
+  "Your plan is ready": {
+    "zh": "你的计划已准备好",
+    "ms": "Pelan anda sudah sedia"
+  },
+  "Start plan": {
+    "zh": "开始计划",
+    "ms": "Mulakan pelan"
+  },
+  "Edit preferences": {
+    "zh": "编辑偏好",
+    "ms": "Sunting keutamaan"
+  },
+  "Back to preferences": {
+    "zh": "返回偏好设置",
+    "ms": "Kembali ke keutamaan"
+  },
+  "Review course availability": {
+    "zh": "检查课程是否可用",
+    "ms": "Semak ketersediaan kursus"
+  },
+  "Keep it": {
+    "zh": "保留",
+    "ms": "Kekalkan"
+  },
+  "Remove anyway": {
+    "zh": "仍然移除",
+    "ms": "Buang juga"
+  },
+  "Open learning resource ↗": {
+    "zh": "打开学习资源 ↗",
+    "ms": "Buka sumber pembelajaran ↗"
+  },
+  "Online learning resources": {
+    "zh": "在线学习资源",
+    "ms": "Sumber pembelajaran dalam talian"
+  },
+  "Online learning · choose free materials or paid provider resources below.": {
+    "zh": "在线学习 · 在下方选择免费材料或付费学习资源。",
+    "ms": "Pembelajaran dalam talian · pilih bahan percuma atau sumber berbayar di bawah."
+  },
+  "No gaps — switch to Custom to stretch further.": {
+    "zh": "已达到目标要求，可切换至自选模式继续提升。",
+    "ms": "Tiada jurang — tukar kepada Tersuai untuk terus berkembang."
+  },
+  "Select at least one skill to learn.": {
+    "zh": "请至少选择一项待学习技能。",
+    "ms": "Pilih sekurang-kurangnya satu kemahiran untuk dipelajari."
+  },
+  "Pick a career target first.": {
+    "zh": "请先选择职业目标。",
+    "ms": "Pilih sasaran kerjaya dahulu."
+  },
+  "Confirm your profile and skills before generating a plan.": {
+    "zh": "生成计划前，请确认个人资料和技能。",
+    "ms": "Sahkan profil dan kemahiran sebelum menjana pelan."
+  },
+  "Small steps.": {
+    "zh": "每一步积累，",
+    "ms": "Langkah kecil."
+  },
+  "Real momentum.": {
+    "zh": "都在靠近理想。",
+    "ms": "Kemajuan bermakna."
+  },
+  "Your route": {
+    "zh": "你的学习路径",
+    "ms": "Laluan anda"
+  },
+  "Your achievements": {
+    "zh": "你的成就",
+    "ms": "Pencapaian anda"
+  },
+  "Learning badges": {
+    "zh": "学习徽章",
+    "ms": "Lencana pembelajaran"
+  },
+  "Revise plan": {
+    "zh": "调整计划",
+    "ms": "Semak semula pelan"
+  },
+  "Review study plan": {
+    "zh": "查看学习计划",
+    "ms": "Semak pelan pembelajaran"
+  },
+  "Recommended resource": {
+    "zh": "推荐资源",
+    "ms": "Sumber disyorkan"
+  },
+  "Save a generated study plan before tracking progress.": {
+    "zh": "请先保存已生成的学习计划，再追踪进度。",
+    "ms": "Simpan pelan pembelajaran yang dijana sebelum menjejak kemajuan."
+  },
+  "Resource not yet curated for this skill.": {
+    "zh": "此技能暂未收录学习资源。",
+    "ms": "Sumber untuk kemahiran ini belum dikurasi."
+  },
+  "Review gaps and update plan": {
+    "zh": "查看差距并更新计划",
+    "ms": "Semak jurang dan kemas kini pelan"
+  },
+  "Reviewed — keep this plan": {
+    "zh": "已检查 — 保留此计划",
+    "ms": "Sudah disemak — kekalkan pelan ini"
+  },
+  "Profile picture": {
+    "zh": "头像",
+    "ms": "Gambar profil"
+  },
+  "Your account": {
+    "zh": "你的账户",
+    "ms": "Akaun anda"
+  },
+  "Display username": {
+    "zh": "显示名称",
+    "ms": "Nama paparan"
+  },
+  "Manage your identity, picture and account security.": {
+    "zh": "管理个人信息、头像及账户安全。",
+    "ms": "Urus identiti, gambar dan keselamatan akaun anda."
+  },
+  "Change password": {
+    "zh": "修改密码",
+    "ms": "Tukar kata laluan"
+  },
+  "Current password": {
+    "zh": "当前密码",
+    "ms": "Kata laluan semasa"
+  },
+  "New password": {
+    "zh": "新密码",
+    "ms": "Kata laluan baharu"
+  },
+  "Confirm new password": {
+    "zh": "确认新密码",
+    "ms": "Sahkan kata laluan baharu"
+  },
+  "Choose a default picture or upload your own. Pictures are cropped to a square.": {
+    "zh": "选择默认头像或上传照片，图片将裁剪为正方形。",
+    "ms": "Pilih gambar lalai atau muat naik gambar sendiri. Gambar dipotong menjadi segi empat sama."
+  },
+  "Upload a picture (PNG, JPG, WebP, up to 5 MB)": {
+    "zh": "上传图片（PNG、JPG、WebP，不超过 5 MB）",
+    "ms": "Muat naik gambar (PNG, JPG, WebP, sehingga 5 MB)"
+  },
+  "For display only; sign in with your email.": {
+    "zh": "仅用于显示；请使用邮箱登录。",
+    "ms": "Untuk paparan sahaja; log masuk menggunakan e-mel."
+  },
+  "Overview": {
+    "zh": "概览",
+    "ms": "Gambaran keseluruhan"
+  },
+  "Structure & assessment skills": {
+    "zh": "组织结构与评估技能",
+    "ms": "Struktur dan kemahiran penilaian"
+  },
+  "Skill intelligence": {
+    "zh": "技能分析",
+    "ms": "Analisis kemahiran"
+  },
+  "HR & workforce": {
+    "zh": "人力资源与员工",
+    "ms": "Sumber manusia dan tenaga kerja"
+  },
+  "University & TVET": {
+    "zh": "大学与 TVET",
+    "ms": "Universiti dan TVET"
+  },
+  "HR / manager workspace": {
+    "zh": "人力资源 / 管理工作区",
+    "ms": "Ruang kerja sumber manusia / pengurus"
+  },
+  "University / TVET workspace": {
+    "zh": "大学 / TVET 工作区",
+    "ms": "Ruang kerja universiti / TVET"
+  },
+  "People first.": {
+    "zh": "以人为本。",
+    "ms": "Utamakan insan."
+  },
+  "Your organisation": {
+    "zh": "你的组织",
+    "ms": "Organisasi anda"
+  },
+  "Company name": {
+    "zh": "公司名称",
+    "ms": "Nama syarikat"
+  },
+  "Institution name": {
+    "zh": "院校名称",
+    "ms": "Nama institusi"
+  },
+  "Industry": {
+    "zh": "行业",
+    "ms": "Industri"
+  },
+  "Institution type": {
+    "zh": "院校类型",
+    "ms": "Jenis institusi"
+  },
+  "Select type": {
+    "zh": "选择类型",
+    "ms": "Pilih jenis"
+  },
+  "University": {
+    "zh": "大学",
+    "ms": "Universiti"
+  },
+  "TVET": {
+    "zh": "技术与职业教育培训",
+    "ms": "TVET"
+  },
+  "Total headcount (optional)": {
+    "zh": "总人数（选填）",
+    "ms": "Jumlah pekerja (pilihan)"
+  },
+  "Employees profiled": {
+    "zh": "已建档员工",
+    "ms": "Pekerja berprofil"
+  },
+  "Students profiled": {
+    "zh": "已建档学生",
+    "ms": "Pelajar berprofil"
+  },
+  "Learning modules assigned": {
+    "zh": "已分配学习模块",
+    "ms": "Modul pembelajaran ditugaskan"
+  },
+  "Set up departments & teams": {
+    "zh": "设置部门与团队",
+    "ms": "Tetapkan jabatan dan pasukan"
+  },
+  "Add department": {
+    "zh": "添加部门",
+    "ms": "Tambah jabatan"
+  },
+  "Add programme": {
+    "zh": "添加专业",
+    "ms": "Tambah program"
+  },
+  "Add team": {
+    "zh": "添加团队",
+    "ms": "Tambah pasukan"
+  },
+  "Assessment skills": {
+    "zh": "评估技能",
+    "ms": "Kemahiran penilaian"
+  },
+  "Department practice skills": {
+    "zh": "部门练习技能",
+    "ms": "Kemahiran latihan jabatan"
+  },
+  "Add person manually": {
+    "zh": "手动添加人员",
+    "ms": "Tambah ahli secara manual"
+  },
+  "Search people": {
+    "zh": "搜索人员",
+    "ms": "Cari ahli"
+  },
+  "No people in this department yet.": {
+    "zh": "此部门暂无人员。",
+    "ms": "Belum ada ahli dalam jabatan ini."
+  },
+  "No team": {
+    "zh": "暂无团队",
+    "ms": "Tiada pasukan"
+  },
+  "All groups": {
+    "zh": "所有组别",
+    "ms": "Semua kumpulan"
+  },
+  "Not divided into teams": {
+    "zh": "未划分团队",
+    "ms": "Tidak dibahagikan kepada pasukan"
+  },
+  "Edit / assess": {
+    "zh": "编辑 / 评估",
+    "ms": "Sunting / nilai"
+  },
+  "Save assessment": {
+    "zh": "保存评估",
+    "ms": "Simpan penilaian"
+  },
+  "Person assessment": {
+    "zh": "个人评估",
+    "ms": "Penilaian individu"
+  },
+  "Career benchmark": {
+    "zh": "职业基准",
+    "ms": "Penanda aras kerjaya"
+  },
+  "Choose a career to see its analysis.": {
+    "zh": "选择职业以查看分析。",
+    "ms": "Pilih kerjaya untuk melihat analisisnya."
+  },
+  "Skill gap analysis": {
+    "zh": "技能差距分析",
+    "ms": "Analisis jurang kemahiran"
+  },
+  "Job match analysis": {
+    "zh": "职业匹配分析",
+    "ms": "Analisis padanan pekerjaan"
+  },
+  "Skill gap details": {
+    "zh": "技能差距详情",
+    "ms": "Butiran jurang kemahiran"
+  },
+  "Readiness for evolving role requirements": {
+    "zh": "面对职业要求变化的准备程度",
+    "ms": "Kesediaan menghadapi perubahan keperluan peranan"
+  },
+  "Moderate AI readiness": {
+    "zh": "AI 稳健发展下的准备程度",
+    "ms": "Kesediaan AI sederhana"
+  },
+  "Rapid AI readiness": {
+    "zh": "AI 快速发展下的准备程度",
+    "ms": "Kesediaan AI pesat"
+  },
+  "Competency comparison": {
+    "zh": "能力对比",
+    "ms": "Perbandingan kecekapan"
+  },
+  "Skill priorities": {
+    "zh": "技能重点",
+    "ms": "Keutamaan kemahiran"
+  },
+  "Scenario target": {
+    "zh": "情景目标",
+    "ms": "Sasaran senario"
+  },
+  "Gap": {
+    "zh": "差距",
+    "ms": "Jurang"
+  },
+  "Gap to scenario": {
+    "zh": "与情景要求的差距",
+    "ms": "Jurang berbanding senario"
+  },
+  "Include": {
+    "zh": "包含",
+    "ms": "Sertakan"
+  },
+  "Select all": {
+    "zh": "全选",
+    "ms": "Pilih semua"
+  },
+  "Reset selection": {
+    "zh": "重置选择",
+    "ms": "Tetapkan semula pilihan"
+  },
+  "Plan by": {
+    "zh": "规划依据",
+    "ms": "Rancang mengikut"
+  },
+  "Budget per participant": {
+    "zh": "每人预算",
+    "ms": "Bajet setiap peserta"
+  },
+  "Maximum budget per participant (RM)": {
+    "zh": "每人最高预算（RM）",
+    "ms": "Bajet maksimum setiap peserta (RM)"
+  },
+  "Hours per week": {
+    "zh": "每周时数",
+    "ms": "Jam seminggu"
+  },
+  "Study hours per week": {
+    "zh": "每周学习时数",
+    "ms": "Jam pembelajaran seminggu"
+  },
+  "Plan duration": {
+    "zh": "计划时长",
+    "ms": "Tempoh pelan"
+  },
+  "Plan duration (weeks)": {
+    "zh": "计划时长（周）",
+    "ms": "Tempoh pelan (minggu)"
+  },
+  "Learning time": {
+    "zh": "学习时间",
+    "ms": "Masa pembelajaran"
+  },
+  "Preferred schedule": {
+    "zh": "偏好安排",
+    "ms": "Jadual pilihan"
+  },
+  "Any cost": {
+    "zh": "不限费用",
+    "ms": "Sebarang kos"
+  },
+  "Up to RM 200": {
+    "zh": "不超过 RM 200",
+    "ms": "Sehingga RM 200"
+  },
+  "Up to RM 500": {
+    "zh": "不超过 RM 500",
+    "ms": "Sehingga RM 500"
+  },
+  "Confirm learning plan →": {
+    "zh": "确认学习计划 →",
+    "ms": "Sahkan pelan pembelajaran →"
+  },
+  "Create learning plan →": {
+    "zh": "创建学习计划 →",
+    "ms": "Cipta pelan pembelajaran →"
+  },
+  "Generate learning plan →": {
+    "zh": "生成学习计划 →",
+    "ms": "Jana pelan pembelajaran →"
+  },
+  "Recommended learning modules": {
+    "zh": "推荐学习模块",
+    "ms": "Modul pembelajaran disyorkan"
+  },
+  "Expected learning outcomes": {
+    "zh": "预期学习成果",
+    "ms": "Hasil pembelajaran dijangka"
+  },
+  "Priority skill": {
+    "zh": "优先技能",
+    "ms": "Kemahiran keutamaan"
+  },
+  "Total training cost": {
+    "zh": "培训总费用",
+    "ms": "Jumlah kos latihan"
+  },
+  "Open assigned resource ↗": {
+    "zh": "打开已分配资源 ↗",
+    "ms": "Buka sumber ditugaskan ↗"
+  },
+  "Confirm a learning plan to start tracking progress.": {
+    "zh": "确认学习计划后即可追踪进度。",
+    "ms": "Sahkan pelan pembelajaran untuk mula menjejak kemajuan."
+  },
+  "Workspace data is saved in this browser for your signed-in account.": {
+    "zh": "工作区资料按登录账户保存在此浏览器中。",
+    "ms": "Data ruang kerja disimpan dalam pelayar ini untuk akaun anda."
+  },
+  "Download workspace backup": {
+    "zh": "下载工作区备份",
+    "ms": "Muat turun sandaran ruang kerja"
+  },
+  "Download CSV template": {
+    "zh": "下载 CSV 模板",
+    "ms": "Muat turun templat CSV"
+  },
+  "Download department CSV template": {
+    "zh": "下载部门 CSV 模板",
+    "ms": "Muat turun templat CSV jabatan"
+  },
+  "Import evidence CSV": {
+    "zh": "导入资料 CSV",
+    "ms": "Import bukti CSV"
+  },
+  "View source": {
+    "zh": "查看来源",
+    "ms": "Lihat sumber"
+  },
+  "Source": {
+    "zh": "来源",
+    "ms": "Sumber"
+  },
+  "Source:": {
+    "zh": "来源：",
+    "ms": "Sumber:"
+  },
+  "Observed": {
+    "zh": "数据日期",
+    "ms": "Tarikh data"
+  },
+  "Snapshot checked:": {
+    "zh": "快照检查时间：",
+    "ms": "Semakan petikan data:"
+  },
+  "Skill and job trends": {
+    "zh": "技能与就业趋势",
+    "ms": "Trend kemahiran dan pekerjaan"
+  },
+  "Skill trends": {
+    "zh": "技能趋势",
+    "ms": "Trend kemahiran"
+  },
+  "Job trend analysis": {
+    "zh": "就业趋势分析",
+    "ms": "Analisis trend pekerjaan"
+  },
+  "Previous vs current": {
+    "zh": "过去与当前",
+    "ms": "Terdahulu berbanding semasa"
+  },
+  "Current vs future": {
+    "zh": "当前与未来",
+    "ms": "Semasa berbanding masa depan"
+  },
+  "Skill requirements · current vs future": {
+    "zh": "技能要求 · 当前与未来",
+    "ms": "Keperluan kemahiran · semasa dan masa depan"
+  },
+  "O*NET previous vs current": {
+    "zh": "O*NET 过去与当前",
+    "ms": "O*NET terdahulu berbanding semasa"
+  },
+  "O*NET current vs future": {
+    "zh": "O*NET 当前与未来",
+    "ms": "O*NET semasa berbanding masa depan"
+  },
+  "O*NET skill importance · previous vs current": {
+    "zh": "O*NET 技能重要性 · 过去与当前",
+    "ms": "Kepentingan kemahiran O*NET · terdahulu dan semasa"
+  },
+  "O*NET release check": {
+    "zh": "O*NET 版本信息",
+    "ms": "Maklumat keluaran O*NET"
+  },
+  "BLS employment outlook": {
+    "zh": "BLS 就业前景",
+    "ms": "Prospek pekerjaan BLS"
+  },
+  "BLS current vs future estimate": {
+    "zh": "BLS 当前与未来估计",
+    "ms": "Anggaran BLS semasa dan masa depan"
+  },
+  "DOSM labour-force context": {
+    "zh": "DOSM 劳动力概况",
+    "ms": "Konteks tenaga buruh DOSM"
+  },
+  "DOSM groups related to your selected careers": {
+    "zh": "与你所选职业相关的 DOSM 职业组别",
+    "ms": "Kumpulan DOSM berkaitan kerjaya pilihan anda"
+  },
+  "arXiv AI/ML research": {
+    "zh": "arXiv 人工智能与机器学习研究",
+    "ms": "Penyelidikan AI/ML arXiv"
+  },
+  "Recent AI research signals and publication dates": {
+    "zh": "近期 AI 研究及发表日期",
+    "ms": "Isyarat penyelidikan AI terkini dan tarikh penerbitan"
+  },
+  "Source table and data period": {
+    "zh": "来源表格与数据期间",
+    "ms": "Jadual sumber dan tempoh data"
+  },
+  "No mapped O*NET skill history for this career.": {
+    "zh": "此职业暂无对应的 O*NET 技能历史数据。",
+    "ms": "Tiada sejarah kemahiran O*NET yang dipadankan untuk kerjaya ini."
+  },
+  "No DOSM group mapping is available for the selected careers.": {
+    "zh": "所选职业暂无对应的 DOSM 组别。",
+    "ms": "Tiada pemetaan kumpulan DOSM bagi kerjaya yang dipilih."
+  },
+  "Set up your interest, industry or academic programmes to show relevant occupations.": {
+    "zh": "设置兴趣、行业或学术专业后，即可查看相关职业。",
+    "ms": "Tetapkan minat, industri atau program akademik untuk memaparkan pekerjaan berkaitan."
+  },
+  "Loading…": {
+    "zh": "正在加载…",
+    "ms": "Sedang memuatkan…"
+  },
+  "Restoring your account…": {
+    "zh": "正在恢复账户…",
+    "ms": "Sedang memulihkan akaun anda…"
+  },
+  "Saving changes and signing out…": {
+    "zh": "正在保存更改并退出…",
+    "ms": "Menyimpan perubahan dan log keluar…"
+  },
+  "Your profile could not be restored": {
+    "zh": "无法恢复个人资料",
+    "ms": "Profil anda tidak dapat dipulihkan"
+  },
+  "Editing is paused so an empty profile cannot overwrite your saved data.": {
+    "zh": "已暂停编辑，以免空白资料覆盖已保存的数据。",
+    "ms": "Penyuntingan dijeda supaya profil kosong tidak menimpa data yang disimpan."
+  },
+  "Retry saving preferences": {
+    "zh": "重新保存偏好",
+    "ms": "Cuba simpan keutamaan semula"
+  },
+  "Saving your selected preferences to your account…": {
+    "zh": "正在将偏好保存至账户…",
+    "ms": "Menyimpan keutamaan pilihan ke akaun anda…"
+  },
+  "Personal profile and skills saved to your account.": {
+    "zh": "个人资料和技能已保存至账户。",
+    "ms": "Profil peribadi dan kemahiran disimpan dalam akaun anda."
+  },
+  "Saving your personal profile…": {
+    "zh": "正在保存个人资料…",
+    "ms": "Menyimpan profil peribadi anda…"
+  },
+  "Technical importance reference and formula-based scenario; not vacancy demand.": {
+    "zh": "专业技能重要性参考及公式情景，并非职位需求数据。",
+    "ms": "Rujukan kepentingan teknikal dan senario berformula; bukan permintaan kekosongan kerja."
+  },
+  "United States · employment, thousands": {
+    "zh": "美国 · 就业人数（千人）",
+    "ms": "Amerika Syarikat · pekerjaan, ribuan"
+  },
+  "Malaysia · online job offerings": {
+    "zh": "马来西亚 · 网络职位发布",
+    "ms": "Malaysia · tawaran kerja dalam talian"
+  },
+  "Occupation reference index · /100": {
+    "zh": "职业参考指数 · /100",
+    "ms": "Indeks rujukan pekerjaan · /100"
+  },
+  "Importance": {
+    "zh": "重要性",
+    "ms": "Kepentingan"
+  },
+  "Focus": {
+    "zh": "重点",
+    "ms": "Fokus"
+  },
+  "Step": {
+    "zh": "步骤",
+    "ms": "Langkah"
+  },
+  "Next: learning preferences →": {
+    "zh": "下一步：学习偏好 →",
+    "ms": "Seterusnya: keutamaan pembelajaran →"
+  },
+  "See skill analysis": {
+    "zh": "查看技能分析",
+    "ms": "Lihat analisis kemahiran"
+  },
+  "Explore skill gaps →": {
+    "zh": "探索技能差距 →",
+    "ms": "Teroka jurang kemahiran →"
+  },
+  "Plan upskilling →": {
+    "zh": "规划技能提升 →",
+    "ms": "Rancang peningkatan kemahiran →"
+  },
+  "Back: structure": {
+    "zh": "返回：组织结构",
+    "ms": "Kembali: struktur"
+  },
+  "← Back to analysis": {
+    "zh": "← 返回分析",
+    "ms": "← Kembali ke analisis"
+  },
+  "← Planning options": {
+    "zh": "← 规划选项",
+    "ms": "← Pilihan perancangan"
+  },
+  "← Back / edit preferences": {
+    "zh": "← 返回 / 编辑偏好",
+    "ms": "← Kembali / sunting keutamaan"
+  },
+  "Open job detail": {
+    "zh": "打开职业详情",
+    "ms": "Buka butiran pekerjaan"
+  },
+  "Detail skill": {
+    "zh": "技能详情",
+    "ms": "Butiran kemahiran"
+  },
+  "More skills": {
+    "zh": "更多技能",
+    "ms": "Lebih banyak kemahiran"
+  },
+  "Current:": {
+    "zh": "当前：",
+    "ms": "Semasa:"
+  },
+  "Moderate readiness:": {
+    "zh": "稳健发展下的准备程度：",
+    "ms": "Kesediaan sederhana:"
+  },
+  "Rapid readiness:": {
+    "zh": "快速发展下的准备程度：",
+    "ms": "Kesediaan pesat:"
+  },
+  "min": {
+    "zh": "分钟",
+    "ms": "minit"
+  },
+  "weeks": {
+    "zh": "周",
+    "ms": "minggu"
+  },
+  "wk": {
+    "zh": "周",
+    "ms": "minggu"
+  },
+  "h": {
+    "zh": "小时",
+    "ms": "j"
+  },
+  "completed": {
+    "zh": "已完成",
+    "ms": "selesai"
+  },
+  "skills rated": {
+    "zh": "项技能已评分",
+    "ms": "kemahiran dinilai"
+  },
+  "careers ranked": {
+    "zh": "个职业已排名",
+    "ms": "kerjaya diperingkat"
+  },
+  "selected": {
+    "zh": "已选择",
+    "ms": "dipilih"
+  },
+  "Primary": {
+    "zh": "主要",
+    "ms": "Utama"
+  },
+  "Breadcrumb": {
+    "zh": "导航路径",
+    "ms": "Jejak navigasi"
+  },
+  "Mobile navigation": {
+    "zh": "移动端导航",
+    "ms": "Navigasi mudah alih"
+  },
+  "AI adoption scenario": {
+    "zh": "AI 发展情景",
+    "ms": "Senario perkembangan AI"
+  },
+  "Faraway home": {
+    "zh": "Faraway 首页",
+    "ms": "Laman utama Faraway"
+  },
+  "Computer Science": {
+    "zh": "计算机科学",
+    "ms": "Sains Komputer"
+  },
+  "Finance": {
+    "zh": "金融",
+    "ms": "Kewangan"
+  },
+  "Business": {
+    "zh": "商业",
+    "ms": "Perniagaan"
+  },
+  "Design & Media": {
+    "zh": "设计与媒体",
+    "ms": "Reka Bentuk dan Media"
+  },
+  "Healthcare & public health": {
+    "zh": "医疗与公共卫生",
+    "ms": "Penjagaan kesihatan dan kesihatan awam"
+  },
+  "Engineering & manufacturing": {
+    "zh": "工程与制造",
+    "ms": "Kejuruteraan dan pembuatan"
+  },
+  "Education & training": {
+    "zh": "教育与培训",
+    "ms": "Pendidikan dan latihan"
+  },
+  "Science & research": {
+    "zh": "科学与研究",
+    "ms": "Sains dan penyelidikan"
+  },
+  "Environment & sustainability": {
+    "zh": "环境与可持续发展",
+    "ms": "Alam sekitar dan kelestarian"
+  },
+  "Agriculture & food": {
+    "zh": "农业与食品",
+    "ms": "Pertanian dan makanan"
+  },
+  "Law & governance": {
+    "zh": "法律与治理",
+    "ms": "Undang-undang dan tadbir urus"
+  },
+  "Logistics & supply chain": {
+    "zh": "物流与供应链",
+    "ms": "Logistik dan rantaian bekalan"
+  },
+  "Hospitality & tourism": {
+    "zh": "酒店与旅游",
+    "ms": "Hospitaliti dan pelancongan"
+  },
+  "Construction & built environment": {
+    "zh": "建筑与建成环境",
+    "ms": "Pembinaan dan alam bina"
+  },
+  "Social services & community": {
+    "zh": "社会服务与社区",
+    "ms": "Perkhidmatan sosial dan komuniti"
+  },
+  "Media & communications": {
+    "zh": "媒体与传播",
+    "ms": "Media dan komunikasi"
+  },
+  "Entrepreneurship & retail": {
+    "zh": "创业与零售",
+    "ms": "Keusahawanan dan peruncitan"
+  },
+  "Public service": {
+    "zh": "公共服务",
+    "ms": "Perkhidmatan awam"
+  },
+  "Other / still exploring": {
+    "zh": "其他 / 尚在探索",
+    "ms": "Lain-lain / masih meneroka"
+  },
+  "Software, data, cloud and security": {
+    "zh": "软件、数据、云端与安全",
+    "ms": "Perisian, data, awan dan keselamatan"
+  },
+  "Analysis, risk, accounting and fintech": {
+    "zh": "分析、风险、会计与金融科技",
+    "ms": "Analisis, risiko, perakaunan dan teknologi kewangan"
+  },
+  "Strategy, marketing, operations and people": {
+    "zh": "策略、营销、运营与人才",
+    "ms": "Strategi, pemasaran, operasi dan sumber manusia"
+  },
+  "Product, visual and content design": {
+    "zh": "产品、视觉与内容设计",
+    "ms": "Reka bentuk produk, visual dan kandungan"
+  },
+  "No Poverty": {
+    "zh": "无贫穷",
+    "ms": "Tiada kemiskinan"
+  },
+  "Zero Hunger": {
+    "zh": "零饥饿",
+    "ms": "Kelaparan sifar"
+  },
+  "Good Health and Well-being": {
+    "zh": "良好健康与福祉",
+    "ms": "Kesihatan dan kesejahteraan yang baik"
+  },
+  "Quality Education": {
+    "zh": "优质教育",
+    "ms": "Pendidikan berkualiti"
+  },
+  "Gender Equality": {
+    "zh": "性别平等",
+    "ms": "Kesaksamaan gender"
+  },
+  "Clean Water and Sanitation": {
+    "zh": "清洁饮水和卫生设施",
+    "ms": "Air bersih dan sanitasi"
+  },
+  "Affordable and Clean Energy": {
+    "zh": "经济适用的清洁能源",
+    "ms": "Tenaga mampu milik dan bersih"
+  },
+  "Decent Work & Economic Growth": {
+    "zh": "体面工作和经济增长",
+    "ms": "Pekerjaan layak dan pertumbuhan ekonomi"
+  },
+  "Decent Work and Economic Growth": {
+    "zh": "体面工作和经济增长",
+    "ms": "Pekerjaan layak dan pertumbuhan ekonomi"
+  },
+  "Industry, Innovation & Infrastructure": {
+    "zh": "产业、创新和基础设施",
+    "ms": "Industri, inovasi dan infrastruktur"
+  },
+  "Industry, Innovation and Infrastructure": {
+    "zh": "产业、创新和基础设施",
+    "ms": "Industri, inovasi dan infrastruktur"
+  },
+  "Reduced Inequalities": {
+    "zh": "减少不平等",
+    "ms": "Mengurangkan ketidaksamaan"
+  },
+  "Sustainable Cities": {
+    "zh": "可持续城市",
+    "ms": "Bandar mampan"
+  },
+  "Sustainable Cities and Communities": {
+    "zh": "可持续城市和社区",
+    "ms": "Bandar dan komuniti mampan"
+  },
+  "Responsible Consumption": {
+    "zh": "负责任消费",
+    "ms": "Penggunaan bertanggungjawab"
+  },
+  "Responsible Consumption and Production": {
+    "zh": "负责任消费和生产",
+    "ms": "Penggunaan dan pengeluaran bertanggungjawab"
+  },
+  "Climate Action": {
+    "zh": "气候行动",
+    "ms": "Tindakan iklim"
+  },
+  "Life Below Water": {
+    "zh": "水下生物",
+    "ms": "Hidupan di bawah air"
+  },
+  "Life on Land": {
+    "zh": "陆地生物",
+    "ms": "Hidupan di darat"
+  },
+  "Peace, Justice & Strong Institutions": {
+    "zh": "和平、正义与强大机构",
+    "ms": "Keamanan, keadilan dan institusi kukuh"
+  },
+  "Peace, Justice and Strong Institutions": {
+    "zh": "和平、正义与强大机构",
+    "ms": "Keamanan, keadilan dan institusi kukuh"
+  },
+  "Partnerships for the Goals": {
+    "zh": "促进目标实现的伙伴关系",
+    "ms": "Perkongsian untuk mencapai matlamat"
+  },
+  "Academic programmes & assessment skills": {
+    "zh": "学术专业与评估技能",
+    "ms": "Program akademik dan kemahiran penilaian"
+  },
+  "Departments & assessment skills": {
+    "zh": "部门与评估技能",
+    "ms": "Jabatan dan kemahiran penilaian"
+  },
+  "Skill-based planning": {
+    "zh": "按技能规划",
+    "ms": "Perancangan mengikut kemahiran"
+  },
+  "People-based planning": {
+    "zh": "按人员规划",
+    "ms": "Perancangan mengikut ahli"
+  },
+  "academic programme": {
+    "zh": "学术专业",
+    "ms": "program akademik"
+  },
+  "department": {
+    "zh": "部门",
+    "ms": "jabatan"
+  },
+  "team": {
+    "zh": "团队",
+    "ms": "pasukan"
+  },
+  "cohort / class": {
+    "zh": "年级 / 班级",
+    "ms": "kohort / kelas"
+  },
+  "students": {
+    "zh": "学生",
+    "ms": "pelajar"
+  },
+  "people": {
+    "zh": "人员",
+    "ms": "ahli"
+  },
+  "No plan yet — set a career target and Faraway will list the skills to close.": {
+    "zh": "暂无计划 — 设定职业目标后，Faraway 将列出需要提升的技能。",
+    "ms": "Belum ada pelan — tetapkan sasaran kerjaya dan Faraway akan menyenaraikan kemahiran yang perlu ditingkatkan."
+  },
+  "You meet every required level. Keep sharpening.": {
+    "zh": "你已达到所有要求，继续精进。",
+    "ms": "Anda memenuhi semua tahap yang diperlukan. Teruskan meningkatkan kemahiran."
+  },
+  "Next: add": {
+    "zh": "下一步：添加",
+    "ms": "Seterusnya: tambah"
+  },
+  "Next:": {
+    "zh": "下一步：",
+    "ms": "Seterusnya:"
+  },
+  "(selected)": {
+    "zh": "（已选择）",
+    "ms": "(dipilih)"
+  },
+  "(select any)": {
+    "zh": "（可多选）",
+    "ms": "(pilih mana-mana)"
+  },
+  "Your plan matches these preferences. Review the outline below, then save.": {
+    "zh": "计划与当前偏好一致，请查看以下安排并保存。",
+    "ms": "Pelan sepadan dengan keutamaan ini. Semak rangka di bawah, kemudian simpan."
+  },
+  "Your budget and learning-format choices will stay as selected.": {
+    "zh": "预算和学习形式将保持你的选择。",
+    "ms": "Bajet dan format pembelajaran anda kekal mengikut pilihan."
+  },
+  "Review your generated plan, then start learning. Your completed activities will be kept.": {
+    "zh": "查看生成的计划后即可开始学习，已完成的活动将保留。",
+    "ms": "Semak pelan yang dijana, kemudian mula belajar. Aktiviti yang telah selesai akan dikekalkan."
+  },
+  "Please enter your name.": {
+    "zh": "请输入姓名。",
+    "ms": "Sila masukkan nama anda."
+  },
+  "Highest readiness first": {
+    "zh": "准备程度由高到低",
+    "ms": "Kesediaan tertinggi dahulu"
+  },
+  "Lowest readiness first": {
+    "zh": "准备程度由低到高",
+    "ms": "Kesediaan terendah dahulu"
+  },
+  "Add people before planning.": {
+    "zh": "请先添加人员，再制定计划。",
+    "ms": "Tambah ahli sebelum merancang."
+  },
+  "Complete your profile to see related skill analysis.": {
+    "zh": "完善个人资料以查看相关技能分析。",
+    "ms": "Lengkapkan profil untuk melihat analisis kemahiran berkaitan."
+  },
+  "Set up departments or academic programmes and assessment skills before adding people.": {
+    "zh": "添加人员前，请先设置部门或学术专业及评估技能。",
+    "ms": "Tetapkan jabatan atau program akademik dan kemahiran penilaian sebelum menambah ahli."
+  },
+  "Chart where you stand.": {
+    "zh": "了解你的起点。",
+    "ms": "Kenali kedudukan anda."
+  },
+  "Keep your compass": {
+    "zh": "让你的指南",
+    "ms": "Pastikan panduan anda"
+  },
+  "up to date.": {
+    "zh": "紧跟时代。",
+    "ms": "sentiasa terkini."
+  },
+  "Importance ratings describe occupational requirements, not hiring demand.": {
+    "zh": "重要性评分描述职业要求，而非招聘需求。",
+    "ms": "Penarafan kepentingan menerangkan keperluan pekerjaan, bukan permintaan pengambilan pekerja."
+  },
+  "For example: Chemical Engineer": {
+    "zh": "例如：化学工程师",
+    "ms": "Contohnya: Jurutera Kimia"
+  },
+  "For example: marine conservation": {
+    "zh": "例如：海洋保护",
+    "ms": "Contohnya: pemuliharaan marin"
+  },
+  "For example: pharmacy assistant": {
+    "zh": "例如：药房助理",
+    "ms": "Contohnya: pembantu farmasi"
+  },
+  "Your compass has no bearing yet.": {
+    "zh": "你的职业指南尚未设定方向。",
+    "ms": "Panduan kerjaya anda belum mempunyai hala tuju."
+  },
+  "Faraway tunes its compass differently for one person charting a career and for an organisation charting many.": {
+    "zh": "Faraway 为个人职业规划与组织人才规划提供不同的支持。",
+    "ms": "Faraway menyediakan panduan berbeza untuk perancangan kerjaya individu dan perancangan tenaga kerja organisasi."
+  },
+  "Use Back to edit your skill ratings; this summary is read-only.": {
+    "zh": "此总结仅供查看，需修改技能评分时请点击返回。",
+    "ms": "Gunakan Kembali untuk menyunting penilaian kemahiran; ringkasan ini hanya untuk bacaan."
+  },
+  "name": {
+    "zh": "姓名",
+    "ms": "nama"
+  },
+  "email": {
+    "zh": "邮箱",
+    "ms": "e-mel"
+  },
+  "location": {
+    "zh": "所在地",
+    "ms": "lokasi"
+  },
+  "Choose the language that feels like home.": {
+    "zh": "用熟悉的语言，看见更远的未来。",
+    "ms": "Teroka masa depan dalam bahasa pilihan anda."
+  },
+  "Deploy the updated AI function to generate explanations and study plans in your selected language.": {
+    "zh": "请先部署已更新的 AI 函数，即可用所选语言生成说明和学习计划。",
+    "ms": "Sila gunakan fungsi AI yang dikemas kini untuk menjana penjelasan dan pelan pembelajaran dalam bahasa pilihan anda."
+  },
+  "Imagine putting {expertise} to work where it matters. Choose one challenge in your community, create a practical solution and listen to the people whose lives it could improve.": {
+    "zh": "让{expertise}成为改变的起点。从社区里一个真实的难题出发，尝试可行的方案，倾听每一位可能因此受益的人。",
+    "ms": "Jadikan {expertise} titik mula perubahan yang bermakna. Pilih satu cabaran sebenar dalam komuniti, usahakan penyelesaian praktikal dan dengar suara mereka yang bakal menerima manfaat."
+  },
+  "Strengthen {skills} with guided practice and the linked learning resource. Complete the activities, apply what you learn, then reassess your progress.": {
+    "zh": "结合引导练习与所附学习资源，逐步提升{skills}。完成活动后，把所学用于实践，再重新评估自己的进步。",
+    "ms": "Tingkatkan {skills} melalui latihan berpandu dan sumber pembelajaran yang dipautkan. Lengkapkan aktiviti, gunakan apa yang dipelajari dan nilai semula kemajuan anda."
+  },
+  "Loading your language…": {
+    "zh": "正在铺展你的语言旅程…",
+    "ms": "Menyediakan pengalaman dalam bahasa anda…"
+  },
+  "Core concepts": {
+    "zh": "核心概念",
+    "ms": "Konsep teras"
+  },
+  "Guided practice exercises": {
+    "zh": "引导练习",
+    "ms": "Latihan berpandu"
+  },
+  "Mini project applying the skill": {
+    "zh": "技能应用小项目",
+    "ms": "Projek mini menggunakan kemahiran"
+  },
+  "Self-assessment and reflection": {
+    "zh": "自我评估与反思",
+    "ms": "Penilaian kendiri dan refleksi"
+  },
+  "Your language changed while AI was working. Generate again in the selected language.": {
+    "zh": "AI 生成期间，你切换了语言。请按当前所选语言重新生成。",
+    "ms": "Bahasa telah ditukar semasa AI sedang menjana. Sila jana semula dalam bahasa yang dipilih."
+  },
+  "Skill preparation does not confer a professional licence or qualification. Check local entry requirements.": {
+    "zh": "技能学习并不等同于取得专业执照或资格，请另行确认当地的入行要求。",
+    "ms": "Pembelajaran kemahiran tidak memberikan lesen atau kelayakan profesional. Sila semak syarat kemasukan tempatan."
+  },
+  "Related interests first · match = 60% scenario readiness + 20% interest + 10% experience + 10% market outlook": {
+    "zh": "优先推荐相关兴趣领域 · 匹配分数 = 60% 情景技能准备程度 + 20% 职业兴趣 + 10% 工作经验 + 10% 就业前景",
+    "ms": "Utamakan bidang minat berkaitan · skor padanan = 60% kesediaan kemahiran senario + 20% minat + 10% pengalaman + 10% prospek pasaran"
+  },
+  "60% scenario skill readiness (": {
+    "zh": "60% 情景技能准备程度（",
+    "ms": "60% kesediaan kemahiran senario ("
+  },
+  "%) + 20% interest + 10% experience + 10% employment outlook. Product weights are planning choices, not validated predictions.": {
+    "zh": "%）+ 20% 职业兴趣 + 10% 工作经验 + 10% 就业前景。这些权重属于规划规则，并非经过验证的预测系数。",
+    "ms": "%) + 20% minat + 10% pengalaman + 10% prospek pekerjaan. Wajaran ini ialah pilihan perancangan, bukan pekali ramalan yang telah disahkan."
+  },
+  "N/A means unassessed or an unused axis, not zero. Only assessed points are drawn.": {
+    "zh": "N/A 表示尚未评估或该维度未使用，不代表零分。图中只绘制已评估的技能。",
+    "ms": "N/A bermaksud belum dinilai atau paksi tidak digunakan, bukan sifar. Hanya kemahiran yang telah dinilai dipaparkan."
+  },
+  "Choose current requirements, or a what-if AI development scenario. This changes the target skill gaps used for this plan.": {
+    "zh": "选择当前职业要求，或一种假设性的 AI 发展情景。不同选择会调整这份计划所针对的技能差距。",
+    "ms": "Pilih keperluan semasa atau senario andaian perkembangan AI. Pilihan ini mengubah jurang kemahiran sasaran bagi pelan ini."
+  },
+  "New publications can change outlook rankings; an unchanged source correctly leaves the figures unchanged.": {
+    "zh": "新发布的资料可能改变职业前景排名；若来源没有更新，图表数值也应保持一致。",
+    "ms": "Penerbitan baharu boleh mengubah kedudukan prospek; jika sumber tidak berubah, angka juga kekal sama."
+  },
+  "Develop quantitative techniques to inform securities investing, equities investing, pricing, or valuation of financial instruments. Develop mathematical or statistical models for risk management, asset optimization, pricing, or relative value analysis.": {
+    "zh": "开发量化方法，为证券与股票投资、定价及金融工具估值提供依据。建立数学或统计模型，用于风险管理、资产优化、定价或相对价值分析。",
+    "ms": "Membangunkan kaedah kuantitatif untuk menyokong pelaburan sekuriti dan ekuiti, penetapan harga atau penilaian instrumen kewangan. Membina model matematik atau statistik bagi pengurusan risiko, pengoptimuman aset, penetapan harga atau analisis nilai relatif."
+  },
+  "Coordinate or design programs and conduct outreach to promote the religious education or activities of a denominational group. May provide counseling, guidance, and leadership relative to marital, health, financial, and religious problems.": {
+    "zh": "协调或设计项目，并开展推广工作，促进宗教团体的教育与活动。也可能就婚姻、健康、财务及宗教相关问题提供辅导、指引与组织支持。",
+    "ms": "Menyelaras atau mereka bentuk program serta menjalankan aktiviti jangkauan untuk menyokong pendidikan atau kegiatan sesebuah kumpulan agama. Turut boleh memberikan kaunseling, bimbingan dan kepimpinan berkaitan masalah perkahwinan, kesihatan, kewangan dan agama."
+  },
+  "Helpers--Carpenters": {
+    "zh": "木工助手",
+    "ms": "Pembantu tukang kayu"
+  },
+  "Helpers--Electricians": {
+    "zh": "电工助手",
+    "ms": "Pembantu juruelektrik"
+  },
+  "Helpers--Roofers": {
+    "zh": "屋面工助手",
+    "ms": "Pembantu pekerja bumbung"
+  },
+  "/5 practice target": {
+    "zh": "/5 练习目标",
+    "ms": "/5 sasaran latihan"
+  },
+  "/5. Practise on a work sample, then reassess.": {
+    "zh": "/5。先完成一个实际工作练习，再重新评估。",
+    "ms": "/5. Berlatih menggunakan contoh tugasan kerja, kemudian nilai semula."
+  },
+  "/5; target": {
+    "zh": "/5；目标",
+    "ms": "/5; sasaran"
+  },
+  "Orientation:": {
+    "zh": "规划方向：",
+    "ms": "Hala tuju:"
+  },
+  "Welcome,": {
+    "zh": "欢迎，",
+    "ms": "Selamat datang,"
+  },
+  "at": {
+    "zh": "按",
+    "ms": "pada"
+  },
+  "for": {
+    "zh": "适用于",
+    "ms": "untuk"
+  },
+  "fundamentals": {
+    "zh": "基础",
+    "ms": "asas"
+  },
+  "hours/week": {
+    "zh": "小时/周",
+    "ms": "jam/minggu"
+  },
+  "level": {
+    "zh": "等级",
+    "ms": "tahap"
+  },
+  "occupations": {
+    "zh": "个职业",
+    "ms": "pekerjaan"
+  },
+  "participants": {
+    "zh": "位参与者",
+    "ms": "peserta"
+  },
+  "roles": {
+    "zh": "个职业",
+    "ms": "peranan"
+  },
+  "to": {
+    "zh": "至",
+    "ms": "hingga"
+  },
+  "yrs": {
+    "zh": "年",
+    "ms": "tahun"
+  },
+  "New department": {
+    "zh": "新部门",
+    "ms": "Jabatan baharu"
+  },
+  "New academic programme": {
+    "zh": "新学术专业",
+    "ms": "Program akademik baharu"
+  },
+  "New team": {
+    "zh": "新团队",
+    "ms": "Pasukan baharu"
+  },
+  "New cohort / class": {
+    "zh": "新年级 / 班级",
+    "ms": "Kohort / kelas baharu"
+  }
+}

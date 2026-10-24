@@ -1,6 +1,17 @@
 # Faraway
 ### Where Possibilities Take You
 
+## Current Replit source package
+
+The complete current Replit website source is preserved in
+[`Faraway-Replit/`](Faraway-Replit/README.md), including the frontend, backend,
+assets, Supabase sources, pnpm lockfile, environment example, and local setup
+instructions. See that directory's README to install and run this snapshot.
+
+The existing `Faraway/` application, workflows, submission materials, and hosting
+configuration below are retained unchanged. This source upload does not change
+or republish the existing hosted website.
+
 A career and education compass for exploring skills, comparing possible AI futures, and turning career goals into practical learning plans.
 
 **[Open Faraway](https://faraway-practice-faraway.vercel.app)**

@@ -1,0 +1,4 @@
+[functions.faraway-recommendations]
+# The function verifies every Bearer token through Supabase Auth /user itself.
+# This supports modern Supabase signing keys as well as legacy JWTs.
+verify_jwt = false

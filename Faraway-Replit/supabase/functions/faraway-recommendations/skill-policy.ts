@@ -1,0 +1,8 @@
+// Exact aliases only: generic programming must never imply C++ proficiency.
+const aliases:Record<string,string>={cpp:'c++',cplusplus:'c++','c plus plus':'c++','structured query language':'sql','cloud computing':'cloud','amazon web services':'aws','data visualization':'data visualisation','git and devops':'git & devops'};
+export const skillKey=(s:string)=>{const key=s.trim().toLowerCase().replace(/\s+/g,' ');return aliases[key]??key;};
+const soft=new Set(['communication','active listening','speaking','writing','reading comprehension','critical thinking','problem solving','complex problem solving','judgment and decision making','social perceptiveness','coordination','persuasion','negotiation','instructing','learning strategies','active learning','service orientation','time management','management of personnel resources','monitoring','stakeholder management','leadership','teamwork']);
+export const isHardSkill=(s:string)=>!soft.has(skillKey(s));
+export function skillRating(ratings:Record<string,number>,skill:string):number|undefined {const key=skillKey(skill);const entries=Object.entries(ratings).filter(([s])=>skillKey(s)===key);return entries.length?Math.max(...entries.map(([,v])=>v)):undefined;}
+export function hardRequirements(required:Record<string,number>){const hard=Object.fromEntries(Object.entries(required).filter(([s])=>isHardSkill(s)));return Object.keys(hard).length?hard:required;}
+export function focusRole<T extends {required:Record<string,number>}>(role:T):T{const required=hardRequirements(role.required);const existing=(role as T & {futureSkills?:string[]}).futureSkills?.filter(s=>s in required);return {...role,required,futureSkills:existing?.length?existing:Object.keys(required).slice(0,2)};}

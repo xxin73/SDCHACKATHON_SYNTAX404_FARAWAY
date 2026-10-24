@@ -1,0 +1,4 @@
+import type {JobTrend,Scenario} from '@/data/careers';
+export function averageJobSeries(first:JobTrend[],second:JobTrend[],scenario:Scenario){return first.flatMap(a=>{const b=second.find(b=>b.role===a.role);if(!b||a.history.length<2||b.history.length<2)return [];return [{role:a.role,previous:(a.history.at(-2)!+b.history.at(-2)!)/2,current:(a.history.at(-1)!+b.history.at(-1)!)/2,future:(a[scenario]+b[scenario])/2}];});}
+export const roleSeriesSkills:Record<string,string[]>={'Cloud Engineer':['Cloud Computing','Git & DevOps','AI Tools'],'Cyber Analyst':['Cybersecurity'],'ML Engineer':['Machine Learning','Python','Statistics'],'Data Analyst':['SQL','Excel','Statistics','Data Visualisation'],'Accountant':['Accounting','Excel','Financial Modelling'],'Data Entry Clerk':['Excel','Data Entry']};
+export const seriesRelevant=(role:string,skills?:string[])=>!skills||!!roleSeriesSkills[role]?.some(s=>skills.some(k=>k.toLowerCase()===s.toLowerCase()));

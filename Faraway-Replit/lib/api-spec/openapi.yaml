@@ -1,0 +1,247 @@
+openapi: 3.1.0
+info:
+  # Do not change the title, if the title changes, the import paths will be broken
+  title: Api
+  version: 0.1.0
+  description: API specification
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: ai
+    description: Faraway AI features
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      description: Returns server health status
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+  /ai/parse-cv:
+    post:
+      operationId: parseCv
+      tags: [ai]
+      summary: Scan a CV and extract profile fields
+      description: Accepts a CV as base64 file content (PDF, DOCX or TXT) or as raw text. AI extracts personal info, education, experience and skills (rated 1-5) to auto-fill the profile.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CvInput"
+      responses:
+        "200":
+          description: Parsed CV
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ParsedCv"
+        "400":
+          description: Bad input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /ai/career-insight:
+    post:
+      operationId: getCareerInsight
+      tags: [ai]
+      summary: AI explanation of a career under an AI adoption scenario
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CareerInsightInput"
+      responses:
+        "200":
+          description: Insight
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CareerInsight"
+  /ai/study-plan:
+    post:
+      operationId: generateStudyPlan
+      tags: [ai]
+      summary: AI-generated study plan for selected skills
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StudyPlanInput"
+      responses:
+        "200":
+          description: Study plan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StudyPlan"
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status
+    ErrorResponse:
+      type: object
+      properties:
+        error: { type: string }
+      required: [error]
+    CvInput:
+      type: object
+      properties:
+        fileName: { type: string }
+        mimeType: { type: string }
+        contentBase64:
+          type: string
+          description: Base64 file content (PDF, DOCX or plain text), max ~8MB
+        text:
+          type: string
+          description: Raw CV text, used when no file is given
+        knownSkills:
+          type: array
+          items: { type: string }
+          description: Skill vocabulary to map onto where possible
+    EducationEntry:
+      type: object
+      properties:
+        field: { type: string }
+        institution: { type: string }
+        year: { type: string }
+      required: [field, institution, year]
+    RoleEntry:
+      type: object
+      properties:
+        title: { type: string }
+        company: { type: string }
+        years: { type: number }
+      required: [title, company, years]
+    SkillRating:
+      type: object
+      properties:
+        name: { type: string }
+        level: { type: integer, minimum: 1, maximum: 5 }
+        evidence: { type: string }
+      required: [name, level]
+    ParsedCv:
+      type: object
+      properties:
+        name: { type: string }
+        email: { type: string }
+        location: { type: string }
+        summary: { type: string }
+        highest:
+          type: string
+          enum: [SPM, Diploma, Degree, Masters, PhD]
+        years: { type: number, description: Total years of work experience }
+        roles:
+          type: array
+          items: { $ref: "#/components/schemas/RoleEntry" }
+        ug: { $ref: "#/components/schemas/EducationEntry" }
+        pg: { $ref: "#/components/schemas/EducationEntry" }
+        phd: { $ref: "#/components/schemas/EducationEntry" }
+        skills:
+          type: array
+          items: { $ref: "#/components/schemas/SkillRating" }
+        suggestedStream:
+          type: string
+          enum: [cs, finance, business, design]
+        missing:
+          type: array
+          items: { type: string }
+          description: Profile fields the CV did not cover
+      required: [name, email, location, summary, highest, years, roles, ug, pg, phd, skills, suggestedStream, missing]
+    SkillGap:
+      type: object
+      properties:
+        skill: { type: string }
+        have: { type: integer }
+        need: { type: integer }
+      required: [skill, have, need]
+    CareerInsightInput:
+      type: object
+      properties:
+        careerTitle: { type: string }
+        scenario:
+          type: string
+          enum: [moderate, fast]
+        matchScore: { type: number }
+        skills:
+          type: object
+          additionalProperties: { type: integer }
+        gaps:
+          type: array
+          items: { $ref: "#/components/schemas/SkillGap" }
+        sdgs:
+          type: array
+          items: { type: string }
+      required: [careerTitle, scenario, skills, gaps]
+    CareerInsight:
+      type: object
+      properties:
+        headline: { type: string }
+        scenarioExplanation: { type: string }
+        fitSummary: { type: string }
+        sdgImpact: { type: string }
+        actions:
+          type: array
+          items: { type: string }
+      required: [headline, scenarioExplanation, fitSummary, sdgImpact, actions]
+    StudyPlanInput:
+      type: object
+      properties:
+        targetJob: { type: string }
+        scenario:
+          type: string
+          enum: [moderate, fast]
+        minutesPerDay: { type: integer }
+        setting:
+          type: string
+          enum: [indoor, outdoor, either]
+        cost:
+          type: string
+          enum: [free, low, hrdc, any]
+        skills:
+          type: array
+          items: { $ref: "#/components/schemas/SkillGap" }
+      required: [targetJob, scenario, minutesPerDay, skills]
+    StudyStep:
+      type: object
+      properties:
+        title: { type: string }
+        hours: { type: number }
+      required: [title, hours]
+    StudyModule:
+      type: object
+      properties:
+        skill: { type: string }
+        weeks: { type: number }
+        why: { type: string }
+        steps:
+          type: array
+          items: { $ref: "#/components/schemas/StudyStep" }
+        resource: { type: string }
+      required: [skill, weeks, why, steps, resource]
+    StudyPlan:
+      type: object
+      properties:
+        overview: { type: string }
+        totalWeeks: { type: number }
+        modules:
+          type: array
+          items: { $ref: "#/components/schemas/StudyModule" }
+      required: [overview, totalWeeks, modules]

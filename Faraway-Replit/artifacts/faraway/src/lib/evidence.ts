@@ -1,0 +1,9 @@
+import { CAREERS } from '@/data/careers';
+import { parseCsv } from './org-model';
+export interface EvidenceRow{careerId:string;count:number;sourceUrl:string;observedAt:string}
+export interface Evidence{label:string;loadedAt:string;rows:EvidenceRow[]}
+const KEY='faraway_market_evidence_v1';
+export function loadEvidence():Evidence|null{try{return JSON.parse(localStorage.getItem(KEY)||'null');}catch{return null;}}
+export function saveEvidence(e:Evidence|null){if(e)localStorage.setItem(KEY,JSON.stringify(e));else localStorage.removeItem(KEY);}
+export function demandFromEvidence(id:string,fallback:number){const e=loadEvidence();if(!e)return fallback;const row=e.rows.find(r=>r.careerId===id);if(!row)return fallback;const max=Math.max(...e.rows.map(r=>r.count),1);return Math.round(row.count/max*100);}
+export function parseEvidence(text:string):EvidenceRow[]{const rows=parseCsv(text);const h=rows.shift()?.map(x=>x.trim().toLowerCase())??[];for(const key of ['career_id','postings','source_url','observed_at'])if(!h.includes(key))throw new Error('Missing column: '+key);const ids=new Set<string>();if(rows.length<2)throw new Error('Add at least two career rows for a comparison.');return rows.map((r,i)=>{const get=(k:string)=>r[h.indexOf(k)]?.trim()??'';const careerId=get('career_id');if(!CAREERS.some(c=>c.id===careerId)||ids.has(careerId))throw new Error(`Row ${i+2}: unknown or repeated career ID.`);ids.add(careerId);const count=Number(get('postings'));if(!get('postings')||!Number.isInteger(count)||count<0)throw new Error(`Row ${i+2}: postings must be a nonnegative whole number.`);const url=new URL(get('source_url'));if(url.protocol!=='https:')throw new Error('Use an HTTPS source URL.');const observedAt=get('observed_at');if(!/^\d{4}-\d{2}-\d{2}$/.test(observedAt)||Number.isNaN(Date.parse(observedAt)))throw new Error(`Row ${i+2}: use YYYY-MM-DD for the observation date.`);return{careerId,count,sourceUrl:url.href,observedAt};});}
