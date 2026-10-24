@@ -7,6 +7,42 @@ A career and education compass for exploring skills, comparing possible AI futur
 
 Faraway brings individual learners, HR teams, and universities/TVET institutions into one platform. It combines explainable skill matching, dated public labour-market evidence, and AI-assisted explanations and learning plans.
 
+## Hackathon submission
+
+### Team information
+
+| Field | Details |
+| --- | --- |
+| **Team Name** | **TO COMPLETE — official registered team name** |
+| **Team Domain** | **Domain 1** — career and education planning in an AI-changing job market |
+| **SDG Track (1–17)** | **TO CONFIRM — official registered SDG track**. Project contributions include SDG 4 (Quality Education), SDG 8 (Decent Work and Economic Growth), and SDG 9 (Industry, Innovation and Infrastructure). |
+| **Team Leader** | **TO COMPLETE — registered team leader** |
+| **University** | Xiamen University Malaysia (XMUM); confirm any additional team universities |
+| **Number of Members** | **TO COMPLETE — registered member count** |
+
+### Submission links
+
+| Resource | Link |
+| --- | --- |
+| **GitHub Repository** | [xxin73/faraway-practice](https://github.com/xxin73/faraway-practice) |
+| **Replit Project** | **TO COMPLETE — shareable Replit project URL** |
+| **Live Demo** | [Open Faraway](https://faraway-practice-faraway.vercel.app) |
+| **RunPod Endpoint** | **TO COMPLETE — verified endpoint URL, without an API key** |
+| **Slide Deck** | **TO COMPLETE — viewable pitching slide deck URL** |
+| **Pitching / Demo Video** | **TO COMPLETE — viewable pitching video URL** |
+
+**Before submission:** replace every **TO COMPLETE / TO CONFIRM** entry and check that judges can access the repository, project, slides, and video using the required sharing permissions. Do not include API keys, passwords, or access tokens. The RunPod endpoint requires authorised server-side access; use the live demo to test the integrated AI flow.
+
+## Overview
+
+### Problem
+
+Learners and organisations face changing skill requirements, fragmented labour-market information, and uncertainty about AI's impact on careers. A career list alone does not explain which skills to develop or how to turn a gap into a realistic learning plan.
+
+### Solution
+
+Faraway connects assessed skills to related career options, makes AI scenario assumptions visible, cites public evidence, and supports actionable learning plans and progress tracking. HR departments and university programmes use their own names, assessment skills, and participants' ratings to contextualise career suggestions and trend charts.
+
 ## Who it is for
 
 | Workspace | Main journey |
