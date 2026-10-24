@@ -24,7 +24,10 @@ export function industryRoles(org:OrganizationData,department='all'):Career[]{
    const explicit=members.some(m=>(m.target||roleForPosition(m.position)?.id)===role.id);
    // Recognised unit names define the candidate field; specific skill overlap
    // narrows unknown unit names without letting common skills match every job.
-   const eligible=titleMatch||streamMatch||explicit||(!streams.length&&overlap>=2);
+   const hasSpecific=specific.length>0;
+   const educationRole=/teacher|instructor|professor|postsecondary/i.test(role.title);
+   const educationUnit=/educat|teach|training/i.test(name);
+   const eligible=explicit||((!educationRole||educationUnit)&&(hasSpecific?(overlap>=2&&(titleMatch||streamMatch||!streams.length)):(titleMatch||streamMatch)));
    if(eligible)scored.set(role.id,Math.max(scored.get(role.id)??0,(titleMatch?8:0)+(streamMatch?4:0)+(explicit?6:0)+overlap*3));
   }
  }
