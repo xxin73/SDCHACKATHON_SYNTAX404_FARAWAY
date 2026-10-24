@@ -13,12 +13,12 @@ Faraway brings individual learners, HR teams, and universities/TVET institutions
 
 | Field | Details |
 | --- | --- |
-| **Team Name** | **TO COMPLETE — official registered team name** |
-| **Team Domain** | **Domain 1** — career and education planning in an AI-changing job market |
+| **Team Name** | Syntax 404 |
+| **Team Domain** | **Domain 1: The Aiversecurity Future-ready Workforce Domain** |
 | **SDG Track (1–17)** | **TO CONFIRM — official registered SDG track**. Project contributions include SDG 4 (Quality Education), SDG 8 (Decent Work and Economic Growth), and SDG 9 (Industry, Innovation and Infrastructure). |
-| **Team Leader** | **TO COMPLETE — registered team leader** |
-| **University** | Xiamen University Malaysia (XMUM); confirm any additional team universities |
-| **Number of Members** | **TO COMPLETE — registered member count** |
+| **Team Leader** | Low Xin Hui |
+| **University** | Xiamen University Malaysia (XMUM) |
+| **Number of Members** | 4 |
 
 ### Submission links
 
